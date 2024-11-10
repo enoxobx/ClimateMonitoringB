@@ -13,7 +13,7 @@ public class Server extends Thread{
             // Crea l'oggetto DatabaseImpl (Skeleton)
             DatabaseImpl db = new DatabaseImpl();
             // Registra l'oggetto nell'RMI
-            Registry registry = LocateRegistry.createRegistry(1099);
+            Registry registry = LocateRegistry.createRegistry(5432);
             registry.rebind("DatabaseImpl",db);
 
             System.out.println("db è pronto");
