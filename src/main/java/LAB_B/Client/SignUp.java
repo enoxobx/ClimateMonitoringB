@@ -23,7 +23,7 @@ public class SignUp extends LayoutStandard {
         super();
 
         // Impostazioni finestra
-        setSize(500, 400);
+        setSize(500, 400);// sistema
         setLayout(new BorderLayout());
         JLabel bio = new JLabel("Registra nuovo Operatore");
         bio.setHorizontalAlignment(JLabel.CENTER);
