@@ -75,7 +75,4 @@ public class Home extends JFrame {
             finestraOperatore.setVisible(true);
             dispose();
         }
-    }
-
-
-}
+    }}

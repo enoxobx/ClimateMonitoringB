@@ -3,7 +3,8 @@ package LAB_B.Client;
 import LAB_B.Common.*;
 import javax.swing.*;
 import java.awt.*;
-import java.sql.*;
+import java.util.regex.Pattern;
+//import java.sql.*; // Import per database disabilitato temporaneamente
 
 public class SignUp extends LayoutStandard {
 
@@ -14,23 +15,20 @@ public class SignUp extends LayoutStandard {
     private JPasswordField password = new JPasswordField(15);
     private JTextField centro = new JTextField(15);
 
-    private String res = ""; // Per memorizzare i dati raccolti
-    private String err = ""; // Per memorizzare gli errori
-
-    private Connection conn; // Connessione al database
+    private StringBuilder res = new StringBuilder();
+    private StringBuilder err = new StringBuilder();
 
     public SignUp() {
         super();
 
-        // Impostazioni finestra
-        setSize(500, 400);// sistema
+        setSize(500, 400);
         setLayout(new BorderLayout());
+
         JLabel bio = new JLabel("Registra nuovo Operatore");
         bio.setHorizontalAlignment(JLabel.CENTER);
         bio.setFont(new Font("Courier", Font.BOLD, 20));
         add(bio, BorderLayout.NORTH);
 
-        // Aggiunta del menu "Info"
         JMenuBar mb = new JMenuBar();
         JMenu menu = new JMenu("Info");
         JMenuItem i1 = new JMenuItem("Come compilare");
@@ -42,59 +40,26 @@ public class SignUp extends LayoutStandard {
         mb.add(menu);
         setJMenuBar(mb);
 
-        // Pannello principale con padding
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Pannello centrale per i campi di input
         JPanel inputPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 5, 5, 5); // Spaziatura tra i campi
+        gbc.insets = new Insets(5, 5, 5, 5);
 
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        inputPanel.add(new JLabel("Nome:"), gbc);
-        gbc.gridx = 1;
-        inputPanel.add(nome, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-        inputPanel.add(new JLabel("Cognome:"), gbc);
-        gbc.gridx = 1;
-        inputPanel.add(cognome, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-        inputPanel.add(new JLabel("Codice Fiscale:"), gbc);
-        gbc.gridx = 1;
-        inputPanel.add(codFiscale, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-        inputPanel.add(new JLabel("Email:"), gbc);
-        gbc.gridx = 1;
-        inputPanel.add(email, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-        inputPanel.add(new JLabel("Password:"), gbc);
-        gbc.gridx = 1;
-        inputPanel.add(password, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-        inputPanel.add(new JLabel("Centro Monitoraggio:"), gbc);
-        gbc.gridx = 1;
-        inputPanel.add(centro, gbc);
+        // Aggiungi i campi in righe separate
+        addField(inputPanel, gbc, "Nome:", nome);
+        addField(inputPanel, gbc, "Cognome:", cognome);
+        addField(inputPanel, gbc, "Codice Fiscale:", codFiscale);
+        addField(inputPanel, gbc, "Email:", email);
+        addField(inputPanel, gbc, "Password:", password);
+        addField(inputPanel, gbc, "Centro Monitoraggio:", centro);
 
         mainPanel.add(inputPanel, BorderLayout.CENTER);
         add(mainPanel, BorderLayout.CENTER);
 
-        // Pannello per i bottoni
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 10));
-
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         JButton butSalva = new JButton("Salva");
         butSalva.addActionListener(e -> salvaOperatore());
 
@@ -109,104 +74,66 @@ public class SignUp extends LayoutStandard {
         add(buttonPanel, BorderLayout.SOUTH);
 
         setVisible(true);
+    }
 
-        // Connessione al database
-        try {
-            conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/operatori_db", "tuo_utente", "tua_password");
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Errore di connessione al database", "Errore", JOptionPane.ERROR_MESSAGE);
-        }
+    private void addField(JPanel panel, GridBagConstraints gbc, String label, JTextField field) {
+        // Aggiungi l'etichetta
+        gbc.gridx = 0;
+        gbc.gridy++;  // Incrementa la riga per ogni nuovo campo
+        panel.add(new JLabel(label), gbc);
+
+        // Aggiungi il campo di input
+        gbc.gridx = 1;
+        panel.add(field, gbc);
     }
 
     private void salvaOperatore() {
-        if (regOperatore()) {
-            try {
-                String sql = "INSERT INTO operatori (nome, cognome, codice_fiscale, email, password, centro_monitoraggio) VALUES (?, ?, ?, ?, ?, ?)";
-                try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                    stmt.setString(1, nome.getText().toUpperCase());
-                    stmt.setString(2, cognome.getText().toUpperCase());
-                    stmt.setString(3, codFiscale.getText().toUpperCase());
-                    stmt.setString(4, email.getText().toUpperCase());
-                    stmt.setString(5, new String(password.getPassword()));
-                    stmt.setString(6, centro.getText().toUpperCase());
-
-                    int rowsAffected = stmt.executeUpdate();
-                    if (rowsAffected > 0) {
-                        JOptionPane.showMessageDialog(this, "Operatore registrato correttamente!", "Successo", JOptionPane.INFORMATION_MESSAGE);
-                        dispose();
-                        new Login().setVisible(true);
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Errore durante la registrazione!", "Errore", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Errore di connessione al database", "Errore", JOptionPane.ERROR_MESSAGE);
-            }
+        if (validateInputs()) {
+            JOptionPane.showMessageDialog(this, "Registrazione simulata: \n" + res, "Successo", JOptionPane.INFORMATION_MESSAGE);
         } else {
-            JOptionPane.showMessageDialog(this, err, "Errore", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, err.toString(), "Errore", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private boolean validateEmail(String email) {
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$";
-        return email.matches(emailRegex);
+    private boolean validateInputs() {
+        res.setLength(0);
+        err.setLength(0);
+
+        validateField(nome.getText(), "Il nome non è stato inserito.", 30);
+        validateField(cognome.getText(), "Il cognome non è stato inserito.", 30);
+        validateField(codFiscale.getText(), "Il codice fiscale deve avere 16 caratteri.", 16);
+        validateEmail(email.getText());
+        validatePassword(new String(password.getPassword()));
+        validateField(centro.getText(), "Il centro di monitoraggio non è stato inserito.", 50);
+
+        return err.length() == 0;
     }
 
-    private boolean isPasswordValid(String password) {
+    private void validateField(String value, String errorMessage, int maxLength) {
+        if (value.isEmpty() || value.length() > maxLength) {
+            err.append(errorMessage).append("\n");
+        } else {
+            res.append(value.toUpperCase()).append(";");
+        }
+    }
+
+    private void validateEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+        if (!Pattern.matches(emailRegex, email)) {
+            err.append("L'email non è valida.\n");
+        } else {
+            res.append(email.toUpperCase()).append(";");
+        }
+    }
+
+    private void validatePassword(String password) {
         if (password.isEmpty() || password.length() < 8) {
-            return false;
-        }
-
-        boolean hasUppercase = !password.equals(password.toLowerCase());
-        boolean hasLowercase = !password.equals(password.toUpperCase());
-        boolean hasDigit = password.matches(".*\\d.*");
-        boolean hasSpecial = password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\",.<>/?].*");
-
-        return hasUppercase && hasLowercase && hasDigit && hasSpecial;
-    }
-
-    private boolean regOperatore() {
-        res = "";
-        err = "";
-
-        if (nome.getText().isEmpty()) {
-            err += "Il nome non è stato inserito.\n";
+            err.append("La password deve avere almeno 8 caratteri.\n");
+        } else if (!password.matches(".*[A-Z].*") || !password.matches(".*[a-z].*") ||
+                !password.matches(".*\\d.*") || !password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\",.<>/?].*")) {
+            err.append("La password non è valida.\n");
         } else {
-            res += nome.getText().toUpperCase() + ";";
+            res.append(password).append(";");
         }
-
-        if (cognome.getText().isEmpty()) {
-            err += "Il cognome non è stato inserito.\n";
-        } else {
-            res += cognome.getText().toUpperCase() + ";";
-        }
-
-        if (codFiscale.getText().isEmpty() || codFiscale.getText().length() != 16) {
-            err += "Il codice fiscale deve avere 16 caratteri.\n";
-        } else {
-            res += codFiscale.getText().toUpperCase() + ";";
-        }
-
-        if (!validateEmail(email.getText())) {
-            err += "L'email non è valida.\n";
-        } else {
-            res += email.getText().toUpperCase() + ";";
-        }
-
-        if (!isPasswordValid(new String(password.getPassword()))) {
-            err += "La password non è valida.\n";
-        } else {
-            res += new String(password.getPassword()) + ";";
-        }
-
-        if (centro.getText().isEmpty()) {
-            err += "Il centro di monitoraggio non è stato inserito.\n";
-        } else {
-            res += centro.getText().toUpperCase() + ";";
-        }
-
-        return err.isEmpty();
     }
 }
