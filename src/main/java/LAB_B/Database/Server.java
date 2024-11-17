@@ -1,29 +1,30 @@
 package LAB_B.Database;
-//Skeleton
-import java.rmi.RemoteException;
+
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.sql.SQLException;
 
-public class Server extends Thread{
-    @Override
-    public void run() {
-        super.run();
+public class Server {
+    public void start() {
         try {
-            // Crea l'oggetto DatabaseImpl (Skeleton)
-            DatabaseImpl db = new DatabaseImpl();
-            // Registra l'oggetto nell'RMI
-            Registry registry = LocateRegistry.createRegistry(5432);
-            registry.rebind("DatabaseImpl",db);
+            // Crea o ottieni il registro RMI
+            Registry registry;
+            try {
+                registry = LocateRegistry.createRegistry(1099);
+                System.out.println("Registro RMI creato.");
+            } catch (Exception e) {
+                registry = LocateRegistry.getRegistry(1099);
+                System.out.println("Registro RMI già esistente, connessione stabilita.");
+            }
 
-            System.out.println("db è pronto");
+            // Creazione dell'oggetto remoto
+            Database db = new DatabaseImpl();
 
-        } catch (RemoteException e) {
-            System.err.println(e.getMessage());
+            // Binding dell'oggetto al registro RMI
+            registry.rebind("DatabaseImpl", db);
+
+            System.out.println("Server avviato. Database disponibile.");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-
     }
-
-
 }

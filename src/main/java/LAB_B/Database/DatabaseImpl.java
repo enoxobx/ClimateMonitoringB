@@ -2,94 +2,94 @@ package LAB_B.Database;
 
 import LAB_B.Common.Operatore;
 
-import javax.xml.crypto.Data;
-import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.*;
 
 public class DatabaseImpl extends UnicastRemoteObject implements Database {
-    private String host = "localhost";
-    private String port = "5433";
-    private String dbName = "ClimateMonitoring";
-    private String user = "postgres";
-    private String psw = "123456789";
-    private Connection c;
+    private Connection conn; // Variabile per la connessione al database
 
-    public DatabaseImpl() throws RemoteException {
+    // Costruttore - Connessione al database PostgreSQL
+    public DatabaseImpl() throws Exception {
         super();
-        String url = "jdbc:postgresql://" + host + ":" + port + "/" + dbName;
-        try {
-            creaCon(url);
-        } catch (ClassNotFoundException | SQLException e) {
-            System.err.println(e.getMessage());
-        }
+        // Configura la connessione al database PostgreSQL con l'URL, il nome utente e la password
+        conn = DriverManager.getConnection(
+                "jdbc:postgresql://localhost:5432/climate_monitoring", // URL del database
+                "postgres", // Nome utente
+                "0000"      // Password
+        );
     }
-
-    private void creaCon(String url) throws ClassNotFoundException, SQLException {
-        try {
-            Class.forName("org.postgresql.Driver");
-            c = DriverManager.getConnection(url, user, psw);
-            System.out.println("Connesione riuscita lato db");
-        } catch (ClassNotFoundException | SQLException e) {
-            System.err.println(e.getMessage());
-        }
-
-    }
-
 
     @Override
     public boolean login(String usr, String psw) {
+        System.out.println("Tentativo di login con username: " + usr);
+        // Query per selezionare la password memorizzata per l'utente specificato
+        String query = "SELECT password FROM operatori WHERE user_id = ?";
 
-        try {
-            // Esecuzione della query
-            String sql = "SELECT UserId,password FROM Operatori WHERE UserId = ? and password = ? ;";
-            PreparedStatement q = c.prepareStatement(sql);
-            q.setString(1, usr);
-            q.setString(2, psw);
-            ResultSet rs = q.executeQuery();
-            while (rs.next()) if (rs.getString("UserId").equals(usr)) return true;
-            // Chiusura delle risorse
-            rs.close();
-            return false;
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, usr); // Imposta il parametro della query con il nome utente fornito
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    // Se l'utente è trovato, recupera la password memorizzata nel database
+                    String storedPassword = rs.getString("password");
+
+                    // Confronta la password fornita con quella memorizzata nel database
+                    return psw.equals(storedPassword); // Restituisce true se le password corrispondono
+                } else {
+                    // Nessun utente trovato con lo username specificato
+                    return false;
+                }
+            }
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
-            return false;
+            e.printStackTrace();
+            return false; // Restituisce false in caso di errore SQL
         }
-
     }
 
     @Override
     public boolean registrazione(Operatore op) {
-        try {
-            String sql = "INSERT INTO operatori (cf,name,surname,userId,mail,password) VALUES ( ?,?,?,?,?,?);";
-            PreparedStatement q = c.prepareStatement(sql);
-            q.setString(1,op.getCf());
-            q.setString(2,op.getName());
-            q.setString(3,op.getSurname());
-            q.setString(4,op.getUserId());
-            q.setString(5,op.getMail());
-            q.setString(6,op.getPassword());
-            int rowAffected = q.executeUpdate();
-            return rowAffected > 0;
-        } catch (SQLException e) {
-            System.err.println(e.getMessage());
-            return false;
-        }
+        System.out.println("Tentativo di registrazione per utente: " + op.getUserId());
 
+        // Verifica se l'utente esiste già nel database
+        String checkQuery = "SELECT * FROM operatori WHERE user_id = ?";
+        try (PreparedStatement stmtCheck = conn.prepareStatement(checkQuery)) {
+            stmtCheck.setString(1, op.getUserId()); // Imposta il parametro della query con il nome utente
 
-    }
-
-    public boolean close() {
-        if (c == null) return true;
-        else {
-            try {
-                c.close();
-                return true;
-            } catch (SQLException e) {
-                System.err.println(e.getMessage());
-                return false;
+            try (ResultSet rsCheck = stmtCheck.executeQuery()) {
+                if (rsCheck.next()) {
+                    // L'utente esiste già nel database
+                    System.out.println("Utente già presente: " + op.getUserId());
+                    return false; // Se l'utente esiste già, restituisce false
+                }
             }
+
+            // Se l'utente non esiste, inserisce i suoi dati nel database
+            String insertQuery = "INSERT INTO operatori (cf, name, surname, user_id, email, password) VALUES (?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement stmtInsert = conn.prepareStatement(insertQuery)) {
+                // Imposta i parametri della query per inserire i dati dell'operatore
+                stmtInsert.setString(1, op.getCf());
+                stmtInsert.setString(2, op.getName());
+                stmtInsert.setString(3, op.getSurname());
+                stmtInsert.setString(4, op.getUserId());
+                stmtInsert.setString(5, op.getMail());
+                stmtInsert.setString(6, op.getPassword()); // Memorizza la password in chiaro (considera di cifrarla)
+
+                // Esegui l'inserimento dei dati nel database
+                int rowsInserted = stmtInsert.executeUpdate();
+                if (rowsInserted > 0) {
+                    // Se l'inserimento è riuscito
+                    System.out.println("Utente registrato con successo: " + op.getUserId());
+                    return true;
+                } else {
+                    // Se non sono state inserite righe nel database
+                    System.out.println("Errore durante la registrazione.");
+                    return false;
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false; // Restituisce false in caso di errore SQL durante la registrazione
         }
     }
-
 }
