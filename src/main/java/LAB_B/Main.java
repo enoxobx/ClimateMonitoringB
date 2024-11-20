@@ -8,30 +8,37 @@ import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {
-        if (args.length > 0) {
-            if (args[0].equalsIgnoreCase("server")) {
-                System.out.println("Avvio del server...");
-                // Avvia il server
-                new Server().start();
-            } else if (args[0].equalsIgnoreCase("client")) {
-                System.out.println("Avvio del client...");
-                // Avvia il client
-                Client client = new Client();
-                client.start();
+        // Avvia il server in un thread separato
+        Thread serverThread = new Thread(() -> {
+            System.out.println("Avvio del server...");
+            new Server().start();  // Avvia il server
+        });
 
-                // Esempio di login client
-                boolean loggedIn = client.login("user", "password");
-                System.out.println("Login eseguito: " + loggedIn);
-            } else {
-                System.err.println("Argomento non valido. Usa 'server' o 'client'.");
-            }
-        } else {
-            SwingUtilities.invokeLater(() -> {
-                Home home = new Home();
-                home.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                home.setLocationRelativeTo(null);
-                home.setVisible(true);
-            });
+        // Avvia il thread del server
+        serverThread.start();
+
+        // Aggiungi un ritardo per dare il tempo al server di avviarsi
+        try {
+            Thread.sleep(5000); // Aspetta 5 secondi (o il tempo che preferisci)
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+
+        // Avvia il client subito dopo
+        System.out.println("Avvio del client...");
+        Client client = new Client();
+        client.start();
+
+        // Esegui il login per esempio
+        boolean loggedIn = client.login("user", "password");
+        System.out.println("Login eseguito: " + loggedIn);
+
+        // Mostra la GUI (facoltativo, puoi anche farlo separatamente)
+        SwingUtilities.invokeLater(() -> {
+            Home home = new Home();
+            home.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            home.setLocationRelativeTo(null);
+            home.setVisible(true);
+        });
     }
 }

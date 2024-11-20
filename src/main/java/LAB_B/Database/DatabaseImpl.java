@@ -6,20 +6,22 @@ import java.rmi.server.UnicastRemoteObject;
 import java.sql.*;
 
 public class DatabaseImpl extends UnicastRemoteObject implements Database {
-    private Connection conn; // Variabile per la connessione al database
+    private Connection conn;
 
-    // Costruttore - Connessione al database PostgreSQL
     public DatabaseImpl() throws Exception {
         super();
-        // Configura la connessione al database PostgreSQL con l'URL, il nome utente e la password
         try {
+            // Registra il driver JDBC
+            Class.forName("org.postgresql.Driver");
+
+            // Configura la connessione al database PostgreSQL
             conn = DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/climate_monitoring", // URL del database
-                    "postgres", // Nome utente
-                    "0000"      // Password
+                    "jdbc:postgresql://localhost:5432/climate_monitoring", // Porta corretta del database
+                    "postgres",
+                    "nuova_password"
             );
             System.out.println("Connessione al database riuscita.");
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             System.err.println("Errore nella connessione al database: " + e.getMessage());
             e.printStackTrace();
             throw new Exception("Impossibile connettersi al database.");
@@ -32,12 +34,11 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
         String query = "SELECT password FROM operatori WHERE user_id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, usr); // Imposta il parametro della query con il nome utente fornito
+            stmt.setString(1, usr);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     String storedPassword = rs.getString("password");
-                    System.out.println("Password trovata nel database per l'utente: " + usr);
                     return psw.equals(storedPassword);
                 } else {
                     System.out.println("Utente non trovato: " + usr);
@@ -76,13 +77,7 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
                 stmtInsert.setString(6, op.getPassword());
 
                 int rowsInserted = stmtInsert.executeUpdate();
-                if (rowsInserted > 0) {
-                    System.out.println("Utente registrato con successo: " + op.getUserId());
-                    return true;
-                } else {
-                    System.out.println("Errore durante la registrazione dell'utente.");
-                    return false;
-                }
+                return rowsInserted > 0;
             }
         } catch (SQLException e) {
             System.err.println("Errore durante la registrazione: " + e.getMessage());
