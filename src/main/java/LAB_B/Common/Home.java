@@ -10,14 +10,22 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+/**
+ * Classe Home - Finestra principale dell'applicazione.
+ * Permette di scegliere se accedere come "Cittadino" o "Operatore".
+ */
 public class Home extends JFrame {
     private JButton bottoneCittadino;
     private JButton bottoneOperatore;
 
+    /**
+     * Costruttore della finestra principale Home.
+     */
     public Home() {
         super("Monitoraggio Clima");
+
         // Impostazioni base della finestra
-        setSize(400, 400);
+        setSize(400, 400); // Dimensioni uniformi
         setLocationRelativeTo(null); // Centra la finestra sullo schermo
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -46,8 +54,8 @@ public class Home extends JFrame {
         bottoneCittadino.setFocusPainted(false); // Rimuove il focus da bordi
         bottoneCittadino.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // Cambia cursore quando ci si passa sopra
 
-        // Aggiungi un'icona al bottone Cittadino (opzionale, personalizza il path dell'immagine)
-        ImageIcon cittadinoIcon = new ImageIcon("path_to_icon/cittadino_icon.png");
+        // Aggiungi un'icona al bottone Cittadino (se presente il file immagine)
+        ImageIcon cittadinoIcon = new ImageIcon("path_to_icon/cittadino_icon.png"); // Cambia il path in base all'icona
         bottoneCittadino.setIcon(cittadinoIcon);
         bottoneCittadino.setHorizontalTextPosition(SwingConstants.CENTER); // Centra il testo sotto l'icona
 
@@ -67,8 +75,8 @@ public class Home extends JFrame {
         bottoneOperatore.setFocusPainted(false); // Rimuove il focus da bordi
         bottoneOperatore.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // Cambia cursore quando ci si passa sopra
 
-        // Aggiungi un'icona al bottone Operatore (opzionale, personalizza il path dell'immagine)
-        ImageIcon operatoreIcon = new ImageIcon("path_to_icon/operatore_icon.png");
+        // Aggiungi un'icona al bottone Operatore (se presente il file immagine)
+        ImageIcon operatoreIcon = new ImageIcon("path_to_icon/operatore_icon.png"); // Cambia il path in base all'icona
         bottoneOperatore.setIcon(operatoreIcon);
         bottoneOperatore.setHorizontalTextPosition(SwingConstants.CENTER); // Centra il testo sotto l'icona
 
@@ -78,7 +86,7 @@ public class Home extends JFrame {
         corpo.add(bottoneOperatore, gbc);
         bottoneOperatore.addActionListener(new Gestore());
 
-        setVisible(true);
+        setVisible(true); // Rendi visibile la finestra
     }
 
     // Gestore degli eventi per i bottoni

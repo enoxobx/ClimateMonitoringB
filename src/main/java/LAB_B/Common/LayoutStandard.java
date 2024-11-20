@@ -10,48 +10,44 @@ import java.awt.event.ActionListener;
 abstract public class LayoutStandard extends JFrame {
 
     private JButton home;
-
     private Container body;
     private Gestore gestore;
 
-
-    public LayoutStandard(){
+    public LayoutStandard() {
         super("Climate Monitoring");
 
-        body = getContentPane(); //crea la finestra
-        body.setLayout(new BorderLayout()); // imposta il layout della finestra
-        gestore = new Gestore(); //creazione di un gestore di eventi
+        body = getContentPane();
+        body.setLayout(new BorderLayout());
+        gestore = new Gestore();
 
         home = new JButton("Home");
-        body.add(home,BorderLayout.WEST);
+        body.add(home, BorderLayout.WEST);
         home.addActionListener(gestore);
 
-        setSize(600,400);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
-        setVisible(true);
+        setDefaultProperties();
     }
 
+    // Metodo comune per uniformare finestre
+    protected void setDefaultProperties() {
+        setSize(600, 400); // Imposta dimensione fissa
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null); // Centra sullo schermo
+        setResizable(false); // Facoltativo: blocca il ridimensionamento
+    }
 
-
-    //gestore di eventi
     private class Gestore implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if(e.getSource()==home){
+            if (e.getSource() == home) {
                 Home t = new Home();
                 t.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 t.setLocationRelativeTo(null);
                 t.setVisible(true);
-                dispose(); // comando per rilasciare le risorse e chiudere la finestra
+                dispose();
             }
         }
     }
 
-
-
-
-    //getter e setter
     public Container getBody() {
         return body;
     }
@@ -59,7 +55,4 @@ abstract public class LayoutStandard extends JFrame {
     public Gestore getGestore() {
         return gestore;
     }
-
-
-
 }

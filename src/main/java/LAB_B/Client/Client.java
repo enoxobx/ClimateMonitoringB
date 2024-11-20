@@ -11,38 +11,42 @@ public class Client {
 
     public void start() {
         try {
-            // Connessione al registro RMI
-            Registry registry = LocateRegistry.getRegistry("localhost", 1099);
-
-            // Ricerca dell'oggetto remoto
+            // Connessione al registro RMI sulla porta corretta (11111)
+            Registry registry = LocateRegistry.getRegistry("localhost", 11111);
             db = (Database) registry.lookup("DatabaseImpl");
 
             System.out.println("Connessione al server riuscita.");
         } catch (Exception e) {
-            System.err.println("Errore nella connessione al server. Assicurarsi che il server sia attivo.");
+            System.err.println("Errore nella connessione al server RMI. Assicurarsi che il server sia attivo.");
             e.printStackTrace();
         }
     }
+
 
     public boolean login(String usr, String psw) {
         try {
             // Verifica se la connessione al database è attiva
             if (db == null) {
-                // Se il database non è disponibile, mostra un errore nel terminale
                 System.err.println("Impossibile eseguire il login: server non disponibile.");
-                return false; // Ritorna false indicando che il login non può essere eseguito
+                return false;
             }
 
-            // Se la connessione al database è attiva, chiama il metodo login per verificare le credenziali
-            return db.login(usr, psw);
+            // Chiamata al metodo login sul server remoto
+            System.out.println("Esecuzione login per l'utente: " + usr);
+            boolean isLoggedIn = db.login(usr, psw);
+
+            if (isLoggedIn) {
+                System.out.println("Login riuscito per l'utente: " + usr);
+            } else {
+                System.out.println("Login fallito per l'utente: " + usr);
+            }
+
+            return isLoggedIn;
 
         } catch (Exception e) {
-            // In caso di eccezione (errore durante il login), mostra un messaggio di errore
             System.err.println("Errore durante il login.");
-            // Stampa lo stack trace dell'eccezione per il debug
             e.printStackTrace();
-            return false; // Ritorna false indicando che il login non è riuscito
+            return false;
         }
     }
-
 }
