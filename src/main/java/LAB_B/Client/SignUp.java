@@ -207,12 +207,14 @@ public class SignUp extends LayoutStandard {
 
     // Funzione per salvare i dati nel database PostgreSQL
     private void salvaDatiNelDatabase(String nome, String cognome, String codiceFiscale, String email, String password, String centro) {
-        String url = "jdbc:postgresql://localhost:5432/tuo_database";  // URL del database
+        // URL di connessione con il numero di porta 5432 e nome del database 'cliamte_monitoring'
+        String url = "jdbc:postgresql://localhost:5432/climate_monitoring";  // URL del database con il numero di porta
         String sql = "INSERT INTO operatori (nome, cognome, codice_fiscale, email, password, centro_monitoraggio) VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DriverManager.getConnection(url, "tuo_username", "tua_password");
+        try (Connection conn = DriverManager.getConnection(url, "postgres", "0000");  // Usa le tue credenziali
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
+            // Imposta i parametri della query
             pstmt.setString(1, nome);
             pstmt.setString(2, cognome);
             pstmt.setString(3, codiceFiscale);
@@ -220,10 +222,13 @@ public class SignUp extends LayoutStandard {
             pstmt.setString(5, password);
             pstmt.setString(6, centro);
 
-            pstmt.executeUpdate();  // Esegui l'inserimento
+            // Esegui l'inserimento nel database
+            pstmt.executeUpdate();
+            System.out.println("Operatore registrato con successo.");
         } catch (SQLException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Errore nel salvataggio dei dati nel database.", "Errore", JOptionPane.ERROR_MESSAGE);
+            System.out.println("Errore durante la registrazione nel database.");
         }
     }
+
 }

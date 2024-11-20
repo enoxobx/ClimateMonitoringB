@@ -1,43 +1,84 @@
 package LAB_B.Database;
 
 import LAB_B.Common.Operatore;
+
+import javax.swing.JOptionPane;
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.*;
-import java.security.MessageDigest; // Per generare l'hash MD5
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Properties;
+import java.io.FileInputStream;
 
 public class DatabaseImpl extends UnicastRemoteObject implements Database {
     private Connection conn;
+    private final Properties dbConfig;
 
-    // Costruttore della classe che stabilisce la connessione al database
+    // Costruttore: carica la configurazione e stabilisce la connessione
     public DatabaseImpl() throws Exception {
         super();
-        try {
-            // Carica il driver JDBC per PostgreSQL
-            Class.forName("org.postgresql.Driver");
+        dbConfig = new Properties();
 
-            // Crea la connessione al database PostgreSQL
-            conn = DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/climate_monitoring", // URL del database
-                    "postgres",  // Username per il database
-                    "0000"       // Password per il database
-            );
-            System.out.println("Connessione al database riuscita.");
-        } catch (SQLException | ClassNotFoundException e) {
-            // Gestisce eventuali errori nella connessione al database
-            System.err.println("Errore nella connessione al database: " + e.getMessage());
-            e.printStackTrace();
-            throw new Exception("Impossibile connettersi al database.");
+        // Caricamento del file di configurazione
+        try (FileInputStream fis = new FileInputStream("dbconfig.properties")) {
+            dbConfig.load(fis);
+            System.out.println("Configurazione del database caricata con successo.");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Errore durante il caricamento della configurazione: " + e.getMessage(), "Errore Configurazione", JOptionPane.ERROR_MESSAGE);
+            throw new Exception("Impossibile caricare il file di configurazione.");
+        }
+
+        // Tentativo di connessione al database
+        try {
+            connectToDatabase();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Errore di connessione al database: " + e.getMessage(), "Errore Connessione", JOptionPane.ERROR_MESSAGE);
+            throw e;
         }
     }
 
-    // Metodo per eseguire l'hash della password con MD5
+    // Metodo per stabilire la connessione al database
+    private void connectToDatabase() throws SQLException {
+        int maxRetries = Integer.parseInt(dbConfig.getProperty("db.maxRetries", "3"));
+        int attempts = 0;
+
+        while (attempts < maxRetries) {
+            try {
+                if (conn != null && !conn.isClosed()) {
+                    conn.close();
+                }
+
+                // Connessione al database
+                conn = DriverManager.getConnection(
+                        dbConfig.getProperty("db.url"),
+                        dbConfig.getProperty("db.username"),
+                        dbConfig.getProperty("db.password")
+                );
+                System.out.println("Connessione al database stabilita con successo.");
+                return;
+            } catch (SQLException e) {
+                attempts++;
+                System.err.println("Tentativo di connessione fallito (" + attempts + "/" + maxRetries + "): " + e.getMessage());
+
+                if (attempts == maxRetries) {
+                    JOptionPane.showMessageDialog(null, "Impossibile connettersi al database dopo " + maxRetries + " tentativi.", "Errore Connessione", JOptionPane.ERROR_MESSAGE);
+                    throw e;
+                }
+
+                // Aspetta prima di ritentare
+                try {
+                    Thread.sleep(2000); // 2 secondi di attesa
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+    }
+
+    // Metodo per generare l'hash MD5 della password
     private String hashPassword(String password) throws NoSuchAlgorithmException {
-        // Utilizza il digest MD5 per generare l'hash della password
         MessageDigest md = MessageDigest.getInstance("MD5");
         byte[] hashBytes = md.digest(password.getBytes());
-
-        // Converte il byte array in una stringa esadecimale
         StringBuilder hexString = new StringBuilder();
         for (byte b : hashBytes) {
             hexString.append(String.format("%02x", b));
@@ -47,39 +88,34 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
 
     @Override
     public boolean login(String usr, String psw) {
-        // Verifica che l'utente sia 'postgres' (è una limitazione di questo esempio)
-        if (!usr.equals("postgres")) {
-            System.out.println("Login non valido. Usa l'utente 'postgres'.");
-            return false;
-        }
-
         System.out.println("Tentativo di login con username: " + usr);
-        String query = "SELECT password FROM operatori WHERE user_id = ?"; // Query per ottenere la password dall'utente
 
+        // Query per verificare le credenziali
+        String query = "SELECT password FROM operatori WHERE user_id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, usr);  // Imposta il parametro per la query
+            stmt.setString(1, usr);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    String storedPassword = rs.getString("password").trim(); // Password memorizzata nel DB
-                    System.out.println("Password trovata nel DB.");
-
-                    // Verifica la password memorizzata con l'hash della password fornita
+                    String storedPassword = rs.getString("password").trim();
                     if (storedPassword.equals(hashPassword(psw.trim()))) {
-                        return true; // Login riuscito
+                        JOptionPane.showMessageDialog(null, "Login effettuato con successo!", "Login", JOptionPane.INFORMATION_MESSAGE);
+                        System.out.println("Login riuscito.");
+                        return true;
                     } else {
+                        JOptionPane.showMessageDialog(null, "Password errata.", "Errore Login", JOptionPane.WARNING_MESSAGE);
                         System.out.println("Password errata.");
-                        return false; // Password errata
+                        return false;
                     }
                 } else {
-                    System.out.println("Utente non trovato: " + usr);
-                    return false; // Utente non trovato
+                    JOptionPane.showMessageDialog(null, "Utente non trovato.", "Errore Login", JOptionPane.WARNING_MESSAGE);
+                    System.out.println("Utente non trovato.");
+                    return false;
                 }
             }
         } catch (SQLException | NoSuchAlgorithmException e) {
-            // Gestisce eventuali errori durante la query di login
-            System.err.println("Errore durante la query di login: " + e.getMessage());
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Errore durante il login: " + e.getMessage(), "Errore Login", JOptionPane.ERROR_MESSAGE);
+            System.err.println("Errore durante il login: " + e.getMessage());
             return false;
         }
     }
@@ -88,25 +124,21 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
     public boolean registrazione(Operatore op) {
         System.out.println("Tentativo di registrazione per utente: " + op.getUserId());
 
-        // Controlla se l'utente esiste già nel database
         String checkQuery = "SELECT * FROM operatori WHERE user_id = ?";
         try (PreparedStatement stmtCheck = conn.prepareStatement(checkQuery)) {
             stmtCheck.setString(1, op.getUserId());
 
             try (ResultSet rsCheck = stmtCheck.executeQuery()) {
                 if (rsCheck.next()) {
-                    System.out.println("Utente già presente: " + op.getUserId());
-                    return false; // L'utente esiste già
+                    JOptionPane.showMessageDialog(null, "Utente già presente.", "Errore Registrazione", JOptionPane.WARNING_MESSAGE);
+                    System.out.println("Utente già presente.");
+                    return false;
                 }
             }
 
-            // Hash della password prima di salvarla nel DB
             String hashedPassword = hashPassword(op.getPassword());
-
-            // Query per inserire un nuovo operatore nel database
             String insertQuery = "INSERT INTO operatori (cf, name, surname, user_id, email, password) VALUES (?, ?, ?, ?, ?, ?)";
             try (PreparedStatement stmtInsert = conn.prepareStatement(insertQuery)) {
-                // Imposta i parametri per l'inserimento
                 stmtInsert.setString(1, op.getCf());
                 stmtInsert.setString(2, op.getName());
                 stmtInsert.setString(3, op.getSurname());
@@ -114,14 +146,20 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
                 stmtInsert.setString(5, op.getMail());
                 stmtInsert.setString(6, hashedPassword);
 
-                // Esegui l'inserimento nel database
                 int rowsInserted = stmtInsert.executeUpdate();
-                return rowsInserted > 0; // Se sono stati inseriti record, ritorna true
+                if (rowsInserted > 0) {
+                    JOptionPane.showMessageDialog(null, "Registrazione completata con successo!", "Registrazione", JOptionPane.INFORMATION_MESSAGE);
+                    System.out.println("Registrazione completata con successo.");
+                    return true;
+                } else {
+                    JOptionPane.showMessageDialog(null, "Errore durante la registrazione.", "Errore Registrazione", JOptionPane.ERROR_MESSAGE);
+                    System.err.println("Errore durante la registrazione.");
+                    return false;
+                }
             }
         } catch (SQLException | NoSuchAlgorithmException e) {
-            // Gestisce eventuali errori durante la registrazione
+            JOptionPane.showMessageDialog(null, "Errore durante la registrazione: " + e.getMessage(), "Errore Registrazione", JOptionPane.ERROR_MESSAGE);
             System.err.println("Errore durante la registrazione: " + e.getMessage());
-            e.printStackTrace();
             return false;
         }
     }
