@@ -9,6 +9,7 @@ import java.rmi.registry.Registry;
 public class Client {
     private Database db;
 
+
     // Metodo per connettersi al server RMI
     public void start() {
         new Thread(() -> {
