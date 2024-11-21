@@ -6,61 +6,57 @@ import javax.swing.*;
 import java.awt.*;
 import java.sql.*;
 import java.util.regex.Pattern;
-import java.util.List;
-import java.util.ArrayList;
 
 public class SignUp extends LayoutStandard {
 
     // Dichiarazione dei campi di input
-    private JTextField nome = new JTextField(15);
-    private JTextField cognome = new JTextField(15);
-    private JTextField codFiscale = new JTextField(15);  // Codice fiscale (unico campo obbligatorio)
-    private JTextField email = new JTextField(15);
-    private JPasswordField password = new JPasswordField(15);
-    private JTextField centro = new JTextField(15);
+    private JTextField nome = new JTextField(15);               // Campo per il nome
+    private JTextField cognome = new JTextField(15);            // Campo per il cognome
+    private JTextField codFiscale = new JTextField(15);         // Campo per il codice fiscale (unico obbligatorio)
+    private JTextField email = new JTextField(15);              // Campo per l'email
+    private JPasswordField password = new JPasswordField(15);   // Campo per la password
+    private JTextField centro = new JTextField(15);             // Campo per il centro di monitoraggio
 
     // Stringhe per memorizzare i risultati e gli errori durante la validazione
     private StringBuilder res = new StringBuilder();
     private StringBuilder err = new StringBuilder();
 
-    // Simulazione di un database con codici fiscali già registrati
-    private List<String> codiciFiscaliRegistrati = new ArrayList<>();
-
     // Costruttore della finestra di registrazione
     public SignUp() {
-        super();
+        super();  // Costruttore della classe LayoutStandard, che potrebbe definire un layout base
 
         // Impostazioni iniziali della finestra
-        setSize(500, 400);
-        setLayout(new BorderLayout());
+        setSize(500, 400);  // Imposta la dimensione della finestra
+        setLayout(new BorderLayout());  // Usa un layout BorderLayout
 
         // Etichetta del titolo
         JLabel bio = new JLabel("Registra nuovo Operatore");
-        bio.setHorizontalAlignment(JLabel.CENTER);
-        bio.setFont(new Font("Courier", Font.BOLD, 20));
-        add(bio, BorderLayout.NORTH);
+        bio.setHorizontalAlignment(JLabel.CENTER);  // Allinea il titolo al centro
+        bio.setFont(new Font("Courier", Font.BOLD, 20));  // Imposta il font del titolo
+        add(bio, BorderLayout.NORTH);  // Aggiunge l'etichetta al pannello superiore della finestra
 
         // Menu di informazioni con un item che mostra come compilare il modulo
         JMenuBar mb = new JMenuBar();
         JMenu menu = new JMenu("Info");
         JMenuItem i1 = new JMenuItem("Come compilare");
+        // Mostra una finestra di dialogo con le informazioni quando l'utente seleziona "Come compilare"
         i1.addActionListener(e -> JOptionPane.showMessageDialog(this,
                 "Nome e cognome in maiuscolo.\nCodice fiscale di 16 caratteri.\n" +
                         "Email valida e password con almeno 8 caratteri, inclusi maiuscola, minuscola, numero e simbolo.\n" +
                         "Nome del centro in maiuscolo."));
         menu.add(i1);
         mb.add(menu);
-        setJMenuBar(mb);
+        setJMenuBar(mb);  // Aggiungi la barra dei menu alla finestra
 
         // Pannello principale per il layout
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));  // Aggiungi margini intorno al pannello
 
         // Pannello per i campi di input
-        JPanel inputPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        JPanel inputPanel = new JPanel(new GridBagLayout());  // Usa GridBagLayout per disporre i campi
+        GridBagConstraints gbc = new GridBagConstraints();  // Crea un oggetto per gestire il layout
+        gbc.fill = GridBagConstraints.HORIZONTAL;  // I campi si estendono orizzontalmente
+        gbc.insets = new Insets(5, 5, 5, 5);  // Distanza tra i componenti
 
         // Aggiungi i campi di input al pannello
         addField(inputPanel, gbc, "Nome:", nome);
@@ -72,36 +68,34 @@ public class SignUp extends LayoutStandard {
 
         // Aggiungi il pannello di input al pannello principale
         mainPanel.add(inputPanel, BorderLayout.CENTER);
-        add(mainPanel, BorderLayout.CENTER);
+        add(mainPanel, BorderLayout.CENTER);  // Aggiungi il pannello principale alla finestra
 
         // Pannello con i bottoni di salvataggio e chiusura
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));  // Pannello per i bottoni
         JButton butSalva = new JButton("Salva");
-        butSalva.addActionListener(e -> salvaOperatore());
+        butSalva.addActionListener(e -> salvaOperatore());  // Azione per salvare i dati dell'operatore
 
         JButton butChiudi = new JButton("Torna indietro");
         butChiudi.addActionListener(e -> {
-            new Login().setVisible(true);
-            dispose();
+            new Login().setVisible(true);  // Mostra la finestra di login
+            dispose();  // Chiudi la finestra di registrazione
         });
 
-        buttonPanel.add(butChiudi);
-        buttonPanel.add(butSalva);
-        add(buttonPanel, BorderLayout.SOUTH);
+        buttonPanel.add(butChiudi);  // Aggiungi il bottone "Torna indietro"
+        buttonPanel.add(butSalva);   // Aggiungi il bottone "Salva"
+        add(buttonPanel, BorderLayout.SOUTH);  // Aggiungi il pannello dei bottoni al fondo della finestra
 
-        setVisible(true);
+        setVisible(true);  // Rende visibile la finestra
     }
 
     // Metodo per aggiungere un campo di input al pannello con il relativo label
     private void addField(JPanel panel, GridBagConstraints gbc, String label, JTextField field) {
-        // Aggiungi l'etichetta (label)
         gbc.gridx = 0;
         gbc.gridy++;  // Incrementa la riga per ogni nuovo campo
-        panel.add(new JLabel(label), gbc);
+        panel.add(new JLabel(label), gbc);  // Aggiungi l'etichetta (label)
 
-        // Aggiungi il campo di input (field)
         gbc.gridx = 1;
-        panel.add(field, gbc);
+        panel.add(field, gbc);  // Aggiungi il campo di input (field)
     }
 
     // Funzione per generare automaticamente l'username basato su nome, cognome e codice fiscale
@@ -114,31 +108,19 @@ public class SignUp extends LayoutStandard {
         String yearFromCodFiscale = codFiscale.substring(6, 8);  // Le cifre dell'anno sono nelle posizioni 7 e 8
 
         // Concatenazione di nome, cognome e anno per formare l'username
-        String username = nomeFormatted + cognomeFormatted + yearFromCodFiscale;
-
-        return username;
+        return nomeFormatted + cognomeFormatted + yearFromCodFiscale;
     }
 
     // Metodo che viene eseguito per salvare l'operatore (registrazione)
     private void salvaOperatore() {
-        if (validateInputs()) {
+        if (validateInputs()) {  // Se la validazione va a buon fine
             String codiceFiscaleInserito = codFiscale.getText().trim();
-
-            // Verifica se il codice fiscale è già stato registrato
-            if (isCodiceFiscaleRegistrato(codiceFiscaleInserito)) {
-                JOptionPane.showMessageDialog(this, "Codice Fiscale già utilizzato. Impossibile completare la registrazione.",
-                        "Errore", JOptionPane.ERROR_MESSAGE);
-                return;  // Esce senza proseguire se il codice fiscale è già in uso
-            }
 
             // Genera l'username
             String usernameGenerato = generateUsername(nome.getText(), cognome.getText(), codiceFiscaleInserito);
 
-            // Aggiungi il codice fiscale alla lista simulata del database
-            codiciFiscaliRegistrati.add(codiceFiscaleInserito);
-
             // Salva i dati nel database
-            salvaDatiNelDatabase(nome.getText(), cognome.getText(), codiceFiscaleInserito, email.getText(), new String(password.getPassword()), centro.getText());
+            salvaDatiNelDatabase(nome.getText(), cognome.getText(), codiceFiscaleInserito, email.getText(), new String(password.getPassword()), centro.getText(), usernameGenerato);
 
             // Mostra il messaggio di successo
             JOptionPane.showMessageDialog(this, "Registrazione completata con successo. \n" +
@@ -148,14 +130,14 @@ public class SignUp extends LayoutStandard {
             new Login().setVisible(true);
             dispose();
         } else {
-            JOptionPane.showMessageDialog(this, err.toString(), "Errore", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, err.toString(), "Errore", JOptionPane.ERROR_MESSAGE);  // Mostra gli errori
         }
     }
 
     // Funzione di validazione per i campi di input
     private boolean validateInputs() {
-        res.setLength(0);
-        err.setLength(0);
+        res.setLength(0);  // Pulisce i risultati
+        err.setLength(0);  // Pulisce gli errori
 
         // Validazione dei campi
         validateField(nome.getText(), "Il nome non è stato inserito.", 30);
@@ -200,35 +182,42 @@ public class SignUp extends LayoutStandard {
         }
     }
 
-    // Funzione per verificare se un codice fiscale è già registrato
-    private boolean isCodiceFiscaleRegistrato(String codiceFiscale) {
-        return codiciFiscaliRegistrati.contains(codiceFiscale);
-    }
-
     // Funzione per salvare i dati nel database PostgreSQL
-    private void salvaDatiNelDatabase(String nome, String cognome, String codiceFiscale, String email, String password, String centro) {
-        // URL di connessione con il numero di porta 5432 e nome del database 'cliamte_monitoring'
-        String url = "jdbc:postgresql://localhost:5432/climate_monitoring";  // URL del database con il numero di porta
-        String sql = "INSERT INTO operatori (nome, cognome, codice_fiscale, email, password, centro_monitoraggio) VALUES (?, ?, ?, ?, ?, ?)";
+    private void salvaDatiNelDatabase(String nome, String cognome, String codiceFiscale, String email, String password, String centro, String username) {
+        Connection conn = null;
+        try {
+            // Connessione al database PostgreSQL
+            conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/climate_monitoring", "postgres", "0000");
 
-        try (Connection conn = DriverManager.getConnection(url, "postgres", "0000");  // Usa le tue credenziali
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            String sql = "INSERT INTO operatori (nome, cognome, codice_fiscale, email, password, centro_monitoraggio, username) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement ps = conn.prepareStatement(sql);
 
-            // Imposta i parametri della query
-            pstmt.setString(1, nome);
-            pstmt.setString(2, cognome);
-            pstmt.setString(3, codiceFiscale);
-            pstmt.setString(4, email);
-            pstmt.setString(5, password);
-            pstmt.setString(6, centro);
+            ps.setString(1, nome);
+            ps.setString(2, cognome);
+            ps.setString(3, codiceFiscale);
+            ps.setString(4, email);
+            ps.setString(5, password);
+            ps.setString(6, centro);
+            ps.setString(7, username);
 
-            // Esegui l'inserimento nel database
-            pstmt.executeUpdate();
-            System.out.println("Operatore registrato con successo.");
+            ps.executeUpdate();  // Esegui l'operazione di inserimento nel database
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("Errore durante la registrazione nel database.");
+            JOptionPane.showMessageDialog(this, "Errore nel salvataggio dei dati nel database.", "Errore", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            // Chiudere la connessione nel blocco finally per garantire la chiusura
+            try {
+                if (conn != null && !conn.isClosed()) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
+    public static void main(String[] args) {
+        new SignUp();  // Avvia la finestra di registrazione
+    }
 }

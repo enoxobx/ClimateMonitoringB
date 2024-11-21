@@ -1,36 +1,32 @@
 package LAB_B.Database;
 
-import javax.swing.JOptionPane;
-import java.rmi.RemoteException;
+import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 
 public class Server {
-    private Registry registry;
 
+    // Metodo per avviare il server RMI
     public void start() {
         try {
-            System.out.println("Avvio del server...");
+            // Crea un registro RMI sulla porta 1099
+            // Il registro RMI è un servizio di naming per RMI che permette ai client di localizzare gli oggetti remoti
+            LocateRegistry.createRegistry(1099);
 
-            try {
-                registry = LocateRegistry.createRegistry(1099);
-                System.out.println("Registro RMI creato.");
-            } catch (RemoteException e) {
-                registry = LocateRegistry.getRegistry(1099);
-                System.out.println("Registro RMI esistente trovato.");
-            }
+            // Rende l'oggetto DatabaseImpl disponibile come servizio RMI
+            // Utilizza "Naming.rebind()" per associare l'oggetto DatabaseImpl al nome "rmi://localhost/DatabaseService"
+            Naming.rebind("rmi://localhost/DatabaseService", new DatabaseImpl());
 
-            Database db = new DatabaseImpl();
-            registry.rebind("DatabaseImpl", db);
-            System.out.println("Oggetto remoto registrato con successo.");
+            // Stampa un messaggio di conferma che il server è stato avviato
+            System.out.println("Server avviato.");
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Errore durante l'avvio del server: " + e.getMessage(), "Errore Server", JOptionPane.ERROR_MESSAGE);
+            // Se si verifica un errore durante l'avvio del server, stampa l'errore
             e.printStackTrace();
         }
     }
 
+    // Metodo principale per avviare il server
     public static void main(String[] args) {
-        Server server = new Server();
-        server.start();
+        // Crea un'istanza di Server e avvia il server RMI
+        new Server().start();
     }
 }

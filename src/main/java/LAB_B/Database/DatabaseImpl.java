@@ -1,166 +1,83 @@
 package LAB_B.Database;
 
-import LAB_B.Common.Operatore;
+import LAB_B.Common.Operatore;  // Importa la classe Operatore, presumibilmente per gestire gli operatori nel sistema
 
-import javax.swing.JOptionPane;
-import java.rmi.server.UnicastRemoteObject;
-import java.sql.*;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Properties;
-import java.io.FileInputStream;
+import javax.swing.*;  // Importa le librerie Swing (non utilizzate direttamente in questo codice)
+import java.rmi.server.UnicastRemoteObject;  // Permette la creazione di oggetti remoti per RMI
+import java.sql.*;  // Importa le librerie JDBC per interagire con il database
 
+// La classe DatabaseImpl implementa l'interfaccia Database e fornisce le implementazioni per i metodi dichiarati
 public class DatabaseImpl extends UnicastRemoteObject implements Database {
-    private Connection conn;
-    private final Properties dbConfig;
+    private Connection conn;  // Variabile per memorizzare la connessione al database
 
-    // Costruttore: carica la configurazione e stabilisce la connessione
+    // Costruttore che estende UnicastRemoteObject e gestisce la connessione al database
     public DatabaseImpl() throws Exception {
-        super();
-        dbConfig = new Properties();
-
-        // Caricamento del file di configurazione
-        try (FileInputStream fis = new FileInputStream("dbconfig.properties")) {
-            dbConfig.load(fis);
-            System.out.println("Configurazione del database caricata con successo.");
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Errore durante il caricamento della configurazione: " + e.getMessage(), "Errore Configurazione", JOptionPane.ERROR_MESSAGE);
-            throw new Exception("Impossibile caricare il file di configurazione.");
-        }
-
-        // Tentativo di connessione al database
-        try {
-            connectToDatabase();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Errore di connessione al database: " + e.getMessage(), "Errore Connessione", JOptionPane.ERROR_MESSAGE);
-            throw e;
-        }
+        super();  // Chiama il costruttore della classe base UnicastRemoteObject
+        connectToDatabase();  // Invoca il metodo per connettersi al database
     }
 
-    // Metodo per stabilire la connessione al database
+    // Metodo per stabilire la connessione al database PostgreSQL
     private void connectToDatabase() throws SQLException {
-        int maxRetries = Integer.parseInt(dbConfig.getProperty("db.maxRetries", "3"));
-        int attempts = 0;
+        // Parametri di connessione per il database PostgreSQL
+        String dbUrl = "jdbc:postgresql://localhost:5432/climate_monitoring";  // URL del database
+        String dbUsername = "postgres";  // Nome utente per il login al database
+        String dbPassword = "0000";  // Password per il login al database
 
-        while (attempts < maxRetries) {
-            try {
-                if (conn != null && !conn.isClosed()) {
-                    conn.close();
-                }
-
-                // Connessione al database
-                conn = DriverManager.getConnection(
-                        dbConfig.getProperty("db.url"),
-                        dbConfig.getProperty("db.username"),
-                        dbConfig.getProperty("db.password")
-                );
-                System.out.println("Connessione al database stabilita con successo.");
-                return;
-            } catch (SQLException e) {
-                attempts++;
-                System.err.println("Tentativo di connessione fallito (" + attempts + "/" + maxRetries + "): " + e.getMessage());
-
-                if (attempts == maxRetries) {
-                    JOptionPane.showMessageDialog(null, "Impossibile connettersi al database dopo " + maxRetries + " tentativi.", "Errore Connessione", JOptionPane.ERROR_MESSAGE);
-                    throw e;
-                }
-
-                // Aspetta prima di ritentare
-                try {
-                    Thread.sleep(2000); // 2 secondi di attesa
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-        }
+        // Crea la connessione utilizzando DriverManager
+        conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+        System.out.println("Connessione al database stabilita.");  // Messaggio di conferma
     }
 
-    // Metodo per generare l'hash MD5 della password
-    private String hashPassword(String password) throws NoSuchAlgorithmException {
-        MessageDigest md = MessageDigest.getInstance("MD5");
-        byte[] hashBytes = md.digest(password.getBytes());
-        StringBuilder hexString = new StringBuilder();
-        for (byte b : hashBytes) {
-            hexString.append(String.format("%02x", b));
-        }
-        return hexString.toString();
-    }
-
+    // Metodo per gestire il login degli operatori
     @Override
-    public boolean login(String usr, String psw) {
-        System.out.println("Tentativo di login con username: " + usr);
+    public boolean login(String username, String psw) {
+        try (PreparedStatement stmt = conn.prepareStatement(
+                "SELECT password FROM operatori WHERE username = ?")) {
+            stmt.setString(1, username);  // Imposta il valore del parametro "username"
+            ResultSet rs = stmt.executeQuery();  // Esegue la query e ottiene il risultato
 
-        // Query per verificare le credenziali
-        String query = "SELECT password FROM operatori WHERE user_id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, usr);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    String storedPassword = rs.getString("password").trim();
-                    if (storedPassword.equals(hashPassword(psw.trim()))) {
-                        JOptionPane.showMessageDialog(null, "Login effettuato con successo!", "Login", JOptionPane.INFORMATION_MESSAGE);
-                        System.out.println("Login riuscito.");
-                        return true;
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Password errata.", "Errore Login", JOptionPane.WARNING_MESSAGE);
-                        System.out.println("Password errata.");
-                        return false;
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(null, "Utente non trovato.", "Errore Login", JOptionPane.WARNING_MESSAGE);
-                    System.out.println("Utente non trovato.");
-                    return false;
-                }
+            // Se viene trovato un risultato, confronta la password
+            if (rs.next()) {
+                return rs.getString("password").trim().equals(psw.trim());  // Confronta le password, rimuovendo eventuali spazi extra
             }
-        } catch (SQLException | NoSuchAlgorithmException e) {
-            JOptionPane.showMessageDialog(null, "Errore durante il login: " + e.getMessage(), "Errore Login", JOptionPane.ERROR_MESSAGE);
-            System.err.println("Errore durante il login: " + e.getMessage());
-            return false;
+        } catch (SQLException e) {
+            e.printStackTrace();  // Stampa eventuali errori di SQL
         }
+        return false;  // Restituisce false se la login fallisce o se ci sono errori
     }
 
+    // Metodo per gestire la registrazione di un nuovo operatore
     @Override
     public boolean registrazione(Operatore op) {
-        System.out.println("Tentativo di registrazione per utente: " + op.getUserId());
+        try (PreparedStatement stmtCheck = conn.prepareStatement(
+                "SELECT * FROM operatori WHERE codice_fiscale = ? OR username = ?")) {
+            // Controlla se esiste già un operatore con lo stesso codice fiscale o username
+            stmtCheck.setString(1, op.getCodiceFiscale());
+            stmtCheck.setString(2, op.getUsername());  // Imposta il parametro "username"
+            ResultSet rs = stmtCheck.executeQuery();  // Esegui la query per il controllo dell'esistenza
 
-        String checkQuery = "SELECT * FROM operatori WHERE user_id = ?";
-        try (PreparedStatement stmtCheck = conn.prepareStatement(checkQuery)) {
-            stmtCheck.setString(1, op.getUserId());
-
-            try (ResultSet rsCheck = stmtCheck.executeQuery()) {
-                if (rsCheck.next()) {
-                    JOptionPane.showMessageDialog(null, "Utente già presente.", "Errore Registrazione", JOptionPane.WARNING_MESSAGE);
-                    System.out.println("Utente già presente.");
-                    return false;
-                }
+            // Se esiste un operatore con lo stesso codice fiscale o username, la registrazione fallisce
+            if (rs.next()) {
+                return false;  // Restituisce false se l'operatore esiste già
             }
 
-            String hashedPassword = hashPassword(op.getPassword());
-            String insertQuery = "INSERT INTO operatori (cf, name, surname, user_id, email, password) VALUES (?, ?, ?, ?, ?, ?)";
-            try (PreparedStatement stmtInsert = conn.prepareStatement(insertQuery)) {
-                stmtInsert.setString(1, op.getCf());
+            // Se non esiste, inserisce i dati dell'operatore nel database
+            try (PreparedStatement stmtInsert = conn.prepareStatement(
+                    "INSERT INTO operatori (codice_fiscale, name, surname, email, username, password) VALUES (?, ?, ?, ?, ?, ?)")) {
+                // Imposta i valori dei parametri per l'inserimento
+                stmtInsert.setString(1, op.getCodiceFiscale());
                 stmtInsert.setString(2, op.getName());
                 stmtInsert.setString(3, op.getSurname());
-                stmtInsert.setString(4, op.getUserId());
-                stmtInsert.setString(5, op.getMail());
-                stmtInsert.setString(6, hashedPassword);
+                stmtInsert.setString(4, op.getEmail());  // Aggiungi il campo email
+                stmtInsert.setString(5, op.getUsername());  // Aggiungi il campo username
+                stmtInsert.setString(6, op.getPassword());
 
-                int rowsInserted = stmtInsert.executeUpdate();
-                if (rowsInserted > 0) {
-                    JOptionPane.showMessageDialog(null, "Registrazione completata con successo!", "Registrazione", JOptionPane.INFORMATION_MESSAGE);
-                    System.out.println("Registrazione completata con successo.");
-                    return true;
-                } else {
-                    JOptionPane.showMessageDialog(null, "Errore durante la registrazione.", "Errore Registrazione", JOptionPane.ERROR_MESSAGE);
-                    System.err.println("Errore durante la registrazione.");
-                    return false;
-                }
+                // Esegui l'inserimento e restituisce true se almeno una riga è stata inserita
+                return stmtInsert.executeUpdate() > 0;
             }
-        } catch (SQLException | NoSuchAlgorithmException e) {
-            JOptionPane.showMessageDialog(null, "Errore durante la registrazione: " + e.getMessage(), "Errore Registrazione", JOptionPane.ERROR_MESSAGE);
-            System.err.println("Errore durante la registrazione: " + e.getMessage());
-            return false;
+        } catch (SQLException e) {
+            e.printStackTrace();  // Stampa eventuali errori di SQL
         }
+        return false;  // Restituisce false se l'inserimento fallisce o si verifica un errore
     }
 }
