@@ -77,10 +77,11 @@ public class Login extends JFrame {
                 } else if (password.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Il campo password non può essere vuoto!", "Errore", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    // Creazione del client
+                    // Creazione del client per il login
                     Client client = new Client(DB_URL, DB_USERNAME, DB_PASSWORD, MAX_RETRIES);
                     boolean success = client.login(usernameOrCodiceFiscale, password);
 
+                    // Verifica se il login è riuscito
                     if (success) {
                         JOptionPane.showMessageDialog(null, "Login effettuato con successo!", "Successo", JOptionPane.INFORMATION_MESSAGE);
                         // Mostra la finestra successiva
@@ -92,6 +93,7 @@ public class Login extends JFrame {
                 }
             }
         });
+
 
         registerButton.addActionListener(new ActionListener() {
             @Override
