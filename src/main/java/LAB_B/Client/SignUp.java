@@ -93,19 +93,78 @@ public class SignUp extends LayoutStandard {
         return nomeFormatted + cognomeFormatted + yearFromCodFiscale;
     }
 
+    // Metodo per verificare se l'username è già presente nel database
+    private boolean isUsernameExist(String username) {
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/climate_monitoring", "postgres", "0000");
+            String sql = "SELECT 1 FROM operatori WHERE username = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, username);
+
+            ResultSet rs = ps.executeQuery();
+            return rs.next();  // Se trova un risultato, l'username esiste già
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (conn != null && !conn.isClosed()) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // Metodo per generare un username unico
+    private String generateUniqueUsername(String nome, String cognome, String codFiscale) {
+        String username = generateUsername(nome, cognome, codFiscale);
+        int attempt = 0;
+
+        // Verifica se l'username è già presente nel database
+        while (isUsernameExist(username) && attempt < 10) {
+            attempt++;
+            // Aggiunge un suffisso numerico per garantire l'unicità
+            username = generateUsername(nome, cognome, codFiscale) + "_" + attempt;
+        }
+
+        if (attempt == 10) {
+            // Se non si è trovato un username univoco dopo 10 tentativi
+            JOptionPane.showMessageDialog(this, "Impossibile generare un username unico. Prova con un altro codice fiscale.",
+                    "Errore", JOptionPane.ERROR_MESSAGE);
+            return null;  // Ritorna null per evitare che venga salvato nel database
+        }
+
+        return username;
+    }
+
     private void salvaOperatore() {
         if (validateInputs()) {
             String codiceFiscaleInserito = codFiscale.getText().trim();
-            String usernameGenerato = generateUsername(nome.getText(), cognome.getText(), codiceFiscaleInserito);
+            String usernameGenerato = generateUniqueUsername(nome.getText(), cognome.getText(), codiceFiscaleInserito);
 
-            salvaDatiNelDatabase(nome.getText(), cognome.getText(), codiceFiscaleInserito, email.getText(),
+            // Verifica se l'username è stato generato correttamente
+            if (usernameGenerato == null) {
+                // Se non è stato possibile generare un username valido, non procedere
+                return;
+            }
+
+            // Chiamata al metodo che ora restituisce un booleano
+            boolean registrazioneSuccesso = salvaDatiNelDatabase(nome.getText(), cognome.getText(), codiceFiscaleInserito, email.getText(),
                     new String(password.getPassword()), centro.getText(), usernameGenerato);
 
-            JOptionPane.showMessageDialog(this, "Registrazione completata con successo. \n" +
-                    "Username: " + usernameGenerato + "\n" + "Password: " + new String(password.getPassword()), "Successo", JOptionPane.INFORMATION_MESSAGE);
+            if (registrazioneSuccesso) {
+                JOptionPane.showMessageDialog(this, "Registrazione completata con successo. \n" +
+                        "Username: " + usernameGenerato + "\n" + "Password: " + new String(password.getPassword()), "Successo", JOptionPane.INFORMATION_MESSAGE);
 
-            new Login().setVisible(true);
-            dispose();
+                new Login().setVisible(true);
+                dispose();
+            } else {
+                // Se la registrazione fallisce, non procediamo con il messaggio di successo
+                JOptionPane.showMessageDialog(this, "Si è verificato un errore durante la registrazione.", "Errore", JOptionPane.ERROR_MESSAGE);
+            }
         } else {
             JOptionPane.showMessageDialog(this, err.toString(), "Errore", JOptionPane.ERROR_MESSAGE);
         }
@@ -153,25 +212,25 @@ public class SignUp extends LayoutStandard {
         }
     }
 
-    private void salvaDatiNelDatabase(String nome, String cognome, String codiceFiscale, String email, String password, String centro, String username) {
+    private boolean salvaDatiNelDatabase(String nome, String cognome, String codiceFiscale, String email, String password, String centro, String username) {
         Connection conn = null;
         try {
             conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/climate_monitoring", "postgres", "0000");
-            String sql = "INSERT INTO operatori (nome, cognome, codice_fiscale, email, password, centro_monitoraggio, username) VALUES (?, ?, ?, ?, ?, ?, ?)";
-            PreparedStatement ps = conn.prepareStatement(sql);
+            String query = "INSERT INTO operatori (nome, cognome, codice_fiscale, email, password, centro_monitoraggio, username) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement pst = conn.prepareStatement(query);
+            pst.setString(1, nome);
+            pst.setString(2, cognome);
+            pst.setString(3, codiceFiscale);
+            pst.setString(4, email);
+            pst.setString(5, password);
+            pst.setString(6, centro);
+            pst.setString(7, username);
 
-            ps.setString(1, nome);
-            ps.setString(2, cognome);
-            ps.setString(3, codiceFiscale);
-            ps.setString(4, email);
-            ps.setString(5, password);
-            ps.setString(6, centro);
-            ps.setString(7, username);
-
-            ps.executeUpdate();
+            int result = pst.executeUpdate();
+            return result > 0;
         } catch (SQLException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Errore nel salvataggio dei dati nel database.", "Errore", JOptionPane.ERROR_MESSAGE);
+            return false;
         } finally {
             try {
                 if (conn != null && !conn.isClosed()) {
@@ -181,9 +240,5 @@ public class SignUp extends LayoutStandard {
                 e.printStackTrace();
             }
         }
-    }
-
-    public static void main(String[] args) {
-        new SignUp();
     }
 }
