@@ -6,7 +6,7 @@ public class Client {
     private String dbUrl;        // URL del database
     private String dbUsername;   // Nome utente per la connessione al database
     private String dbPassword;   // Password per la connessione al database
-    private int maxRetries;      // Numero massimo di tentativi per la connessione al database
+    private int maxRetries;      // Numero massimo di tentativi di connessione
 
     // Costruttore per inizializzare i parametri di connessione al database
     public Client(String dbUrl, String dbUsername, String dbPassword, int maxRetries) {
@@ -31,24 +31,17 @@ public class Client {
                     System.out.println("Connessione al database riuscita.");  // Conferma della connessione riuscita
 
                     // Debug: stampa i valori ricevuti
-                    System.out.println("Login con username o codice fiscale: " + usernameOrCodiceFiscale);
-                    System.out.println("Password: " + password);
+                    System.out.println("Tentativo di login con username o codice fiscale: " + usernameOrCodiceFiscale);
+                    System.out.println("Password: " + (password != null ? "******" : "null"));  // Evitare di stampare la password in chiaro
 
-                    // Esegui la query di login per verificare se l'utente esiste nel database
-                    String sql;
-                    // Controlla se è stato passato uno username o un codice fiscale
-                    if (!usernameOrCodiceFiscale.isEmpty()) {
-                        // Se è presente lo username
-                        sql = "SELECT * FROM operatori WHERE username = ? AND password = ?";
-                        stmt = conn.prepareStatement(sql);  // Prepara la query
-                        stmt.setString(1, usernameOrCodiceFiscale);  // Imposta il parametro della query per lo username
-                    } else {
-                        // Se è presente il codice fiscale
-                        sql = "SELECT * FROM operatori WHERE codice_fiscale = ? AND password = ?";
-                        stmt = conn.prepareStatement(sql);  // Prepara la query
-                        stmt.setString(1, usernameOrCodiceFiscale);  // Imposta il parametro della query per il codice fiscale
-                    }
-                    stmt.setString(2, password);  // Imposta il parametro della query per la password
+                    // Prepara la query per il login basata su username o codice fiscale
+                    String sql = "SELECT * FROM operatori WHERE (username = ? OR codice_fiscale = ?) AND password = ?";
+
+                    stmt = conn.prepareStatement(sql);  // Prepara la query
+                    stmt.setString(1, usernameOrCodiceFiscale);  // Imposta il parametro per lo username o codice fiscale
+                    stmt.setString(2, usernameOrCodiceFiscale);  // Imposta il parametro per lo username o codice fiscale
+                    stmt.setString(3, password);  // Imposta il parametro per la password
+
                     rs = stmt.executeQuery();  // Esegui la query e ottieni il risultato
 
                     // Se il risultato della query contiene un record, significa che il login è riuscito
@@ -56,7 +49,7 @@ public class Client {
                         System.out.println("Login riuscito.");  // Messaggio di login riuscito
                         return true;  // Restituisci true se le credenziali sono corrette
                     } else {
-                        System.out.println("Login fallito.");  // Messaggio di login fallito
+                        System.out.println("Login fallito. Nessun operatore trovato.");  // Messaggio di login fallito
                         return false;  // Restituisci false se le credenziali non sono corrette
                     }
                 } catch (SQLException e) {

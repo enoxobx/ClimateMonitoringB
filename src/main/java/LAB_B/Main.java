@@ -1,7 +1,6 @@
 package LAB_B;
 
 import LAB_B.Database.Server;  // Importa la classe Server che gestisce la logica del server
-import LAB_B.Client.Client;    // Importa la classe Client per gestire la logica del client
 import LAB_B.Common.Home;      // Importa la classe Home per la finestra principale dell'interfaccia utente
 
 import javax.swing.*;  // Importa le librerie per la gestione delle interfacce grafiche (Swing)

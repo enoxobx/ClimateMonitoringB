@@ -101,57 +101,57 @@ public class Operatore implements Serializable {
         return true;
     }
 
-    // Getter per il codice fiscale
+    // Metodo per il login, che permette di usare il codice fiscale o lo username
+    public boolean login(String identifier, String password) {
+        // Se l'identificatore è il codice fiscale o l'username e la password corrisponde
+        if ((identifier.equals(this.cf) || identifier.equals(this.username)) && this.password.equals(password)) {
+            return true;  // Login riuscito
+        }
+        return false;  // Login fallito
+    }
+
+    // Getter e Setter per tutti i campi
+
     public String getCodiceFiscale() {
         return cf;
     }
 
-    // Getter per il nome
     public String getName() {
         return name;
     }
 
-    // Setter per il nome
     public void setName(String name) {
         this.name = name;
     }
 
-    // Getter per il cognome
     public String getSurname() {
         return surname;
     }
 
-    // Setter per il cognome
     public void setSurname(String surname) {
         this.surname = surname;
     }
 
-    // Getter per l'email
     public String getEmail() {
         return email;
     }
 
-    // Setter per l'email
     public void setEmail(String email) {
         this.email = email;
     }
 
-    // Getter per l'username
     public String getUsername() {
         return username;
     }
 
-    // Setter per l'username
     public void setUsername(String username) {
         this.username = username;
     }
 
-    // Getter per la password
     public String getPassword() {
         return password;
     }
 
-    // Setter per la password
     public void setPassword(String password) {
         this.password = password;
     }

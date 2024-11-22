@@ -9,11 +9,9 @@ public class Server {
     public void start() {
         try {
             // Crea un registro RMI sulla porta 1099
-            // Il registro RMI è un servizio di naming per RMI che permette ai client di localizzare gli oggetti remoti
             LocateRegistry.createRegistry(1099);
 
             // Rende l'oggetto DatabaseImpl disponibile come servizio RMI
-            // Utilizza "Naming.rebind()" per associare l'oggetto DatabaseImpl al nome "rmi://localhost/DatabaseService"
             Naming.rebind("rmi://localhost/DatabaseService", new DatabaseImpl());
 
             // Stampa un messaggio di conferma che il server è stato avviato
