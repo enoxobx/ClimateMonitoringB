@@ -1,0 +1,50 @@
+---
+
+### **Configurazione del Database PostgreSQL**
+
+#### **Indirizzo del server:**
+- **db.url**: `jdbc:postgresql://localhost:5432/climate_monitoring`
+  (Usare `localhost` se il database è locale, altrimenti l'indirizzo IP del server remoto).
+
+#### **Nome del database:**
+- **Nome del database**: `climate_monitoring`.
+
+#### **Credenziali di accesso:**
+- **db.username**: `postgres`.
+- **db.password**: `0000`.
+
+#### **Porta del server:**
+- **Porta**: `5432` (o la porta configurata se diversa).
+
+#### **File di configurazione (`config.properties`):**
+```properties
+db.url=jdbc:postgresql://localhost:5432/climate_monitoring
+db.username=postgres
+db.password=0000
+```
+
+---
+
+### **Istruzioni per la Connessione**
+
+#### **pgAdmin:**
+Configurazione connessione:
+- **Host**: `localhost` o l'indirizzo IP remoto.
+- **Porta**: `5432`.
+- **Maintenance Database**: `postgres` (o `climate_monitoring` se necessario).
+- **Username**: `postgres`.
+- **Password**: `0000`.
+
+#### **Java (JDBC):**
+```java
+String url = "jdbc:postgresql://localhost:5432/climate_monitoring";
+String user = "postgres";
+String password = "0000";
+Connection connection = DriverManager.getConnection(url, user, password);
+```
+
+#### **Accesso Remoto:**
+- Configurare il file **`pg_hba.conf`** per accettare connessioni remote.
+- Impostare `listen_addresses = '*'` in **`postgresql.conf`**.
+
+---
