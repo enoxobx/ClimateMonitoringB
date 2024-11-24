@@ -1,14 +1,10 @@
 package LAB_B.Common;
 
-import LAB_B.Client.*;
+import LAB_B.Operatore.Login;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
 
 /**
  * Classe Home - Finestra principale dell'applicazione.

@@ -1,4 +1,4 @@
-package LAB_B.Client;
+package LAB_B.Operatore;
 
 import LAB_B.Common.Home;
 import LAB_B.Common.LayoutStandard;

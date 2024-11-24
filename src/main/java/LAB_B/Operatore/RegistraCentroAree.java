@@ -1,9 +1,10 @@
-package LAB_B.Client;
+package LAB_B.Operatore;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.*;
 
 public class RegistraCentroAree extends JFrame {
 
@@ -12,14 +13,18 @@ public class RegistraCentroAree extends JFrame {
     private JTextField indirizzo;
     private JTextField areeInteresse;
 
+    private static final String DB_URL = "jdbc:postgresql://localhost:5432/climate_monitoring";
+    private static final String DB_USERNAME = "postgres";
+    private static final String DB_PASSWORD = "0000";
+
     public RegistraCentroAree() {
         // Impostazioni della finestra principale
-        setSize(888, 588);  // Imposta le dimensioni della finestra
-        setTitle("REGISTRA NUOVO CENTRO");  // Imposta il titolo della finestra
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  // Chiude l'applicazione quando la finestra viene chiusa
-        setResizable(false);  // Disabilita la modifica delle dimensioni della finestra
-        setLocationRelativeTo(null);  // Posiziona la finestra al centro dello schermo
-        setVisible(true);  // Rende visibile la finestra
+        setSize(888, 588);
+        setTitle("REGISTRA NUOVO CENTRO");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
+        setLocationRelativeTo(null);
+        setVisible(true);
 
         // Pannello per le etichette (NOME CENTRO, INDIRIZZO, AREE DI INTERESSE)
         JPanel panelEtichette = new JPanel(new GridLayout(3, 1));
@@ -30,7 +35,7 @@ public class RegistraCentroAree extends JFrame {
         // Pannello per le caselle di testo
         nomeCentro = new JTextField(20);
         indirizzo = new JTextField();
-        areeInteresse = new JTextField();  // Max 10 aree di interesse per centro
+        areeInteresse = new JTextField();
 
         JPanel panelTesto = new JPanel(new GridLayout(3, 1, 10, 0));
         panelTesto.add(nomeCentro);
@@ -54,7 +59,7 @@ public class RegistraCentroAree extends JFrame {
         botSalva.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Codice per salvare il nuovo centro (inserimento nel database o altro)
+                // Codice per salvare il nuovo centro
                 salvaCentro();
             }
         });
@@ -62,7 +67,7 @@ public class RegistraCentroAree extends JFrame {
         botIndietro.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Codice per tornare alla finestra precedente (navigazione)
+                // Torna alla finestra precedente
                 tornaIndietro();
             }
         });
@@ -90,23 +95,32 @@ public class RegistraCentroAree extends JFrame {
             return;
         }
 
-        // Logica di salvataggio nel database o altre operazioni
-        // Puoi aggiungere qui il codice per salvare i dati nel database
-        // Ad esempio, chiamare un metodo del database che registra il centro
+        // Logica di salvataggio nel database
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+            String sql = "INSERT INTO centri_monitoraggio (nome, indirizzo, aree_interesse) VALUES (?, ?, ?)";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, nome);
+                stmt.setString(2, indirizzoCentro);
+                stmt.setString(3, aree);
 
-        JOptionPane.showMessageDialog(this, "Centro salvato con successo!", "Successo", JOptionPane.INFORMATION_MESSAGE);
+                // Esegui il salvataggio
+                stmt.executeUpdate();
+                JOptionPane.showMessageDialog(this, "Centro salvato con successo!", "Successo", JOptionPane.INFORMATION_MESSAGE);
 
-        // Pulisci i campi dopo il salvataggio
-        nomeCentro.setText("");
-        indirizzo.setText("");
-        areeInteresse.setText("");
+                // Pulisci i campi dopo il salvataggio
+                nomeCentro.setText("");
+                indirizzo.setText("");
+                areeInteresse.setText("");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Errore durante il salvataggio del centro", "Errore", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     // Metodo per tornare alla finestra precedente
     private void tornaIndietro() {
-        // Codice per chiudere la finestra corrente e tornare alla finestra precedente
         this.dispose();  // Chiude la finestra corrente
-        // Puoi anche aprire un'altra finestra, se necessario
     }
 
     // Metodo main per testare la finestra in modo indipendente

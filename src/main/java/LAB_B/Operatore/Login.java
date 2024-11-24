@@ -1,6 +1,8 @@
-package LAB_B.Client;
+package LAB_B.Operatore;
 
+import LAB_B.Client.Client;
 import LAB_B.Common.Home;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -84,8 +86,8 @@ public class Login extends JFrame {
                     // Verifica se il login è riuscito
                     if (success) {
                         JOptionPane.showMessageDialog(null, "Login effettuato con successo!", "Successo", JOptionPane.INFORMATION_MESSAGE);
-                        // Mostra la finestra successiva
-                        new RegistraCentroAree();
+                        // Passa l'username come argomento a LayoutOperatore
+                        new LayoutOperatore(usernameOrCodiceFiscale); // Apre il layout dell'operatore passando l'username
                         dispose();
                     } else {
                         JOptionPane.showMessageDialog(null, "Username, codice fiscale o password errati!", "Errore", JOptionPane.ERROR_MESSAGE);
