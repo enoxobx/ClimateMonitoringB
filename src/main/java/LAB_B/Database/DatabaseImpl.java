@@ -18,20 +18,49 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
 
     // Metodo per connettersi al database
     private void connectToDatabase() throws SQLException {
-        String dbUrl = "jdbc:postgresql://localhost:5432/climate_monitoring";
+        // Decidi automaticamente l'host da usare
+        String host = getDatabaseHost(); // usa il metodo per determinare l'host
+        String dbUrl = "jdbc:postgresql://" + host + ":5432/climate_monitoring";
         String dbUsername = "postgres";
         String dbPassword = "0000";
-        conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
-        logger.info("Connessione al database stabilita.");
+
+        try {
+            // Connessione al database
+            conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+            logger.info("Connessione al database stabilita.");
+        } catch (SQLException e) {
+            logger.severe("Errore nella connessione al database: " + e.getMessage());
+            e.printStackTrace();
+            throw e; // rilancia l'eccezione
+        }
+    }
+
+    // Metodo per determinare l'host (localhost o IP remoto)
+    private String getDatabaseHost() {
+        // Se l'applicazione è in esecuzione su localhost (lo stesso PC)
+        String host = "localhost"; // Default a localhost
+
+        // IP remoto per esempio
+        String remoteHost = "192.168.1.13";
+
+        // Controlla se l'applicazione deve usare l'IP remoto invece di localhost
+        String useRemoteDb = System.getenv("USE_REMOTE_DB"); // Leggi la variabile di ambiente
+
+        if (useRemoteDb != null && useRemoteDb.equals("true")) {
+            host = remoteHost;
+            logger.info("Utilizzando database remoto: " + host);
+        } else {
+            logger.info("Utilizzando database locale: " + host);
+        }
+
+        return host;
     }
 
     @Override
     public boolean login(String usernameOrCodiceFiscale, String psw) {
         try {
-            // Log per vedere quale parametro è stato immesso
             logger.info("Tentativo di login con username o codice fiscale: " + usernameOrCodiceFiscale);
 
-            // Verifica se è un codice fiscale (16 caratteri alfanumerici)
             if (isCodiceFiscale(usernameOrCodiceFiscale)) {
                 logger.info("Login con codice fiscale");
                 return loginWithCodiceFiscale(usernameOrCodiceFiscale, psw);
@@ -47,25 +76,22 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
     }
 
     private boolean isCodiceFiscale(String input) {
-        // Verifica che sia un codice fiscale valido (16 caratteri alfanumerici)
         return input.length() == 16 && input.matches("[a-zA-Z0-9]+");
     }
 
-    // Login con username
     private boolean loginWithUsername(String username, String psw) throws SQLException {
-        // Log per vedere il valore dell'username inserito
         logger.info("Tentativo di login con Username o Codice Fiscale: " + username.trim());
 
         try (PreparedStatement stmt = conn.prepareStatement(
                 "SELECT password FROM operatori WHERE username = ? OR codice_fiscale = ?")) {
-            stmt.setString(1, username.trim());  // Usa trim per evitare problemi di spazi
-            stmt.setString(2, username.trim());  // Usa trim anche per il codice fiscale
+            stmt.setString(1, username.trim());
+            stmt.setString(2, username.trim());
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                String storedPassword = rs.getString("password").trim();  // Rimuovi eventuali spazi extra dalla password
+                String storedPassword = rs.getString("password").trim();
                 logger.info("Password trovata nel database, ma non verrà stampata per sicurezza.");
-                boolean passwordMatch = storedPassword.equals(psw.trim());  // Usa trim anche per la password
+                boolean passwordMatch = storedPassword.equals(psw.trim());
                 logger.info("Password corrisponde: " + passwordMatch);
                 return passwordMatch;
             } else {
@@ -78,20 +104,18 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
         return false;
     }
 
-    // Login con codice fiscale
     private boolean loginWithCodiceFiscale(String codiceFiscale, String psw) throws SQLException {
-        // Log per vedere il valore del codice fiscale inserito
         logger.info("Tentativo di login con Codice Fiscale: " + codiceFiscale.trim());
 
         try (PreparedStatement stmt = conn.prepareStatement(
                 "SELECT password FROM operatori WHERE LOWER(codice_fiscale) = LOWER(?)")) {
-            stmt.setString(1, codiceFiscale.trim());  // Usa trim per rimuovere spazi extra
+            stmt.setString(1, codiceFiscale.trim());
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                String storedPassword = rs.getString("password").trim();  // Rimuovi eventuali spazi extra dalla password
+                String storedPassword = rs.getString("password").trim();
                 logger.info("Password trovata nel database, ma non verrà stampata per sicurezza.");
-                boolean passwordMatch = storedPassword.equals(psw.trim());  // Usa trim anche per la password
+                boolean passwordMatch = storedPassword.equals(psw.trim());
                 logger.info("Password corrisponde: " + passwordMatch);
                 return passwordMatch;
             } else {
@@ -112,13 +136,11 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
             stmtCheck.setString(2, op.getUsername());
             ResultSet rs = stmtCheck.executeQuery();
 
-            // Se l'operatore esiste già con lo stesso codice fiscale o username, la registrazione fallisce
             if (rs.next()) {
                 logger.warning("Operatore già esistente con codice fiscale o username: " + op.getCodiceFiscale());
                 return false;
             }
 
-            // Se non esiste, inserisce i dati dell'operatore nel database
             try (PreparedStatement stmtInsert = conn.prepareStatement(
                     "INSERT INTO operatori (codice_fiscale, name, surname, email, username, password) VALUES (?, ?, ?, ?, ?, ?)")) {
                 stmtInsert.setString(1, op.getCodiceFiscale());
