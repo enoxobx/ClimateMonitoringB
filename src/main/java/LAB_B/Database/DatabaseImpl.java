@@ -39,7 +39,7 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
             throw new SQLException("Connessione al database non valida.");
         }
 
-        // Se la connessione è valida, esegue l'operazione di aggiornamento tramite DatabaseManager
+        // .Se la connessione è valida, esegue l'operazione di aggiornamento tramite DatabaseManager
         return DatabaseManager.executeUpdate(query, params);
     }
 }
