@@ -1,27 +1,26 @@
 package LAB_B;
 
-import LAB_B.Database.Server;  // Importa la classe Server che gestisce la logica del server
-import LAB_B.Common.Home;      // Importa la classe Home per la finestra principale dell'interfaccia utente
+import LAB_B.Common.Home;
+import LAB_B.Database.DatabaseManager;
+import LAB_B.Database.Server;
 
-import javax.swing.*;  // Importa le librerie per la gestione delle interfacce grafiche (Swing)
+import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {
         try {
             // Avvia il server in un thread separato
-            // Un nuovo thread è creato per eseguire il server senza bloccare l'esecuzione principale
             Thread serverThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    startServer();  // Chiama il metodo startServer() che avvia il server
+                    startServer();  // Avvia il server
                 }
             });
 
             // Avvia il thread del server
-            serverThread.start();  // Il server inizia ad essere eseguito nel suo thread separato
+            serverThread.start();
 
-            // Avvia la finestra principale Home (la schermata di scelta tra cittadino e operatore)
-            // SwingUtilities.invokeLater assicura che la GUI venga aggiornata nel thread dell'interfaccia utente
+            // Avvia la finestra principale Home
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -29,21 +28,23 @@ public class Main {
                 }
             });
 
-            // Attendere che il thread del server finisca (l'app può continuare mentre il server è in esecuzione)
-            // serverThread.join() permette di far attendere il thread principale (main) fino alla fine del server
+            // Attendere che il thread del server finisca
             serverThread.join();
 
         } catch (Exception e) {
-            // In caso di errore durante l'esecuzione, stampiamo l'eccezione
+            // Gestione delle eccezioni generali
             e.printStackTrace();
+        } finally {
+            // Chiusura della connessione al database
+            DatabaseManager.closeConnection();
         }
     }
 
     // Metodo per avviare il server
-    // Questa funzione crea un oggetto Server e avvia il suo processo
     private static void startServer() {
         try {
-            new Server().start();  // Avvia il server chiamando il metodo start della classe Server
+            // Avvia il server senza ripetere il test di connessione al database
+            new Server().start();  // Avvia il server
         } catch (Exception e) {
             // Se si verifica un errore durante l'avvio del server, stampa l'errore
             System.err.println("Errore durante l'avvio del server: ");

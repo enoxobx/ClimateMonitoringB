@@ -1,10 +1,9 @@
 package LAB_B.Database;
 
-import LAB_B.Common.Operatore;
-import java.rmi.Remote;
-import java.rmi.RemoteException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public interface Database extends Remote {
-    boolean login(String cf, String psw) throws RemoteException;
-    boolean registrazione(Operatore op) throws RemoteException;
+public interface Database {
+    ResultSet executeQuery(String query, Object... params) throws SQLException;
+    int executeUpdate(String query, Object... params) throws SQLException;
 }

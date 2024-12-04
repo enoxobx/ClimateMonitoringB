@@ -7,6 +7,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.Properties;
 
 public class Login extends JFrame {
 
@@ -16,12 +18,13 @@ public class Login extends JFrame {
     private JButton registerButton;
     private JButton homeButton;
 
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/climate_monitoring?ssl=false&connectTimeout=5000&socketTimeout=5000";
-    private static final String DB_USERNAME = "postgres";
-    private static final String DB_PASSWORD = "0000";
     private static final int MAX_RETRIES = 3;
+    private String dbUrl;
+    private String dbUsername;
+    private String dbPassword;
 
     public Login() {
+        loadDatabaseConfig(); // Carica la configurazione dal file di proprietà
         setTitle("Login");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -67,6 +70,20 @@ public class Login extends JFrame {
         setVisible(true);
     }
 
+    private void loadDatabaseConfig() {
+        // Carica la configurazione dal file config.properties
+        Properties properties = new Properties();
+        try {
+            properties.load(getClass().getClassLoader().getResourceAsStream("config.properties"));
+            dbUrl = properties.getProperty("db.url");
+            dbUsername = properties.getProperty("db.username");
+            dbPassword = properties.getProperty("db.password");
+        } catch (IOException e) {
+            System.err.println("Errore nel caricamento del file di configurazione: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     private void configureButtons() {
         loginButton.addActionListener(new ActionListener() {
             @Override
@@ -80,7 +97,7 @@ public class Login extends JFrame {
                     JOptionPane.showMessageDialog(null, "Il campo password non può essere vuoto!", "Errore", JOptionPane.ERROR_MESSAGE);
                 } else {
                     // Creazione del client per il login
-                    Client client = new Client(DB_URL, DB_USERNAME, DB_PASSWORD, MAX_RETRIES);
+                    Client client = new Client(dbUrl, dbUsername, dbPassword, MAX_RETRIES);
                     boolean success = client.login(usernameOrCodiceFiscale, password);
 
                     // Verifica se il login è riuscito
@@ -96,10 +113,10 @@ public class Login extends JFrame {
             }
         });
 
-
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
+                // Apre la finestra di registrazione
                 SignUp signUpWindow = new SignUp();
                 dispose();
             }
