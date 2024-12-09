@@ -7,7 +7,7 @@ import java.sql.*;
 public class DatabaseImpl extends UnicastRemoteObject implements Database {
 
     // Costruttore che non richiede un proxy (necessario per RMI)
-    public DatabaseImpl() throws Exception {
+    public DatabaseImpl(String dbUrl, String dbUser, String dbPassword) throws Exception {
         super(); // Chiama il costruttore della classe UnicastRemoteObject per preparare l'oggetto per RMI.
     }
 

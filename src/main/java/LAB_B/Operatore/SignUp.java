@@ -4,6 +4,7 @@ import LAB_B.Common.Home;
 import LAB_B.Common.LayoutStandard;
 import LAB_B.Database.Database;
 import LAB_B.Database.DatabaseImpl;
+import LAB_B.Database.DatabaseProxy;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,8 +30,8 @@ public class SignUp extends LayoutStandard {
         super();
 
         try {
-            // Inizializzazione del database tramite il proxy
-            database = new DatabaseImpl();
+            // Utilizza il proxy per la gestione del database
+            database = new DatabaseProxy();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Errore di connessione al database: " + e.getMessage(),
                     "Errore", JOptionPane.ERROR_MESSAGE);

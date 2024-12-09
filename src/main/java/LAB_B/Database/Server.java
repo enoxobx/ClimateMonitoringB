@@ -2,6 +2,7 @@ package LAB_B.Database;
 
 import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
+import java.util.Properties;
 
 public class Server {
 
@@ -11,8 +12,13 @@ public class Server {
             // Crea un registro RMI sulla porta 1099
             LocateRegistry.createRegistry(1099);
 
+            Properties config = new Properties();
+            String dbUrl = config.getProperty("db.url");
+            String dbUser = config.getProperty("db.user");
+            String dbPassword = config.getProperty("db.password");
+
             // Rende l'oggetto DatabaseImpl disponibile come servizio RMI
-            Naming.rebind("rmi://localhost/DatabaseService", new DatabaseImpl());
+            Naming.rebind("rmi://localhost/DatabaseService", new DatabaseImpl(dbUrl, dbUser, dbPassword));
 
             // Stampa un messaggio di conferma che il server è stato avviato
             System.out.println("Server avviato.");
