@@ -1,81 +1,78 @@
 package LAB_B.Client;
 
-import java.sql.*;  // Importa la libreria per la gestione delle operazioni con il database (SQL)
+import java.sql.*;
+import LAB_B.Database.DatabaseManager;
 
 public class Client {
-    private String dbUrl;        // URL del database
-    private String dbUsername;   // Nome utente per la connessione al database
-    private String dbPassword;   // Password per la connessione al database
-    private int maxRetries;      // Numero massimo di tentativi di connessione
+    private final int maxRetries;
+    private String dbUrl;
+    private String dbUsername;
+    private String dbPassword;
 
-    // Costruttore per inizializzare i parametri di connessione al database
+    // Costruttore per inizializzare i parametri di connessione al database e il numero di tentativi
     public Client(String dbUrl, String dbUsername, String dbPassword, int maxRetries) {
-        this.dbUrl = dbUrl;            // Inizializza l'URL del database
-        this.dbUsername = dbUsername;  // Inizializza il nome utente per la connessione
-        this.dbPassword = dbPassword;  // Inizializza la password per la connessione
-        this.maxRetries = maxRetries;  // Imposta il numero massimo di tentativi di connessione
+        this.dbUrl = dbUrl;
+        this.dbUsername = dbUsername;
+        this.dbPassword = dbPassword;
+        this.maxRetries = maxRetries;
     }
 
     // Metodo per connettersi al database e verificare il login dell'utente
     public boolean login(String usernameOrCodiceFiscale, String password) {
-        Connection conn = null;      // Variabile per la connessione al database
+        Connection conn = null;        // Variabile per la connessione al database
         PreparedStatement stmt = null; // Variabile per eseguire la query SQL
-        ResultSet rs = null;          // Variabile per memorizzare il risultato della query
+        ResultSet rs = null;           // Variabile per memorizzare il risultato della query
 
         try {
-            // Tentativi di connessione al database, fino al numero massimo di retries
-            for (int attempts = 0; attempts < maxRetries; attempts++) {
-                try {
-                    // Connessione al database PostgreSQL usando i parametri forniti
-                    conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
-                    System.out.println("Connessione al database riuscita.");  // Conferma della connessione riuscita
-
-                    // Debug: stampa i valori ricevuti
-                    System.out.println("Tentativo di login con username o codice fiscale: " + usernameOrCodiceFiscale);
-                    System.out.println("Password: " + (password != null ? "******" : "null"));  // Evitare di stampare la password in chiaro
-
-                    // Prepara la query per il login basata su username o codice fiscale
-                    String sql = "SELECT * FROM operatori WHERE (username = ? OR codice_fiscale = ?) AND password = ?";
-
-                    stmt = conn.prepareStatement(sql);  // Prepara la query
-                    stmt.setString(1, usernameOrCodiceFiscale);  // Imposta il parametro per lo username o codice fiscale
-                    stmt.setString(2, usernameOrCodiceFiscale);  // Imposta il parametro per lo username o codice fiscale
-                    stmt.setString(3, password);  // Imposta il parametro per la password
-
-                    rs = stmt.executeQuery();  // Esegui la query e ottieni il risultato
-
-                    // Se il risultato della query contiene un record, significa che il login è riuscito
-                    if (rs.next()) {
-                        System.out.println("Login riuscito.");  // Messaggio di login riuscito
-                        return true;  // Restituisci true se le credenziali sono corrette
-                    } else {
-                        System.out.println("Login fallito. Nessun operatore trovato.");  // Messaggio di login fallito
-                        return false;  // Restituisci false se le credenziali non sono corrette
-                    }
-                } catch (SQLException e) {
-                    // Se c'è un errore durante la connessione o l'esecuzione della query
-                    System.err.println("Errore durante la connessione o la query al database. Tentativo " + (attempts + 1) + " di " + maxRetries + "...");
-                    e.printStackTrace();  // Stampa lo stack trace dell'errore per il debug
-                    try {
-                        Thread.sleep(2000);  // Attendere 2 secondi prima di ritentare la connessione
-                    } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt();  // Ripristina lo stato di interruzione del thread
-                    }
-                }
+            // Ottieni la connessione dal DatabaseManager
+            conn = DatabaseManager.getConnection();  // Ottieni la connessione
+            if (conn == null || conn.isClosed()) {
+                System.err.println("Impossibile ottenere una connessione valida al database.");
+                return false;  // Restituisci false se la connessione non è riuscita o è stata chiusa
             }
-            System.err.println("Impossibile connettersi al database dopo " + maxRetries + " tentativi.");
-            return false;  // Se la connessione non è riuscita dopo il numero massimo di tentativi
+
+            // Debug: stampa i valori ricevuti (attenzione a non stampare la password in chiaro)
+            System.out.println("Tentativo di login con username o codice fiscale: " + usernameOrCodiceFiscale);
+            System.out.println("Password: " + (password != null ? "******" : "null"));
+
+            // Prepara la query per il login basata su username o codice fiscale
+            String sql = "SELECT * FROM operatori WHERE (username = ? OR codice_fiscale = ?) AND password = ?";
+            stmt = conn.prepareStatement(sql);  // Prepara la query
+
+            // Imposta i parametri della query
+            stmt.setString(1, usernameOrCodiceFiscale);  // Imposta il parametro per lo username o codice fiscale
+            stmt.setString(2, usernameOrCodiceFiscale);  // Imposta il parametro per lo username o codice fiscale
+            stmt.setString(3, password);  // Imposta il parametro per la password
+
+            // Esegui la query e ottieni il risultato
+            rs = stmt.executeQuery();
+
+            // Se il risultato della query contiene un record, significa che il login è riuscito
+            if (rs.next()) {
+                System.out.println("Login riuscito.");  // Messaggio di login riuscito
+                return true;  // Restituisci true se le credenziali sono corrette
+            } else {
+                System.out.println("Login fallito. Nessun operatore trovato.");  // Messaggio di login fallito
+                return false;  // Restituisci false se le credenziali non sono corrette
+            }
+        } catch (SQLException e) {
+            // Gestione degli errori in caso di problemi con la connessione o la query
+            System.err.println("Errore durante il login: " + e.getMessage());
+            e.printStackTrace();
+            return false;  // Restituisci false se c'è stato un errore
         } finally {
-            // Chiude le risorse di connessione al database per evitare memory leak
-            try {
-                if (rs != null) rs.close();  // Chiude il ResultSet
-                if (stmt != null) stmt.close();  // Chiude il PreparedStatement
-                if (conn != null) conn.close();  // Chiude la connessione al database
-            } catch (SQLException e) {
-                // Se c'è un errore durante la chiusura delle risorse
-                System.err.println("Errore nella chiusura delle risorse.");
-                e.printStackTrace();
-            }
+            // Chiudi le risorse in modo sicuro
+            closeResources(rs, stmt, conn);  // Chiudi ResultSet, PreparedStatement e Connection
+        }
+    }
+
+    private void closeResources(ResultSet rs, Statement stmt, Connection conn) {
+        try {
+            if (rs != null) rs.close();
+            if (stmt != null) stmt.close();
+            if (conn != null && !conn.isClosed()) conn.close();
+        } catch (SQLException e) {
+            System.err.println("Errore nella chiusura delle risorse: " + e.getMessage());
         }
     }
 }
