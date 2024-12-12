@@ -4,7 +4,7 @@ import java.sql.*;
 import java.util.Properties;
 import java.io.InputStream;
 import java.io.IOException;
-
+//TODO questa classe si può eliminares
 public class DatabaseManager {
     private static Connection connection;
     private static QueryExecutorImpl queryExecutor;

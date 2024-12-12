@@ -1,4 +1,6 @@
 package LAB_B.Common;
+import LAB_B.Client.Client;
+import LAB_B.Database.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,6 +16,7 @@ abstract public class LayoutStandard extends JFrame {
     private JButton home;    // Bottone "Home"
     private Container body;  // Corpo della finestra (contenitore principale)
     private Gestore gestore; // Gestore degli eventi (ActionListener)
+    public Database db;
 
     // Costruttore della classe LayoutStandard
     public LayoutStandard() {
@@ -32,6 +35,10 @@ abstract public class LayoutStandard extends JFrame {
         body.add(home, BorderLayout.WEST);
         // Associa l'azione del bottone al gestore (Gestore implementa ActionListener)
         home.addActionListener(gestore);
+
+        //istanzia il db da usare;
+        db = Client.getDb();
+        
 
         // Imposta le proprietà predefinite della finestra
         setDefaultProperties();
@@ -78,4 +85,5 @@ abstract public class LayoutStandard extends JFrame {
     public Gestore getGestore() {
         return gestore;
     }
+    
 }

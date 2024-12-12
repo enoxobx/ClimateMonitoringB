@@ -19,6 +19,11 @@
             <id>central</id>
             <url>https://repo.maven.apache.org/maven2</url>
         </repository>
+        <repository>
+            <id>JOSM Repository</id>
+            <url>https://josm.openstreetmap.de/nexus/content/repositories/releases/</url>
+        </repository>
+        
     </repositories>
 
     <dependencies>
@@ -28,12 +33,16 @@
             <artifactId>postgresql</artifactId>
             <version>42.6.0</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.bbn/openmap -->
+        <!-- https://mvnrepository.com/artifact/org.openstreetmap.jmapviewer/jmapviewer -->
         <dependency>
-            <groupId>com.bbn</groupId>
-            <artifactId>openmap</artifactId>
-            <version>5.1.3</version>
+            <groupId>org.openstreetmap.jmapviewer</groupId>
+            <artifactId>jmapviewer</artifactId>
+            <version>2.22</version>
         </dependency>
+        
+
+
+
         <!-- Aggiungi altre dipendenze necessarie -->
     </dependencies>
 

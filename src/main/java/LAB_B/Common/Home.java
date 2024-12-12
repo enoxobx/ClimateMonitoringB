@@ -93,7 +93,11 @@ public class Home extends JFrame {
             // Gestione dell'evento per il bottone "Cittadino"
             if (e.getSource() == bottoneCittadino) {
                 // Funzionalità non ancora implementata, stampa un messaggio di errore
-                System.err.println("Funzionalità Cittadino non ancora implementata.");
+                LayoutCittadino cittadino = new LayoutCittadino();
+                cittadino.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                cittadino.setLocationRelativeTo(null); // Centra la finestra sullo schermo
+                cittadino.setVisible(true); // Rende visibile la finestra
+                dispose();
             }
             // Gestione dell'evento per il bottone "Operatore"
             else if (e.getSource() == bottoneOperatore) {

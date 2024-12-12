@@ -3,10 +3,11 @@ package LAB_B.Operatore;
 import LAB_B.Common.Home;
 import LAB_B.Common.LayoutStandard;
 import LAB_B.Database.Database;
-import LAB_B.Database.DatabaseManager;
+import LAB_B.Database.DatabaseImpl;
 
 import javax.swing.*;
 import java.awt.*;
+import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.regex.Pattern;
 
@@ -29,8 +30,8 @@ public class SignUp extends LayoutStandard {
         super();
 
         try {
-            // Utilizza il proxy per la gestione del database
-            database = (Database) new DatabaseManager();
+            
+            database = new DatabaseImpl();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Errore di connessione al database: " + e.getMessage(),
                     "Errore", JOptionPane.ERROR_MESSAGE);
@@ -164,13 +165,14 @@ public class SignUp extends LayoutStandard {
     private void salvaOperatore() {
         if (validateInputs()) {
             try {
-                String query = "INSERT INTO operatore (nome, cognome, cf, email, password, centro) VALUES (?, ?, ?, ?, ?, ?)";
+                //le tabelle non sono uguali al file che ho messo per la crazione delle tabelle, mancano dei campi
+                String query = "INSERT INTO operatori (nome, cognome, cf, email, password, centro) VALUES (?, ?, ?, ?, ?, ?)";
                 database.executeUpdate(query, nome.getText(), cognome.getText(), codFiscale.getText(),
                         email.getText(), new String(password.getPassword()), centro.getText());
                 JOptionPane.showMessageDialog(this, "Operatore registrato con successo!", "Successo", JOptionPane.INFORMATION_MESSAGE);
                 new Login();
                 dispose();
-            } catch (SQLException e) {
+            } catch (RemoteException e) {
                 JOptionPane.showMessageDialog(this, "Errore durante il salvataggio: " + e.getMessage(),
                         "Errore", JOptionPane.ERROR_MESSAGE);
             }
