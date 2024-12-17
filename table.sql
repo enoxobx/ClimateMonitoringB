@@ -23,7 +23,7 @@ GRANT ALL ON DATABASE "ClimateMonitoring" TO agent1;
 GRANT ALL ON DATABASE "ClimateMonitoring" TO postgres;
 
 CREATE TABLE Citta (
-                       Geoname_ID BIGINT() PRIMARY KEY,
+                       Geoname_ID BIGINT PRIMARY KEY,
                        Name VARCHAR(30) NOT NULL,
                        ASCII_Name VARCHAR(30) NOT NULL,
                        Country_Code VARCHAR(3) NOT NULL,
@@ -31,6 +31,7 @@ CREATE TABLE Citta (
                        longitude FLOAT8 NOT NULL,
                        latitude FLOAT8 NOT NULL
 );
+
 
 CREATE TABLE operatori (
                            codice_fiscale VARCHAR(16) PRIMARY KEY,
@@ -43,11 +44,16 @@ CREATE TABLE operatori (
 );
 
 
-CREATE TABLE CentriMonitoraggio(
-                                   id VARCHAR(30) PRIMARY KEY,
-                                   nomeCentro VARCHAR(30) NOT NULL,
-                                   Indirizzo VARCHAR(50) NOT NULL
+CREATE TABLE CentriMonitoraggio (
+                                    id VARCHAR(30) PRIMARY KEY,
+                                    nomeCentro VARCHAR(30) NOT NULL,
+                                    Indirizzo VARCHAR(50) NOT NULL
+
 );
+
+ALTER TABLE CentriMonitoraggio
+    ALTER COLUMN id TYPE VARCHAR(30);
+
 
 CREATE TABLE Parametro(
                           ID VARCHAR(30) PRIMARY KEY,
@@ -75,35 +81,40 @@ CREATE TABLE Parametro(
 );
 
 CREATE TABLE Rilevazione (
-                             CF VARCHAR(16) REFERENCES Operatori(codice_fiscale)
+                             CF VARCHAR(16) NOT NULL REFERENCES Operatori(codice_fiscale)
                                  ON UPDATE CASCADE
                                  ON DELETE NO ACTION,
-                             CentriMonitoraggio_ID VARCHAR(30) REFERENCES CentriMonitoraggio(id)
+                             CentriMonitoraggio_ID VARCHAR(30) NOT NULL REFERENCES CentriMonitoraggio(id)
                                  ON UPDATE CASCADE
                                  ON DELETE NO ACTION,
-                             Geoname_ID BIGINT() REFERENCES Citta(Geoname_ID)
+                             Geoname_ID BIGINT NOT NULL REFERENCES Citta(Geoname_ID)
                                  ON UPDATE CASCADE
                                  ON DELETE NO ACTION,
-                             Par_ID VARCHAR(30) REFERENCES Parametro(ID)
+                             Par_ID VARCHAR(30) NOT NULL REFERENCES Parametro(ID)
                                  ON UPDATE CASCADE
                                  ON DELETE NO ACTION,
-                             date_r date NOT NULL
+                             date_r DATE NOT NULL,
+                             PRIMARY KEY (CF, CentriMonitoraggio_ID, Geoname_ID, Par_ID, date_r)
 );
+
 CREATE TABLE Osservano (
                            CentriMonitoraggio_ID VARCHAR(30) REFERENCES CentriMonitoraggio(id)
                                ON UPDATE CASCADE
                                ON DELETE NO ACTION,
-                           Geoname_ID BIGINT() REFERENCES Citta(Geoname_ID)
+                           Geoname_ID BIGINT REFERENCES Citta(Geoname_ID)
                                ON UPDATE CASCADE
                                ON DELETE NO ACTION,
-                           PRIMARY KEY(CentriMonitoraggio_ID,Geoname_ID)
+                           PRIMARY KEY (CentriMonitoraggio_ID, Geoname_ID)
 );
 
-CREATE TABLE Lavora(
-                       CF VARCHAR(16) REFERENCES Operatori(codice_fiscale)
-                           ON UPDATE CASCADE
-                           ON DELETE NO ACTION,
-                       CentriMonitoraggio_ID VARCHAR(30) REFERENCES CentriMonitoraggio(id)
-                           ON UPDATE CASCADE
-                           ON DELETE NO ACTION
+CREATE TABLE Lavora (
+                        CF VARCHAR(16) NOT NULL REFERENCES Operatori(codice_fiscale)
+                            ON UPDATE CASCADE
+                            ON DELETE NO ACTION,
+                        CentriMonitoraggio_ID VARCHAR(30) NOT NULL REFERENCES CentriMonitoraggio(id)
+                            ON UPDATE CASCADE
+                            ON DELETE NO ACTION,
+                        PRIMARY KEY (CF, CentriMonitoraggio_ID)
 );
+
+

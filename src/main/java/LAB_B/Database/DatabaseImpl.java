@@ -21,7 +21,7 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
         try {
             if (connection == null || connection.isClosed()) {
                 System.out.println("Tentativo di connessione al database...");
-                try (InputStream input = DatabaseManager.class.getClassLoader()
+                try (InputStream input = DatabaseImpl.class.getClassLoader()
                         .getResourceAsStream("config.properties")) {
                     if (input == null) {
                         System.err.println("Impossibile trovare il file di configurazione.");
@@ -93,7 +93,7 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
         try {
             if (connection == null || connection.isClosed()) {
                 System.out.println("Tentativo di connessione al database...");
-                try (InputStream input = DatabaseManager.class.getClassLoader().getResourceAsStream("config.properties")) {
+                try (InputStream input = DatabaseImpl.class.getClassLoader().getResourceAsStream("config.properties")) {
                     if (input == null) {
                         System.err.println("Impossibile trovare il file di configurazione.");
                     } else {

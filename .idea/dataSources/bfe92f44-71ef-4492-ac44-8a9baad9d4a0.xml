@@ -3,9 +3,9 @@
   <database-model serializer="dbm" dbms="POSTGRES" family-id="POSTGRES" format-version="4.52">
     <root id="1">
       <DateStyle>dmy</DateStyle>
-      <IntrospectionStateNumber>927</IntrospectionStateNumber>
+      <IntrospectionStateNumber>973</IntrospectionStateNumber>
       <ServerVersion>16.4</ServerVersion>
-      <StartupTime>1732120772</StartupTime>
+      <StartupTime>1734057593</StartupTime>
       <TimeZones>true ACDT
 true ACSST
 false ACST
@@ -800,7 +800,7 @@ false Zulu
 14697||10|C|G
 14697||-9223372036854775808|U|G
 14697||10|U|G</Grants>
-      <IntrospectionStateNumber>927</IntrospectionStateNumber>
+      <IntrospectionStateNumber>973</IntrospectionStateNumber>
       <ObjectId>16398</ObjectId>
       <OwnerName>postgres</OwnerName>
     </database>
@@ -815,7 +815,6 @@ false Zulu
 14697||10|C|G
 14697||-9223372036854775808|U|G
 14697||10|U|G</Grants>
-      <IntrospectionStateNumber>926</IntrospectionStateNumber>
       <ObjectId>5</ObjectId>
       <OwnerName>postgres</OwnerName>
     </database>
@@ -4234,8 +4233,8 @@ false Zulu
     <schema id="264" parent="2" name="public">
       <Comment>standard public schema</Comment>
       <Current>1</Current>
-      <IntrospectionStateNumber>927</IntrospectionStateNumber>
-      <LastIntrospectionLocalTimestamp>2024-12-09.13:36:01</LastIntrospectionLocalTimestamp>
+      <IntrospectionStateNumber>973</IntrospectionStateNumber>
+      <LastIntrospectionLocalTimestamp>2024-12-17.17:20:34</LastIntrospectionLocalTimestamp>
       <ObjectId>2200</ObjectId>
       <StateNumber>524</StateNumber>
       <OwnerName>pg_database_owner</OwnerName>
@@ -7615,50 +7614,68 @@ false Zulu
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
-    <table id="511" parent="264" name="coordinatemonitoraggio">
+    <table id="511" parent="264" name="citta">
+      <ObjectId>16499</ObjectId>
+      <StateNumber>928</StateNumber>
+      <AccessMethodId>2</AccessMethodId>
+      <OwnerName>postgres</OwnerName>
+    </table>
+    <table id="512" parent="264" name="coordinatemonitoraggio">
       <ObjectId>16494</ObjectId>
       <StateNumber>919</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
-    <table id="512" parent="264" name="operatori">
-      <ObjectId>16431</ObjectId>
-      <StateNumber>910</StateNumber>
+    <table id="513" parent="264" name="lavora">
+      <ObjectId>16657</ObjectId>
+      <StateNumber>972</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
-    <table id="513" parent="264" name="parametriclimatici">
+    <table id="514" parent="264" name="operatori">
+      <ObjectId>16431</ObjectId>
+      <StateNumber>972</StateNumber>
+      <AccessMethodId>2</AccessMethodId>
+      <OwnerName>postgres</OwnerName>
+    </table>
+    <table id="515" parent="264" name="parametriclimatici">
       <ObjectId>16481</ObjectId>
       <StateNumber>913</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
-    <column id="514" parent="510" name="id">
+    <table id="516" parent="264" name="parametro">
+      <ObjectId>16504</ObjectId>
+      <StateNumber>930</StateNumber>
+      <AccessMethodId>2</AccessMethodId>
+      <OwnerName>postgres</OwnerName>
+    </table>
+    <column id="517" parent="510" name="id">
       <DasType>integer|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>870</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="515" parent="510" name="nome">
+    <column id="518" parent="510" name="nome">
       <DasType>varchar(255)|0s</DasType>
       <Position>2</Position>
       <StateNumber>870</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="516" parent="510" name="descrizione">
+    <column id="519" parent="510" name="descrizione">
       <DasType>varchar(255)|0s</DasType>
       <Position>3</Position>
       <StateNumber>870</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="517" parent="510" name="posizione">
+    <column id="520" parent="510" name="posizione">
       <DasType>varchar(255)|0s</DasType>
       <Position>4</Position>
       <StateNumber>870</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <index id="518" parent="510" name="centri_monitoraggio_pkey">
+    <index id="521" parent="510" name="centri_monitoraggio_pkey">
       <ColNames>id</ColNames>
       <ObjectId>16479</ObjectId>
       <Primary>1</Primary>
@@ -7666,44 +7683,109 @@ false Zulu
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="519" parent="510" name="centri_monitoraggio_pkey">
+    <key id="522" parent="510" name="centri_monitoraggio_pkey">
       <ObjectId>16480</ObjectId>
       <Primary>1</Primary>
       <StateNumber>870</StateNumber>
       <UnderlyingIndexId>16479</UnderlyingIndexId>
     </key>
-    <column id="520" parent="511" name="id">
+    <column id="523" parent="511" name="geoname_id">
+      <DasType>bigint|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StateNumber>928</StateNumber>
+      <TypeId>20</TypeId>
+    </column>
+    <column id="524" parent="511" name="name">
+      <DasType>varchar(30)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StateNumber>928</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="525" parent="511" name="ascii_name">
+      <DasType>varchar(30)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StateNumber>928</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="526" parent="511" name="country_code">
+      <DasType>varchar(3)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StateNumber>928</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="527" parent="511" name="country_name">
+      <DasType>varchar(30)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StateNumber>928</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="528" parent="511" name="longitude">
+      <DasType>double precision|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+      <StateNumber>928</StateNumber>
+      <TypeId>701</TypeId>
+    </column>
+    <column id="529" parent="511" name="latitude">
+      <DasType>double precision|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>7</Position>
+      <StateNumber>928</StateNumber>
+      <TypeId>701</TypeId>
+    </column>
+    <index id="530" parent="511" name="citta_pkey">
+      <ColNames>geoname_id</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16502</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>928</StateNumber>
+      <Unique>1</Unique>
+      <AccessMethodId>403</AccessMethodId>
+    </index>
+    <key id="531" parent="511" name="citta_pkey">
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16503</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>928</StateNumber>
+      <UnderlyingIndexId>16502</UnderlyingIndexId>
+    </key>
+    <column id="532" parent="512" name="id">
       <DasType>integer|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>885</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="521" parent="511" name="latitudine">
+    <column id="533" parent="512" name="latitudine">
       <DasType>numeric(9,6 digit)|0s</DasType>
       <Position>2</Position>
       <StateNumber>885</StateNumber>
       <TypeId>1700</TypeId>
     </column>
-    <column id="522" parent="511" name="longitudine">
+    <column id="534" parent="512" name="longitudine">
       <DasType>numeric(9,6 digit)|0s</DasType>
       <Position>3</Position>
       <StateNumber>885</StateNumber>
       <TypeId>1700</TypeId>
     </column>
-    <column id="523" parent="511" name="denominazione_ufficiale">
+    <column id="535" parent="512" name="denominazione_ufficiale">
       <DasType>varchar(255)|0s</DasType>
       <Position>4</Position>
       <StateNumber>885</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="524" parent="511" name="stato">
+    <column id="536" parent="512" name="stato">
       <DasType>varchar(100)|0s</DasType>
       <Position>5</Position>
       <StateNumber>885</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <index id="525" parent="511" name="coordinatemonitoraggio_pkey">
+    <index id="537" parent="512" name="coordinatemonitoraggio_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16497</ObjectId>
@@ -7712,63 +7794,115 @@ false Zulu
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="526" parent="511" name="coordinatemonitoraggio_pkey">
+    <key id="538" parent="512" name="coordinatemonitoraggio_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16498</ObjectId>
       <Primary>1</Primary>
       <StateNumber>885</StateNumber>
       <UnderlyingIndexId>16497</UnderlyingIndexId>
     </key>
-    <column id="527" parent="512" name="codice_fiscale">
+    <column id="539" parent="513" name="cf">
+      <DasType>varchar(16)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StateNumber>972</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="540" parent="513" name="centrimonitoraggio_id">
+      <DasType>integer|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StateNumber>972</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <foreign-key id="541" parent="513" name="lavora_cf_fkey">
+      <ColNames>cf</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16662</ObjectId>
+      <OnUpdate>cascade</OnUpdate>
+      <StateNumber>972</StateNumber>
+      <RefKeyColPositions>1</RefKeyColPositions>
+      <RefTableId>16431</RefTableId>
+    </foreign-key>
+    <foreign-key id="542" parent="513" name="lavora_centrimonitoraggio_id_fkey">
+      <ColNames>centrimonitoraggio_id</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16667</ObjectId>
+      <OnUpdate>cascade</OnUpdate>
+      <StateNumber>972</StateNumber>
+      <RefKeyColPositions>1</RefKeyColPositions>
+      <RefTableId>16474</RefTableId>
+    </foreign-key>
+    <index id="543" parent="513" name="lavora_pkey">
+      <ColNames>cf
+centrimonitoraggio_id</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16660</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>972</StateNumber>
+      <Unique>1</Unique>
+      <AccessMethodId>403</AccessMethodId>
+      <CollationNames>default</CollationNames>
+      <CollationIds>100</CollationIds>
+      <CollationParentNames>pg_catalog</CollationParentNames>
+    </index>
+    <key id="544" parent="513" name="lavora_pkey">
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16661</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>972</StateNumber>
+      <UnderlyingIndexId>16660</UnderlyingIndexId>
+    </key>
+    <column id="545" parent="514" name="codice_fiscale">
       <DasType>varchar(16)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>767</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="528" parent="512" name="nome">
+    <column id="546" parent="514" name="nome">
       <DasType>varchar(50)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>767</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="529" parent="512" name="cognome">
+    <column id="547" parent="514" name="cognome">
       <DasType>varchar(50)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StateNumber>767</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="530" parent="512" name="username">
+    <column id="548" parent="514" name="username">
       <DasType>varchar(50)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StateNumber>767</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="531" parent="512" name="email">
+    <column id="549" parent="514" name="email">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
       <StateNumber>767</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="532" parent="512" name="password">
+    <column id="550" parent="514" name="password">
       <DasType>varchar(255)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>6</Position>
       <StateNumber>767</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="533" parent="512" name="centro_monitoraggio">
+    <column id="551" parent="514" name="centro_monitoraggio">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>7</Position>
       <StateNumber>767</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <index id="534" parent="512" name="operatori_pkey">
+    <index id="552" parent="514" name="operatori_pkey">
       <ColNames>codice_fiscale</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16436</ObjectId>
@@ -7780,7 +7914,7 @@ false Zulu
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <index id="535" parent="512" name="operatori_username_key">
+    <index id="553" parent="514" name="operatori_username_key">
       <ColNames>username</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16438</ObjectId>
@@ -7791,7 +7925,7 @@ false Zulu
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <index id="536" parent="512" name="operatori_email_key">
+    <index id="554" parent="514" name="operatori_email_key">
       <ColNames>email</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16440</ObjectId>
@@ -7802,94 +7936,94 @@ false Zulu
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <key id="537" parent="512" name="operatori_pkey">
+    <key id="555" parent="514" name="operatori_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16437</ObjectId>
       <Primary>1</Primary>
       <StateNumber>767</StateNumber>
       <UnderlyingIndexId>16436</UnderlyingIndexId>
     </key>
-    <key id="538" parent="512" name="operatori_username_key">
+    <key id="556" parent="514" name="operatori_username_key">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16439</ObjectId>
       <StateNumber>767</StateNumber>
       <UnderlyingIndexId>16438</UnderlyingIndexId>
     </key>
-    <key id="539" parent="512" name="operatori_email_key">
+    <key id="557" parent="514" name="operatori_email_key">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16441</ObjectId>
       <StateNumber>767</StateNumber>
       <UnderlyingIndexId>16440</UnderlyingIndexId>
     </key>
-    <column id="540" parent="513" name="id">
+    <column id="558" parent="515" name="id">
       <DasType>integer|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>873</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="541" parent="513" name="centro_id">
+    <column id="559" parent="515" name="centro_id">
       <DasType>integer|0s</DasType>
       <Position>2</Position>
       <StateNumber>873</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="542" parent="513" name="velocita_vento">
+    <column id="560" parent="515" name="velocita_vento">
       <DasType>integer|0s</DasType>
       <Position>3</Position>
       <StateNumber>873</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="543" parent="513" name="temperatura">
+    <column id="561" parent="515" name="temperatura">
       <DasType>integer|0s</DasType>
       <Position>4</Position>
       <StateNumber>873</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="544" parent="513" name="umidita">
+    <column id="562" parent="515" name="umidita">
       <DasType>integer|0s</DasType>
       <Position>5</Position>
       <StateNumber>873</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="545" parent="513" name="precipitazioni">
+    <column id="563" parent="515" name="precipitazioni">
       <DasType>integer|0s</DasType>
       <Position>6</Position>
       <StateNumber>873</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="546" parent="513" name="severita_vento">
+    <column id="564" parent="515" name="severita_vento">
       <DasType>varchar(255)|0s</DasType>
       <Position>7</Position>
       <StateNumber>873</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="547" parent="513" name="severita_temperatura">
+    <column id="565" parent="515" name="severita_temperatura">
       <DasType>varchar(255)|0s</DasType>
       <Position>8</Position>
       <StateNumber>873</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="548" parent="513" name="severita_umidita">
+    <column id="566" parent="515" name="severita_umidita">
       <DasType>varchar(255)|0s</DasType>
       <Position>9</Position>
       <StateNumber>873</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="549" parent="513" name="severita_precipitazioni">
+    <column id="567" parent="515" name="severita_precipitazioni">
       <DasType>varchar(255)|0s</DasType>
       <Position>10</Position>
       <StateNumber>873</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <foreign-key id="550" parent="513" name="parametri_climatici_centro_id_fkey">
+    <foreign-key id="568" parent="515" name="parametri_climatici_centro_id_fkey">
       <ColNames>centro_id</ColNames>
       <ObjectId>16488</ObjectId>
       <StateNumber>873</StateNumber>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16474</RefTableId>
     </foreign-key>
-    <index id="551" parent="513" name="parametri_climatici_pkey">
+    <index id="569" parent="515" name="parametri_climatici_pkey">
       <ColNames>id</ColNames>
       <ObjectId>16486</ObjectId>
       <Primary>1</Primary>
@@ -7897,11 +8031,163 @@ false Zulu
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="552" parent="513" name="parametri_climatici_pkey">
+    <key id="570" parent="515" name="parametri_climatici_pkey">
       <ObjectId>16487</ObjectId>
       <Primary>1</Primary>
       <StateNumber>873</StateNumber>
       <UnderlyingIndexId>16486</UnderlyingIndexId>
+    </key>
+    <column id="571" parent="516" name="id">
+      <DasType>varchar(30)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StateNumber>930</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="572" parent="516" name="wind">
+      <DasType>varchar(10)|0s</DasType>
+      <Position>2</Position>
+      <StateNumber>930</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="573" parent="516" name="humidity">
+      <DasType>varchar(10)|0s</DasType>
+      <Position>3</Position>
+      <StateNumber>930</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="574" parent="516" name="pressure">
+      <DasType>varchar(10)|0s</DasType>
+      <Position>4</Position>
+      <StateNumber>930</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="575" parent="516" name="temperature">
+      <DasType>varchar(10)|0s</DasType>
+      <Position>5</Position>
+      <StateNumber>930</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="576" parent="516" name="precipitation">
+      <DasType>varchar(10)|0s</DasType>
+      <Position>6</Position>
+      <StateNumber>930</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="577" parent="516" name="glacier_altitude">
+      <DasType>varchar(10)|0s</DasType>
+      <Position>7</Position>
+      <StateNumber>930</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="578" parent="516" name="glacier_mass">
+      <DasType>varchar(10)|0s</DasType>
+      <Position>8</Position>
+      <StateNumber>930</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="579" parent="516" name="wind_comment">
+      <DasType>varchar(255)|0s</DasType>
+      <Position>9</Position>
+      <StateNumber>930</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="580" parent="516" name="humidity_comment">
+      <DasType>varchar(255)|0s</DasType>
+      <Position>10</Position>
+      <StateNumber>930</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="581" parent="516" name="pressure_comment">
+      <DasType>varchar(255)|0s</DasType>
+      <Position>11</Position>
+      <StateNumber>930</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="582" parent="516" name="temperature_comment">
+      <DasType>varchar(255)|0s</DasType>
+      <Position>12</Position>
+      <StateNumber>930</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="583" parent="516" name="precipitation_comment">
+      <DasType>varchar(255)|0s</DasType>
+      <Position>13</Position>
+      <StateNumber>930</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="584" parent="516" name="glacier_altitude_comment">
+      <DasType>varchar(255)|0s</DasType>
+      <Position>14</Position>
+      <StateNumber>930</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="585" parent="516" name="glacier_mass_comment">
+      <DasType>varchar(255)|0s</DasType>
+      <Position>15</Position>
+      <StateNumber>930</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="586" parent="516" name="wind_score">
+      <DasType>numeric(5)|0s</DasType>
+      <Position>16</Position>
+      <StateNumber>930</StateNumber>
+      <TypeId>1700</TypeId>
+    </column>
+    <column id="587" parent="516" name="humidity_score">
+      <DasType>numeric(5)|0s</DasType>
+      <Position>17</Position>
+      <StateNumber>930</StateNumber>
+      <TypeId>1700</TypeId>
+    </column>
+    <column id="588" parent="516" name="pressure_score">
+      <DasType>numeric(5)|0s</DasType>
+      <Position>18</Position>
+      <StateNumber>930</StateNumber>
+      <TypeId>1700</TypeId>
+    </column>
+    <column id="589" parent="516" name="temperature_score">
+      <DasType>numeric(5)|0s</DasType>
+      <Position>19</Position>
+      <StateNumber>930</StateNumber>
+      <TypeId>1700</TypeId>
+    </column>
+    <column id="590" parent="516" name="precipitation_score">
+      <DasType>numeric(5)|0s</DasType>
+      <Position>20</Position>
+      <StateNumber>930</StateNumber>
+      <TypeId>1700</TypeId>
+    </column>
+    <column id="591" parent="516" name="glacier_altitude_score">
+      <DasType>numeric(5)|0s</DasType>
+      <Position>21</Position>
+      <StateNumber>930</StateNumber>
+      <TypeId>1700</TypeId>
+    </column>
+    <column id="592" parent="516" name="glacier_mass_score">
+      <DasType>numeric(5)|0s</DasType>
+      <Position>22</Position>
+      <StateNumber>930</StateNumber>
+      <TypeId>1700</TypeId>
+    </column>
+    <index id="593" parent="516" name="parametro_pkey">
+      <ColNames>id</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16509</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>930</StateNumber>
+      <Unique>1</Unique>
+      <AccessMethodId>403</AccessMethodId>
+      <CollationNames>default</CollationNames>
+      <CollationIds>100</CollationIds>
+      <CollationParentNames>pg_catalog</CollationParentNames>
+    </index>
+    <key id="594" parent="516" name="parametro_pkey">
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>16510</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>930</StateNumber>
+      <UnderlyingIndexId>16509</UnderlyingIndexId>
     </key>
   </database-model>
 </dataSource>
