@@ -53,7 +53,7 @@ public class QueryExecutorImpl {
         if (this.conn == null || this.conn.isClosed()) {
             this.conn = DatabaseImpl.getConnection();
         }
-        String query = "select name,longitude,latitude from citta;";
+        String query = "select name,longitude,latitude from citta ;";
         try (PreparedStatement stmt = conn.prepareStatement(
                 query,
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
@@ -63,13 +63,39 @@ public class QueryExecutorImpl {
                         String name = rs.getString("name");
                         Double lat = rs.getDouble("latitude");
                         Double lon = rs.getDouble("longitude");
-                        temp.add(new Coordinate(name, lon, lat));
+                        temp.add(new Coordinate(name, lat, lon));
         
                     }
                     
         }
         return temp;
     }
+
+    public List<Coordinate> getCoordinate(double latitude, double longitude, double tollerance) throws SQLException {
+        List<Coordinate> temp = new ArrayList<>();
+        if (this.conn == null || this.conn.isClosed()) {
+            this.conn = DatabaseImpl.getConnection();
+        }
+        String query = String.format("select name,longitude,latitude from citta\r\n" + //
+                        "where latitude >= '%.2f' and latitude <='%.2f' and longitude >= '%.2f' and longitude <= '%.2f';",latitude - tollerance, latitude + tollerance,longitude-tollerance,longitude + tollerance);
+        try (PreparedStatement stmt = conn.prepareStatement(
+                query,
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)) {
+                    ResultSet rs = stmt.executeQuery();
+                    while (rs.next()) {
+                        String name = rs.getString("name");
+                        Double lat = rs.getDouble("latitude");
+                        Double lon = rs.getDouble("longitude");
+                        temp.add(new Coordinate(name, lat, lon));
+        
+                    }
+                    
+        }
+        return temp;
+    }
+
+    
 
 
     //TODO

@@ -16,4 +16,5 @@ public interface Database extends Remote{
     boolean login(String cf, String psw) throws RemoteException;
     boolean registrazione(Operatore op) throws RemoteException;
     List<Coordinate> getCoordinaResultSet()throws RemoteException ;
+    List<Coordinate> getCoordinaResultSet(double latitude, double longitude, double tollerance )throws RemoteException ;
 }

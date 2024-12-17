@@ -149,16 +149,30 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
 
     //prendere da   ESEMPIO
     @Override
-    public List<Coordinate> getCoordinaResultSet() throws RemoteException {
+    public List<Coordinate> getCoordinaResultSet(double latitude, double longitude, double tollerance) throws RemoteException {
 
         try {
-            return this.queryExecutorImpl.getCoordinate();
+            if(queryExecutorImpl == null)queryExecutorImpl = new QueryExecutorImpl(connection);
+            return this.queryExecutorImpl.getCoordinate(latitude,longitude,tollerance);
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             return null;
         }
 
+    }
+
+    @Override
+    public List<Coordinate> getCoordinaResultSet() throws RemoteException {
+        
+        try {
+            if(queryExecutorImpl == null)queryExecutorImpl = new QueryExecutorImpl(connection);
+            return this.queryExecutorImpl.getCoordinate();
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }
