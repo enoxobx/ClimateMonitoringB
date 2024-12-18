@@ -2,85 +2,62 @@ package LAB_B.Operatore;
 
 import LAB_B.Common.Home;
 import LAB_B.Common.LayoutStandard;
-import LAB_B.Database.Database;
-import LAB_B.Database.DatabaseImpl;
 
 import javax.swing.*;
 import java.awt.*;
-import java.rmi.RemoteException;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.regex.Pattern;
 
 public class SignUp extends LayoutStandard {
 
-    // Campi di input
-    private JTextField nome = new JTextField(15);
-    private JTextField cognome = new JTextField(15);
-    private JTextField codFiscale = new JTextField(15);
-    private JTextField email = new JTextField(15);
-    private JPasswordField password = new JPasswordField(15);
-    private JTextField centro = new JTextField(15);
+    // Dichiarazione dei campi di input
+    private JTextField nome = new JTextField(15);               // Campo per il nome
+    private JTextField cognome = new JTextField(15);            // Campo per il cognome
+    private JTextField codFiscale = new JTextField(15);         // Campo per il codice fiscale (unico obbligatorio)
+    private JTextField email = new JTextField(15);              // Campo per l'email
+    private JPasswordField password = new JPasswordField(15);   // Campo per la password
+    private JTextField centro = new JTextField(15);             // Campo per il centro di monitoraggio
 
     private StringBuilder res = new StringBuilder();
     private StringBuilder err = new StringBuilder();
 
-    private Database database;
-
     public SignUp() {
-        super();
+        super();  // Richiama il costruttore di LayoutStandard
 
-        try {
-            
-            database = new DatabaseImpl();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Errore di connessione al database: " + e.getMessage(),
-                    "Errore", JOptionPane.ERROR_MESSAGE);
-            dispose(); // Chiude la finestra se c'è un errore nel database
-            return;
-        }
-
-        setupUI();
-    }
-
-    // Metodo per configurare l'interfaccia utente
-    private void setupUI() {
         Container body = getBody();
         body.setLayout(new BorderLayout());
 
-        // Intestazione
+        // Configura i pannelli
         JLabel bio = new JLabel("Registra nuovo Operatore");
         bio.setHorizontalAlignment(JLabel.CENTER);
         bio.setFont(new Font("Courier", Font.BOLD, 20));
         body.add(bio, BorderLayout.NORTH);
 
-        // Pannello principale
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         JPanel inputPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
-
-        // Aggiunge i campi di input
         addField(inputPanel, gbc, "Nome:", nome);
         addField(inputPanel, gbc, "Cognome:", cognome);
         addField(inputPanel, gbc, "Codice Fiscale:", codFiscale);
         addField(inputPanel, gbc, "Email:", email);
         addField(inputPanel, gbc, "Password:", password);
         addField(inputPanel, gbc, "Centro Monitoraggio:", centro);
-
         mainPanel.add(inputPanel, BorderLayout.CENTER);
+
         body.add(mainPanel, BorderLayout.CENTER);
 
-        // Pulsante Home
-        JButton butHome = new JButton("Home");
+        // Pulsante "Home" aggiunto a BorderLayout.WEST
+        JButton butHome = new JButton("Home");  // Pulsante Home
         butHome.addActionListener(e -> {
-            new Home();
-            dispose();
+            new Home(); // Torna alla finestra Home
+            dispose();  // Chiude la finestra corrente
         });
-        body.add(butHome, BorderLayout.WEST);
+        body.add(butHome, BorderLayout.WEST); // Pulsante posizionato a sinistra (WEST)
 
-        // Pannello dei pulsanti
+        // Pannello per gli altri pulsanti ("Salva" e "Torna indietro")
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         JButton butSalva = new JButton("Salva");
         butSalva.addActionListener(e -> salvaOperatore());
@@ -91,14 +68,15 @@ public class SignUp extends LayoutStandard {
             dispose();
         });
 
+        // Aggiunta dei pulsanti al pannello
         buttonPanel.add(butChiudi);
         buttonPanel.add(butSalva);
-        body.add(buttonPanel, BorderLayout.SOUTH);
+        body.add(buttonPanel, BorderLayout.SOUTH); // Pulsanti posizionati in basso (SOUTH)
 
-        setVisible(true);
+        setVisible(true);  // Mostra la finestra
     }
 
-    // Metodo per aggiungere i campi di input
+    // Metodo per aggiungere un campo di input al pannello con il relativo label
     private void addField(JPanel panel, GridBagConstraints gbc, String label, JTextField field) {
         gbc.gridx = 0;
         gbc.gridy++;
@@ -107,7 +85,102 @@ public class SignUp extends LayoutStandard {
         panel.add(field, gbc);
     }
 
-    // Validazione dei campi di input
+    // Funzione per generare automaticamente l'username basato su nome, cognome e codice fiscale
+    private String generateUsername(String nome, String cognome, String codFiscale) {
+        String nomeFormatted = nome.substring(0, 1).toUpperCase() + nome.substring(1).toLowerCase();
+        String cognomeFormatted = cognome.substring(0, 1).toUpperCase() + cognome.substring(1).toLowerCase();
+        String yearFromCodFiscale = codFiscale.substring(6, 8);
+        String username = nomeFormatted + cognomeFormatted + yearFromCodFiscale;
+
+        // Truncare l'username a 12 caratteri
+        if (username.length() > 12) {
+            username = username.substring(0, 12);
+        }
+
+        return username;
+    }
+
+    // Metodo per verificare se l'username è già presente nel database
+    private boolean isUsernameExist(String username) {
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/climate_monitoring", "postgres", "0000");
+            String sql = "SELECT 1 FROM operatori WHERE username = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, username);
+
+            ResultSet rs = ps.executeQuery();
+            return rs.next();  // Se trova un risultato, l'username esiste già
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (conn != null && !conn.isClosed()) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // Metodo per generare un username unico
+    private String generateUniqueUsername(String nome, String cognome, String codFiscale) {
+        String username = generateUsername(nome, cognome, codFiscale);
+        int attempt = 0;
+
+        // Verifica se l'username è già presente nel database
+        while (isUsernameExist(username) && attempt < 10) {
+            attempt++;
+            // Aggiunge un suffisso numerico per garantire l'unicità
+            username = generateUsername(nome, cognome, codFiscale) + "_" + attempt;
+            // Truncare l'username a 12 caratteri anche se aggiunge un numero
+            if (username.length() > 12) {
+                username = username.substring(0, 12);
+            }
+        }
+
+        if (attempt == 10) {
+            // Se non si è trovato un username univoco dopo 10 tentativi
+            JOptionPane.showMessageDialog(this, "Impossibile generare un username unico. Prova con un altro codice fiscale.",
+                    "Errore", JOptionPane.ERROR_MESSAGE);
+            return null;  // Ritorna null per evitare che venga salvato nel database
+        }
+
+        return username;
+    }
+
+    private void salvaOperatore() {
+        if (validateInputs()) {
+            String codiceFiscaleInserito = codFiscale.getText().trim();
+            String usernameGenerato = generateUniqueUsername(nome.getText(), cognome.getText(), codiceFiscaleInserito);
+
+            // Verifica se l'username è stato generato correttamente
+            if (usernameGenerato == null) {
+                // Se non è stato possibile generare un username valido, non procedere
+                return;
+            }
+
+            // Chiamata al metodo che ora restituisce un booleano
+            boolean registrazioneSuccesso = salvaDatiNelDatabase(nome.getText(), cognome.getText(), codiceFiscaleInserito, email.getText(),
+                    new String(password.getPassword()), centro.getText(), usernameGenerato);
+
+            if (registrazioneSuccesso) {
+                JOptionPane.showMessageDialog(this, "Registrazione completata con successo. \n" +
+                        "Username: " + usernameGenerato + "\n" + "Password: " + new String(password.getPassword()), "Successo", JOptionPane.INFORMATION_MESSAGE);
+
+                new Login().setVisible(true);
+                dispose();
+            } else {
+                // Se la registrazione fallisce, non procediamo con il messaggio di successo
+                JOptionPane.showMessageDialog(this, "Si è verificato un errore durante la registrazione.", "Errore", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, err.toString(), "Errore", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     private boolean validateInputs() {
         res.setLength(0);
         err.setLength(0);
@@ -140,44 +213,43 @@ public class SignUp extends LayoutStandard {
     }
 
     private void validatePassword(String password) {
-        try {
-            checkPassword(password);
-            res.append(password).append("; ");
-        } catch (Exception e) {
-            err.append(e.getMessage()).append("\n");
-        }
-    }
-
-    private boolean checkPassword(String password) throws Exception {
-        Pattern PASSWORD_PATTERN = Pattern.compile(
-                "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$"
-        );
-        if (password == null || password.isEmpty()) {
-            throw new Exception("La password non è stata inserita.");
-        }
-        if (!PASSWORD_PATTERN.matcher(password).matches()) {
-            throw new Exception("La password non è valida.");
-        }
-        return true;
-    }
-
-    // Metodo per salvare l'operatore
-    private void salvaOperatore() {
-        if (validateInputs()) {
-            try {
-                //le tabelle non sono uguali al file che ho messo per la crazione delle tabelle, mancano dei campi
-                String query = "INSERT INTO operatori (nome, cognome, cf, email, password, centro) VALUES (?, ?, ?, ?, ?, ?)";
-                database.executeUpdate(query, nome.getText(), cognome.getText(), codFiscale.getText(),
-                        email.getText(), new String(password.getPassword()), centro.getText());
-                JOptionPane.showMessageDialog(this, "Operatore registrato con successo!", "Successo", JOptionPane.INFORMATION_MESSAGE);
-                new Login();
-                dispose();
-            } catch (RemoteException e) {
-                JOptionPane.showMessageDialog(this, "Errore durante il salvataggio: " + e.getMessage(),
-                        "Errore", JOptionPane.ERROR_MESSAGE);
-            }
+        if (password.isEmpty() || password.length() < 8) {
+            err.append("La password deve avere almeno 8 caratteri.\n");
+        } else if (!password.matches(".*[A-Z].*") || !password.matches(".*[a-z].*") ||
+                !password.matches(".*\\d.*") || !password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*")) {
+            err.append("La password deve contenere almeno una maiuscola, una minuscola, un numero e un simbolo.\n");
         } else {
-            JOptionPane.showMessageDialog(this, err.toString(), "Errore", JOptionPane.ERROR_MESSAGE);
+            res.append(password).append("; ");
+        }
+    }
+
+    private boolean salvaDatiNelDatabase(String nome, String cognome, String codiceFiscale, String email, String password, String centro, String username) {
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/climate_monitoring", "postgres", "0000");
+            String query = "INSERT INTO operatori (nome, cognome, codice_fiscale, email, password, centro_monitoraggio, username) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement pst = conn.prepareStatement(query);
+            pst.setString(1, nome);
+            pst.setString(2, cognome);
+            pst.setString(3, codiceFiscale);
+            pst.setString(4, email);
+            pst.setString(5, password);
+            pst.setString(6, centro);
+            pst.setString(7, username);
+
+            int result = pst.executeUpdate();
+            return result > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (conn != null && !conn.isClosed()) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
