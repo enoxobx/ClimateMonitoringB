@@ -24,10 +24,10 @@ GRANT ALL ON DATABASE "ClimateMonitoring" TO postgres;
 
 CREATE TABLE Citta (
                        Geoname_ID BIGINT PRIMARY KEY,
-                       Name VARCHAR(30) NOT NULL,
-                       ASCII_Name VARCHAR(30) NOT NULL,
-                       Country_Code VARCHAR(3) NOT NULL,
-                       Country_Name VARCHAR(30) NOT NULL,
+                       Name VARCHAR(100) NOT NULL,
+                       ASCII_Name VARCHAR(100) NOT NULL,
+                       Country_Code VARCHAR(10) NOT NULL,
+                       Country_Name VARCHAR(100) NOT NULL,
                        longitude FLOAT8 NOT NULL,
                        latitude FLOAT8 NOT NULL
 );
@@ -35,28 +35,28 @@ CREATE TABLE Citta (
 
 CREATE TABLE operatori (
                            codice_fiscale VARCHAR(16) PRIMARY KEY,
-                           nome VARCHAR(30) NOT NULL,
-                           cognome VARCHAR(30) NOT NULL,
+                           nome VARCHAR(100) NOT NULL,
+                           cognome VARCHAR(100) NOT NULL,
                            username VARCHAR(12) NOT NULL UNIQUE,
-                           email VARCHAR(30) NOT NULL UNIQUE,
-                           password VARCHAR(30) NOT NULL,
-                           centro_monitoraggio VARCHAR(30) NOT NULL
+                           email VARCHAR(100) NOT NULL UNIQUE,
+                           password VARCHAR(100) NOT NULL,
+                           centro_monitoraggio VARCHAR(100) NOT NULL
 );
 
 
 CREATE TABLE CentriMonitoraggio (
-                                    id VARCHAR(30) PRIMARY KEY,
-                                    nomeCentro VARCHAR(30) NOT NULL,
+                                    id VARCHAR(100) PRIMARY KEY,
+                                    nomeCentro VARCHAR(100) NOT NULL,
                                     Indirizzo VARCHAR(50) NOT NULL
 
 );
 
 ALTER TABLE CentriMonitoraggio
-    ALTER COLUMN id TYPE VARCHAR(30);
+    ALTER COLUMN id TYPE VARCHAR(100);
 
 
 CREATE TABLE Parametro(
-                          ID VARCHAR(30) PRIMARY KEY,
+                          ID VARCHAR(100) PRIMARY KEY,
                           wind VARCHAR(10),
                           humidity VARCHAR(10),
                           pressure VARCHAR(10),
@@ -84,13 +84,13 @@ CREATE TABLE Rilevazione (
                              CF VARCHAR(16) NOT NULL REFERENCES Operatori(codice_fiscale)
                                  ON UPDATE CASCADE
                                  ON DELETE NO ACTION,
-                             CentriMonitoraggio_ID VARCHAR(30) NOT NULL REFERENCES CentriMonitoraggio(id)
+                             CentriMonitoraggio_ID VARCHAR(100) NOT NULL REFERENCES CentriMonitoraggio(id)
                                  ON UPDATE CASCADE
                                  ON DELETE NO ACTION,
                              Geoname_ID BIGINT NOT NULL REFERENCES Citta(Geoname_ID)
                                  ON UPDATE CASCADE
                                  ON DELETE NO ACTION,
-                             Par_ID VARCHAR(30) NOT NULL REFERENCES Parametro(ID)
+                             Par_ID VARCHAR(100) NOT NULL REFERENCES Parametro(ID)
                                  ON UPDATE CASCADE
                                  ON DELETE NO ACTION,
                              date_r DATE NOT NULL,
@@ -98,7 +98,7 @@ CREATE TABLE Rilevazione (
 );
 
 CREATE TABLE Osservano (
-                           CentriMonitoraggio_ID VARCHAR(30) REFERENCES CentriMonitoraggio(id)
+                           CentriMonitoraggio_ID VARCHAR(100) REFERENCES CentriMonitoraggio(id)
                                ON UPDATE CASCADE
                                ON DELETE NO ACTION,
                            Geoname_ID BIGINT REFERENCES Citta(Geoname_ID)
@@ -111,7 +111,7 @@ CREATE TABLE Lavora (
                         CF VARCHAR(16) NOT NULL REFERENCES Operatori(codice_fiscale)
                             ON UPDATE CASCADE
                             ON DELETE NO ACTION,
-                        CentriMonitoraggio_ID VARCHAR(30) NOT NULL REFERENCES CentriMonitoraggio(id)
+                        CentriMonitoraggio_ID VARCHAR(100) NOT NULL REFERENCES CentriMonitoraggio(id)
                             ON UPDATE CASCADE
                             ON DELETE NO ACTION,
                         PRIMARY KEY (CF, CentriMonitoraggio_ID)

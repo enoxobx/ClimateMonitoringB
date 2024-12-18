@@ -71,28 +71,29 @@ public class QueryExecutorImpl {
         return temp;
     }
 
-    public List<Coordinate> getCoordinate(double latitude, double longitude, double tollerance) throws SQLException {
-        List<Coordinate> temp = new ArrayList<>();
-        if (this.conn == null || this.conn.isClosed()) {
-            this.conn = DatabaseImpl.getConnection();
+    public List<Coordinate> getCoordinate(double latitude, double longitude, double tolerance) throws SQLException {
+        List<Coordinate> coordinates = new ArrayList<>();  // Use descriptive name
+
+        try (Connection conn = DatabaseImpl.getConnection(); // Get connection outside the if block
+             PreparedStatement stmt = conn.prepareStatement("SELECT name, longitude, latitude FROM citta " +
+                     "WHERE latitude >= ? AND latitude <= ? AND longitude >= ? AND longitude <= ? ;")) {
+
+            // Set parameters for prepared statement
+            stmt.setDouble(1, latitude - tolerance);
+            stmt.setDouble(2, latitude + tolerance);
+            stmt.setDouble(3, longitude - tolerance);
+            stmt.setDouble(4, longitude + tolerance);
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                String name = rs.getString("name");
+                double lat = rs.getDouble("latitude");
+                double lon = rs.getDouble("longitude");
+                coordinates.add(new Coordinate(name, lat, lon));
+            }
         }
-        String query = String.format("select name,longitude,latitude from citta\r\n" + //
-                        "where latitude >= '%.2f' and latitude <='%.2f' and longitude >= '%.2f' and longitude <= '%.2f';",latitude - tollerance, latitude + tollerance,longitude-tollerance,longitude + tollerance);
-        try (PreparedStatement stmt = conn.prepareStatement(
-                query,
-                ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY)) {
-                    ResultSet rs = stmt.executeQuery();
-                    while (rs.next()) {
-                        String name = rs.getString("name");
-                        Double lat = rs.getDouble("latitude");
-                        Double lon = rs.getDouble("longitude");
-                        temp.add(new Coordinate(name, lat, lon));
-        
-                    }
-                    
-        }
-        return temp;
+
+        return coordinates;
     }
 
     
