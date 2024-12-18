@@ -96,19 +96,19 @@ public class Login extends JFrame {
                 } else if (password.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Il campo password non può essere vuoto!", "Errore", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    //TODO da sistemare
-                    //Client client = new Client();
-                    //boolean success = client.login(usernameOrCodiceFiscale, password);
+                    // Crea l'istanza di Client e verifica le credenziali
+                    Client client = new Client(dbUrl, dbUsername, dbPassword); // Passa i dettagli del database
+                    boolean success = client.login(usernameOrCodiceFiscale, password);
 
                     // Verifica se il login è riuscito
-                    /*if (success) {
+                    if (success) {
                         JOptionPane.showMessageDialog(null, "Login effettuato con successo!", "Successo", JOptionPane.INFORMATION_MESSAGE);
                         // Passa l'username come argomento a LayoutOperatore
                         new LayoutOperatore(usernameOrCodiceFiscale); // Apre il layout dell'operatore passando l'username
                         dispose();
                     } else {
                         JOptionPane.showMessageDialog(null, "Username, codice fiscale o password errati!", "Errore", JOptionPane.ERROR_MESSAGE);
-                    }*/
+                    }
                 }
             }
         });

@@ -38,7 +38,7 @@ abstract public class LayoutStandard extends JFrame {
 
         //istanzia il db da usare;
         db = Client.getDb();
-        
+
 
         // Imposta le proprietà predefinite della finestra
         setDefaultProperties();

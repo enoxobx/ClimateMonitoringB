@@ -13,7 +13,7 @@ public interface Database extends Remote{
     ResultSet executeQuery(String query, Object... params)throws RemoteException ;
     int executeUpdate(String query, Object... params)throws RemoteException ;
 
-    boolean login(String cf, String psw) throws RemoteException;
+    boolean login(String codice_fiscale, String password) throws RemoteException;
     boolean registrazione(Operatore op) throws RemoteException;
     List<Coordinate> getCoordinaResultSet()throws RemoteException ;
     List<Coordinate> getCoordinaResultSet(double latitude, double longitude, double tollerance )throws RemoteException ;

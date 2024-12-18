@@ -4,17 +4,11 @@ import org.openstreetmap.gui.jmapviewer.JMapViewer;
 import org.openstreetmap.gui.jmapviewer.Layer;
 import org.openstreetmap.gui.jmapviewer.MapMarkerDot;
 
-import java.util.*;
 import javax.swing.*;
-
-import java.awt.Component;
-import java.awt.BorderLayout;
-import java.awt.Container;
+import java.awt.*;
 import java.awt.event.*;
-
 import java.rmi.RemoteException;
-
-
+import java.util.List;
 
 public class LayoutCittadino extends LayoutStandard {
     private JPanel centerP;
@@ -26,7 +20,7 @@ public class LayoutCittadino extends LayoutStandard {
     private MapMarkerDot newDot;
 
     public LayoutCittadino() {
-
+        // Container e componenti della GUI
         Container body = this.getBody();
 
         centerP = new JPanel();
@@ -49,52 +43,39 @@ public class LayoutCittadino extends LayoutStandard {
         setComboBox();
         setMarker();
 
+        // Listener per il clic sulla mappa
         mapViewer.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                // Ottieni le coordinate dove l'utente ha cliccato e si attiva solo con doppio
-                // click sx
                 if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
-                    // setComboBox();
-
+                    // Gestione del doppio clic
                 }
-
             }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-            }
-
+            @Override public void mousePressed(MouseEvent e) {}
+            @Override public void mouseReleased(MouseEvent e) {}
+            @Override public void mouseEntered(MouseEvent e) {}
+            @Override public void mouseExited(MouseEvent e) {}
         });
 
+        // Listener per il pulsante "Refresh"
         caricaCitta.addActionListener(e -> {
             setComboBox();
             comboBox.showPopup();
         });
 
+        // Renderer per la JComboBox
         comboBox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (index == -1 && value == null) { // Nessun elemento selezionato
-                    setText("Premi refresh per ottenere le città nella zona"); // Testo di default
+                if (index == -1 && value == null) {
+                    setText("Premi refresh per ottenere le città nella zona");
                 }
                 return this;
             }
         });
 
+        // Listener per la selezione nella JComboBox
         comboBox.addActionListener(e -> {
             String selectedItem = (String) ((JComboBox<String>) e.getSource()).getSelectedItem();
             if (selectedItem != null && comboBox.isEnabled()) {
@@ -117,54 +98,49 @@ public class LayoutCittadino extends LayoutStandard {
                                 && x.getLon() <= (mapY + tolerance))
                         .toList();
                 if (temp.size() > 1) {
-                    // qua non deve mai entrare
                     System.err.println("ci sono ambiguità");
                 } else if (temp.size() == 1) {
                     mapViewer.setDisplayPosition(temp.getFirst(), mapViewer.getZoom());
-                    newDot = new MapMarkerDot(new Layer(temp.getFirst().getName()),temp.getFirst().getLat(),temp.getFirst().getLon());
+                    newDot = new MapMarkerDot(new Layer(temp.getFirst().getName()), temp.getFirst().getLat(), temp.getFirst().getLon());
                     mapViewer.addMapMarker(newDot);
                 } else {
                     JOptionPane.showMessageDialog(body,
                             "Si è verificato un errore, riprova a selezionare una città e fare Refresh");
                 }
             }
-
         });
-        
 
         submit.addActionListener(e -> {
             setComboBox();
         });
 
         this.setSize(800, 600);
-
     }
 
-    // prendere da ESEMPIO
+    // Metodo per impostare i marker sulla mappa
     private void setMarker() {
-
-        try {
-            // DB è UN RIFERIMENTO CHE HA LA CLASSE layoutStandard, dalla quale devono
-            // estendere tutte le classi della GUI
-            coordinateM = db.getCoordinaResultSet();
-            if (coordinateM == null) {
-                System.err.print(" vuoto");
+        if (db != null) {
+            try {
+                coordinateM = db.getCoordinaResultSet();
+                if (coordinateM == null) {
+                    System.err.print("vuoto");
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
             }
-        } catch (RemoteException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } else {
+            System.err.println("Errore: db non è stato inizializzato.");
         }
-
     }
 
+    // Metodo per impostare la JComboBox con le città
     private void setComboBox() {
         comboBox.setSelectedIndex(-1);
         comboBox.removeAllItems();
         Double lat = mapViewer.getPosition().getLat();
         Double lon = mapViewer.getPosition().getLon();
-        int round = 5;
-        Double tolerance;
         int zoom = mapViewer.getZoom();
+        Double tolerance;
         if (zoom <= 5)
             tolerance = 10.00;
         else if (zoom > 5 && zoom <= 11)
@@ -174,25 +150,21 @@ public class LayoutCittadino extends LayoutStandard {
         else
             tolerance = 0.005;
 
-        List<Coordinate> ciao;
-        try {
-            ciao = db.getCoordinaResultSet(lat, lon, tolerance);
-            comboBox.setEnabled(false);
-            for (Coordinate coordinate : ciao) {
-
-                comboBox.addItem(coordinate.getName());
-
+        if (db != null) {
+            try {
+                List<Coordinate> ciao = db.getCoordinaResultSet(lat, lon, tolerance);
+                comboBox.setEnabled(false);
+                for (Coordinate coordinate : ciao) {
+                    comboBox.addItem(coordinate.getName());
+                }
+                comboBox.setSelectedIndex(-1);
+                comboBox.setEnabled(true);
+                if (newDot != null) newDot.setVisible(false);
+            } catch (RemoteException e1) {
+                e1.printStackTrace();
             }
-            comboBox.setSelectedIndex(-1);
-            comboBox.setEnabled(true);
-            if(newDot!=null)newDot.setVisible(false);
-
-        } catch (RemoteException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+        } else {
+            System.err.println("Errore: db non è stato inizializzato.");
         }
-
     }
-    
-
 }
