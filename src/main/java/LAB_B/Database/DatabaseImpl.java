@@ -153,7 +153,7 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
 
         try {
             if(queryExecutorImpl == null)queryExecutorImpl = new QueryExecutorImpl(connection);
-            return this.queryExecutorImpl.getCoordinate(latitude,longitude,tollerance);
+            return queryExecutorImpl.getCoordinate(latitude,longitude,tollerance);
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -167,7 +167,7 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
         
         try {
             if(queryExecutorImpl == null)queryExecutorImpl = new QueryExecutorImpl(connection);
-            return this.queryExecutorImpl.getCoordinate();
+            return queryExecutorImpl.getCoordinate();
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

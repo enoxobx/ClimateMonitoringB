@@ -12,11 +12,11 @@ import java.util.Properties;
 
 public class Login extends JFrame {
 
-    private JTextField usernameOrCodiceFiscaleField;
-    private JPasswordField passwordField;
-    private JButton loginButton;
-    private JButton registerButton;
-    private JButton homeButton;
+    private final JTextField usernameOrCodiceFiscaleField;
+    private final JPasswordField passwordField;
+    private final JButton loginButton;
+    private final JButton registerButton;
+    private final JButton homeButton;
 
     private static final int MAX_RETRIES = 3;
     private String dbUrl;

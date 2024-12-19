@@ -7,11 +7,15 @@ import java.awt.event.ActionListener;
 
 public class LayoutOperatore extends JFrame {
 
-    private String username;
-    private JButton aggiungiCentro, aggiungiDatiClimatici, salvaDatiButton, indietroButton, creaCentroButton;
-    private JTextField centroTextField;
-    private JList<String> centriList;
-    private DefaultListModel<String> listaCentriModel;
+    private final String username;
+    private final JButton aggiungiCentro;
+    private final JButton aggiungiDatiClimatici;
+    private final JButton salvaDatiButton;
+    private final JButton indietroButton;
+    private final JButton creaCentroButton;
+    private final JTextField centroTextField;
+    private final JList<String> centriList;
+    private final DefaultListModel<String> listaCentriModel;
 
     public LayoutOperatore(String username) {
         this.username = username;
@@ -267,7 +271,7 @@ public class LayoutOperatore extends JFrame {
 
     // Classe per limitare il numero di caratteri nelle aree di testo
     public class LimitedDocument extends javax.swing.text.PlainDocument {
-        private int limit;
+        private final int limit;
 
         public LimitedDocument(int limit) {
             this.limit = limit;

@@ -7,9 +7,9 @@ import LAB_B.Database.Database;
 import LAB_B.Database.DatabaseImpl;
 
 public class Client {
-    private String dbUrl;
-    private String dbUsername;
-    private String dbPassword;
+    private final String dbUrl;
+    private final String dbUsername;
+    private final String dbPassword;
 
     // Aggiungi un campo per il Database
     private static Database db;

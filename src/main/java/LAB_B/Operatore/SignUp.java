@@ -11,15 +11,15 @@ import java.util.regex.Pattern;
 public class SignUp extends LayoutStandard {
 
     // Dichiarazione dei campi di input
-    private JTextField nome = new JTextField(15);               // Campo per il nome
-    private JTextField cognome = new JTextField(15);            // Campo per il cognome
-    private JTextField codFiscale = new JTextField(15);         // Campo per il codice fiscale (unico obbligatorio)
-    private JTextField email = new JTextField(15);              // Campo per l'email
-    private JPasswordField password = new JPasswordField(15);   // Campo per la password
-    private JTextField centro = new JTextField(15);             // Campo per il centro di monitoraggio
+    private final JTextField nome = new JTextField(15);               // Campo per il nome
+    private final JTextField cognome = new JTextField(15);            // Campo per il cognome
+    private final JTextField codFiscale = new JTextField(15);         // Campo per il codice fiscale (unico obbligatorio)
+    private final JTextField email = new JTextField(15);              // Campo per l'email
+    private final JPasswordField password = new JPasswordField(15);   // Campo per la password
+    private final JTextField centro = new JTextField(15);             // Campo per il centro di monitoraggio
 
-    private StringBuilder res = new StringBuilder();
-    private StringBuilder err = new StringBuilder();
+    private final StringBuilder res = new StringBuilder();
+    private final StringBuilder err = new StringBuilder();
 
     public SignUp() {
         super();  // Richiama il costruttore di LayoutStandard

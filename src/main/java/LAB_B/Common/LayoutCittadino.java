@@ -11,11 +11,11 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 public class LayoutCittadino extends LayoutStandard {
-    private JPanel centerP;
-    private JMapViewer mapViewer;
-    private JButton caricaCitta;
-    private JButton submit;
-    private JComboBox<String> comboBox;
+    private final JPanel centerP;
+    private final JMapViewer mapViewer;
+    private final JButton caricaCitta;
+    private final JButton submit;
+    private final JComboBox<String> comboBox;
     private List<Coordinate> coordinateM;
     private MapMarkerDot newDot;
 
@@ -51,10 +51,22 @@ public class LayoutCittadino extends LayoutStandard {
                     // Gestione del doppio clic
                 }
             }
-            @Override public void mousePressed(MouseEvent e) {}
-            @Override public void mouseReleased(MouseEvent e) {}
-            @Override public void mouseEntered(MouseEvent e) {}
-            @Override public void mouseExited(MouseEvent e) {}
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
         });
 
         // Listener per il pulsante "Refresh"
@@ -77,37 +89,43 @@ public class LayoutCittadino extends LayoutStandard {
 
         // Listener per la selezione nella JComboBox
         comboBox.addActionListener(e -> {
-            String selectedItem = (String) ((JComboBox<String>) e.getSource()).getSelectedItem();
-            if (selectedItem != null && comboBox.isEnabled()) {
-                double mapX = mapViewer.getPosition().getLat();
-                double mapY = mapViewer.getPosition().getLon();
-                Double tolerance;
-                int zoom = mapViewer.getZoom();
-                if (zoom <= 5)
-                    tolerance = 10.00;
-                else if (zoom > 5 && zoom <= 11)
-                    tolerance = 0.5;
-                else if (zoom > 11 && zoom <= 15)
-                    tolerance = 0.05;
-                else
-                    tolerance = 0.005;
+            if (e.getSource().getClass() == JComboBox.class) {
+                String selectedItem = (String) ((JComboBox<?>) e.getSource()).getSelectedItem();
+                if (selectedItem != null && comboBox.isEnabled()) {
+                    double mapX = mapViewer.getPosition().getLat();
+                    double mapY = mapViewer.getPosition().getLon();
+                    Double tolerance;
+                    int zoom = mapViewer.getZoom();
+                    if (zoom <= 5)
+                        tolerance = 10.00;
+                    else if (zoom <= 11)
+                        tolerance = 0.5;
+                    else if (zoom <= 15)
+                        tolerance = 0.05;
+                    else
+                        tolerance = 0.005;
 
-                List<Coordinate> temp = coordinateM.stream()
-                        .filter(x -> x.getName().equals(selectedItem) && x.getLat() >= (mapX - tolerance)
-                                && x.getLat() <= (mapX + tolerance) && x.getLon() >= (mapY - tolerance)
-                                && x.getLon() <= (mapY + tolerance))
-                        .toList();
-                if (temp.size() > 1) {
-                    System.err.println("ci sono ambiguità");
-                } else if (temp.size() == 1) {
-                    mapViewer.setDisplayPosition(temp.getFirst(), mapViewer.getZoom());
-                    newDot = new MapMarkerDot(new Layer(temp.getFirst().getName()), temp.getFirst().getLat(), temp.getFirst().getLon());
-                    mapViewer.addMapMarker(newDot);
+                    List<Coordinate> temp = coordinateM.stream()
+                            .filter(x -> x.getName().equals(selectedItem) && x.getLat() >= (mapX - tolerance)
+                                    && x.getLat() <= (mapX + tolerance) && x.getLon() >= (mapY - tolerance)
+                                    && x.getLon() <= (mapY + tolerance))
+                            .toList();
+                    if (temp.size() > 1) {
+                        System.err.println("ci sono ambiguità");
+                    } else if (temp.size() == 1) {
+                        mapViewer.setDisplayPosition(temp.getFirst(), mapViewer.getZoom());
+                        newDot = new MapMarkerDot(new Layer(temp.getFirst().getName()), temp.getFirst().getLat(), temp.getFirst().getLon());
+                        mapViewer.addMapMarker(newDot);
+                    } else {
+                        JOptionPane.showMessageDialog(body,
+                                "Si è verificato un errore, riprova a selezionare una città e fare Refresh");
+                    }
                 } else {
-                    JOptionPane.showMessageDialog(body,
-                            "Si è verificato un errore, riprova a selezionare una città e fare Refresh");
+                    //non dovrebbe mai entrare qua
+                    System.err.println("Non è stato attivato dalla classe corretta");
                 }
             }
+
         });
 
         submit.addActionListener(e -> {
@@ -137,15 +155,15 @@ public class LayoutCittadino extends LayoutStandard {
     private void setComboBox() {
         comboBox.setSelectedIndex(-1);
         comboBox.removeAllItems();
-        Double lat = mapViewer.getPosition().getLat();
-        Double lon = mapViewer.getPosition().getLon();
+        double lat = mapViewer.getPosition().getLat();
+        double lon = mapViewer.getPosition().getLon();
         int zoom = mapViewer.getZoom();
-        Double tolerance;
+        double tolerance;
         if (zoom <= 5)
             tolerance = 10.00;
-        else if (zoom > 5 && zoom <= 11)
+        else if (zoom <= 11)
             tolerance = 0.5;
-        else if (zoom > 11 && zoom <= 15)
+        else if (zoom <= 15)
             tolerance = 0.05;
         else
             tolerance = 0.005;

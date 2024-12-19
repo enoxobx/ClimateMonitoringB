@@ -12,8 +12,8 @@ import java.awt.event.*;
  */
 public class Home extends JFrame {
     // Dichiarazione dei bottoni per le due opzioni: "Cittadino" e "Operatore"
-    private JButton bottoneCittadino;
-    private JButton bottoneOperatore;
+    private final JButton bottoneCittadino;
+    private final JButton bottoneOperatore;
 
     /**
      * Costruttore della finestra principale Home.

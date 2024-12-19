@@ -65,17 +65,15 @@ public class Operatore implements Serializable {
     // Metodo per validare il nome (non deve essere nullo e deve avere lunghezza massima di 30 caratteri)
     private boolean checkName(String name) {
         // Se il nome è nullo o supera la lunghezza massima, ritorna falso
-        if (name == null || name.length() > 30) return false;
+        return name != null && name.length() <= 30;
         // Altrimenti ritorna vero
-        return true;
     }
 
     // Metodo per validare il cognome (stessa logica della validazione del nome)
     private boolean checkSurname(String surname) {
         // Se il cognome è nullo o supera la lunghezza massima, ritorna falso
-        if (surname == null || surname.length() > 30) return false;
+        return surname != null && surname.length() <= 30;
         // Altrimenti ritorna vero
-        return true;
     }
 
     // Metodo per validare il codice fiscale (deve rispettare un formato specifico di 16 caratteri)

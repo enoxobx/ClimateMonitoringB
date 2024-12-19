@@ -6,7 +6,7 @@ import org.openstreetmap.gui.jmapviewer.interfaces.ICoordinate;
 
 public class Coordinate implements ICoordinate,Serializable{
     private static final long serialVersionUID = 1L;
-    private String name;
+    private final String name;
     private double latitude;
     private double longitude;
 
