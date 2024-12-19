@@ -32,6 +32,7 @@ public class Client {
         return connection;
     }
 
+    //TODO assolutamente non va messo qui
     // Metodo per il login (esistente)
     public boolean login(String usernameOrCodiceFiscale, String password) {
         boolean loginSuccess = false;
