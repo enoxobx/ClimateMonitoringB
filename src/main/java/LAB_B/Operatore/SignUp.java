@@ -100,6 +100,8 @@ public class SignUp extends LayoutStandard {
         return username;
     }
 
+
+    //TODO non va bene, informazioni cablate nella classe, usare reference di layout standar e usare le query ad hoc su queryImpl
     // Metodo per verificare se l'username è già presente nel database
     private boolean isUsernameExist(String username) {
         Connection conn = null;
@@ -222,7 +224,7 @@ public class SignUp extends LayoutStandard {
             res.append(password).append("; ");
         }
     }
-
+    //TODO non va bene stesso errore di prima
     private boolean salvaDatiNelDatabase(String nome, String cognome, String codiceFiscale, String email, String password, String centro, String username) {
         Connection conn = null;
         try {

@@ -23,6 +23,8 @@ public class Login extends JFrame {
     private String dbUsername;
     private String dbPassword;
 
+
+    //TODO non estende la classe layoutStandard
     public Login() {
         loadDatabaseConfig(); // Carica la configurazione dal file di proprietà
         setTitle("Login");
@@ -70,6 +72,7 @@ public class Login extends JFrame {
         setVisible(true);
     }
 
+    //metodo inutile,se estendi da layout standard è già persente un istanza del db, al massimo puoi controllore se è istanziata o meno
     private void loadDatabaseConfig() {
         // Carica la configurazione dal file config.properties
         Properties properties = new Properties();
