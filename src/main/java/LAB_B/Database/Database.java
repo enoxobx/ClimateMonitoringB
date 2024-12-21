@@ -17,4 +17,5 @@ public interface Database extends Remote{
     boolean registrazione(Operatore op) throws RemoteException;
     List<Coordinate> getCoordinaResultSet()throws RemoteException ;
     List<Coordinate> getCoordinaResultSet(double latitude, double longitude, double tollerance )throws RemoteException ;
+
 }
