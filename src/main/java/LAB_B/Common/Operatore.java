@@ -3,6 +3,7 @@ package LAB_B.Common;
 import java.util.regex.Pattern;
 
 public class Operatore {
+
     private String nome;
     private String cognome;
     private String codFiscale;
@@ -10,104 +11,113 @@ public class Operatore {
     private String password;
     private String centroMonitoraggio;
     private String username;
-
-    private StringBuilder res = new StringBuilder();
     private StringBuilder err = new StringBuilder();
 
-    // Costruttore completo
-    public Operatore(String nome, String cognome, String codFiscale, String email, String password, String centroMonitoraggio) {
+    // Costruttore completo con tutti i parametri
+    public Operatore(String nome, String cognome, String codFiscale, String email, String password, String centroMonitoraggio, String username) {
         this.nome = nome;
         this.cognome = cognome;
-        this.codFiscale = codFiscale.toUpperCase();
+        this.codFiscale = codFiscale != null ? codFiscale.toUpperCase() : ""; // Assicurati che il codice fiscale sia in maiuscolo
         this.email = email;
         this.password = password;
         this.centroMonitoraggio = centroMonitoraggio;
-        this.username = generateUsername(nome, cognome, codFiscale);
+        this.username = (username != null && !username.isEmpty()) ? username : generateUsername(nome, cognome, codFiscale);
     }
 
-    // Costruttore con 4 parametri (nome, cognome, codFiscale, email)
-    public Operatore(String nome, String cognome, String codFiscale, String email) {
-        this(nome, cognome, codFiscale, email, "", "");  // Default password e centroMonitoraggio
+    // Getter per ottenere i vari campi
+    public String getNome() {
+        return nome;
+    }
+
+    public String getCognome() {
+        return cognome;
+    }
+
+    public String getCodFiscale() {
+        return codFiscale;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getCentroMonitoraggio() {
+        return centroMonitoraggio;
     }
 
     public String getUsername() {
-        return this.username;
+        return username;
     }
 
-    // Metodo di validazione migliorato
+    // Metodo per validare i dati dell'operatore
     public boolean validate() {
-        res.setLength(0);
+        // Reset degli errori
         err.setLength(0);
 
-        // Esegui tutte le validazioni sui campi
-        validateField(nome, "Il nome non è stato inserito.", 30);
-        validateField(cognome, "Il cognome non è stato inserito.", 30);
-        validateCodFiscale(codFiscale); // Validazione per il codice fiscale
-        validateEmail(email);
-        validatePassword(password);
-        validateField(centroMonitoraggio, "Il centro di monitoraggio non è stato inserito.", 50);
-
-        return err.length() == 0;
-    }
-
-    private void validateField(String value, String errorMessage, int maxLength) {
-        if (value.isEmpty()) {
-            err.append(errorMessage).append("\n");
-        } else if (value.length() > maxLength) {
-            err.append("Il campo " + errorMessage.split(" ")[1] + " supera la lunghezza massima di " + maxLength + " caratteri.\n");
-        } else {
-            res.append(value.toUpperCase()).append("; ");
+        // Nome e cognome (max 30 caratteri)
+        if (nome == null || nome.isEmpty() || nome.length() > 30) {
+            err.append("Nome non valido. Deve essere non vuoto e massimo 30 caratteri.\n");
         }
-    }
 
-    private void validateCodFiscale(String codFiscale) {
-        // Regex per il formato corretto del Codice Fiscale
-        String regexCodFiscale = "^[A-Z0-9]{16}$";
-        if (codFiscale.isEmpty()) {
-            err.append("Il codice fiscale non è stato inserito.\n");
-        } else if (codFiscale.length() != 16 || !codFiscale.matches(regexCodFiscale)) {
-            err.append("Il codice fiscale deve avere esattamente 16 caratteri e deve essere composto da lettere e numeri.\n");
-        } else {
-            res.append(codFiscale.toUpperCase()).append("; ");
+        if (cognome == null || cognome.isEmpty() || cognome.length() > 30) {
+            err.append("Cognome non valido. Deve essere non vuoto e massimo 30 caratteri.\n");
         }
-    }
 
-    private void validateEmail(String email) {
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
-        if (email.isEmpty()) {
-            err.append("L'email non è stata inserita.\n");
-        } else if (!Pattern.matches(emailRegex, email)) {
-            err.append("L'email non è valida.\n");
-        } else {
-            res.append(email.toUpperCase()).append("; ");
+        // Codice fiscale (deve essere 16 caratteri)
+        if (codFiscale == null || codFiscale.length() != 16 || !Pattern.matches("[A-Z0-9]{16}", codFiscale)) {
+            err.append("Codice Fiscale non valido. Deve essere di 16 caratteri alfanumerici.\n");
         }
-    }
 
-    private void validatePassword(String password) {
-        if (password.isEmpty()) {
-            err.append("La password non può essere vuota.\n");
-        } else if (password.length() < 8) {
-            err.append("La password deve avere almeno 8 caratteri.\n");
-        } else if (!password.matches(".*[A-Z].*") || !password.matches(".*[a-z].*") || !password.matches(".*[0-9].*") || !password.matches(".*[^A-Za-z0-9].*")) {
-            err.append("La password deve contenere almeno una lettera maiuscola, una lettera minuscola, un numero e un simbolo.\n");
+        // Email (deve essere una email valida)
+        if (!isValidEmail(email)) {
+            err.append("Email non valida. Formato non corretto.\n");
         }
+
+        // Password (minimo 8 caratteri con almeno un numero, una lettera maiuscola, una minuscola e un simbolo)
+        if (password == null || password.length() < 8 || !isValidPassword(password)) {
+            err.append("Password non valida. Deve essere lunga almeno 8 caratteri e contenere almeno un numero, una lettera maiuscola, una minuscola e un simbolo.\n");
+        }
+
+        // Centro monitoraggio (non deve essere vuoto)
+        if (centroMonitoraggio == null || centroMonitoraggio.isEmpty()) {
+            err.append("Centro Monitoraggio non valido. Non può essere vuoto.\n");
+        }
+
+        return err.length() == 0; // Restituisce true se non ci sono errori
     }
 
-    // Metodo per generare lo username
-    private String generateUsername(String nome, String cognome, String codFiscale) {
-        // Prima lettera maiuscola di nome e cognome, resto in minuscolo
-        String initials = nome.substring(0, 1).toUpperCase() + nome.substring(1).toLowerCase() +
-                cognome.substring(0, 1).toUpperCase() + cognome.substring(1).toLowerCase();
-
-        // Ultimi due caratteri del codice fiscale
-        String lastTwoDigits = codFiscale.substring(14, 16);
-
-        // Combina le iniziali e i due ultimi caratteri del codice fiscale per generare lo username
-        return initials + lastTwoDigits;
-    }
-
-    // Restituisce i messaggi di errore
+    // Metodo per ottenere i messaggi di errore
     public String getErrorMessages() {
         return err.toString();
+    }
+
+    // Verifica se la email è valida
+    private boolean isValidEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            return false;  // Email vuota
+        }
+        // Regex per validare email con almeno una lettera e simbolo '@' e '.'
+        return email.matches("^[\\w-\\.]+@[\\w-]+\\.[a-zA-Z]{2,6}$");
+    }
+
+    // Metodo per validare la password con i requisiti specifici
+    public boolean isValidPassword(String password) {
+        return password.matches(".*[A-Z].*") && // almeno una lettera maiuscola
+                password.matches(".*[a-z].*") && // almeno una lettera minuscola
+                password.matches(".*[0-9].*") && // almeno un numero
+                password.matches(".*[!@#\\$%^&*].*"); // almeno un simbolo
+    }
+
+
+    // Metodo per generare il nome utente
+    private String generateUsername(String nome, String cognome, String codFiscale) {
+        // Assicurati che nome e cognome abbiano almeno 3 caratteri
+        String nomeParte = nome.length() >= 3 ? nome.substring(0, 3) : nome;
+        String cognomeParte = cognome.length() >= 3 ? cognome.substring(0, 3) : cognome;
+        return nomeParte + cognomeParte + codFiscale.substring(0, 4); // Esempio di generazione
     }
 }

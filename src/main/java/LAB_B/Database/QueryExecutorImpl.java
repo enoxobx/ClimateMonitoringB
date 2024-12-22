@@ -8,45 +8,101 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QueryExecutorImpl {
+    private static final String SELECT_OPERATORI_QUERY = "SELECT 1 FROM operatori WHERE %s = ? LIMIT 1";
     private Connection conn;
 
-    public QueryExecutorImpl(Connection conn) {
-        this.conn = conn;
+    public QueryExecutorImpl() {
+        this.conn = DatabaseImpl.getConnection();
     }
 
-    private void ensureConnection() throws SQLException {
+    // Metodo per verificare e mantenere la connessione aperta
+    public void ensureConnection() throws SQLException {
         if (conn == null || conn.isClosed()) {
-            conn = DatabaseImpl.getConnection();  // Assuming DatabaseImpl provides a static method to get the connection
+            System.out.println("Riconnessione al database...");
+            conn = DatabaseImpl.getConnection();  // Riconnessione solo se necessario
+            if (conn == null || conn.isClosed()) {
+                throw new SQLException("Impossibile stabilire la connessione al database.");
+            }
         }
     }
 
-    // Metodo per eseguire una query generica
-    public ResultSet executeQuery(String query, Object... params) throws SQLException {
-        ensureConnection();
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            for (int i = 0; i < params.length; i++) {
-                stmt.setObject(i + 1, params[i]);
+
+
+
+    // Verifica se un campo è vuoto o nullo
+    public boolean isNullOrEmpty(String... fields) {
+        for (String field : fields) {
+            if (field == null || field.trim().isEmpty()) {
+                return true;
             }
-            return stmt.executeQuery();
-        } catch (SQLException e) {
-            System.err.println("Errore esecuzione query: " + e.getMessage());
-            System.err.println("Query: " + query);
-            throw e;
+        }
+        return false;
+    }
+
+    // Verifica se un valore esiste nel database
+    private boolean existsInDatabase(String field, String value) throws SQLException {
+        ensureConnection();
+        String query = String.format(SELECT_OPERATORI_QUERY, field);
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, value);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
         }
     }
 
-    // Metodo per eseguire una query di aggiornamento
-    public int executeUpdate(String query, Object... params) throws SQLException {
+    // Metodo per salvare l'operatore
+    public boolean salvaOperatore(Operatore operatore) throws SQLException {
         ensureConnection();
+
+        if (isNullOrEmpty(operatore.getNome(), operatore.getCognome(), operatore.getCodFiscale(),
+                operatore.getEmail(), operatore.getPassword(), operatore.getCentroMonitoraggio())) {
+            throw new IllegalArgumentException("Tutti i campi devono essere compilati.");
+        }
+
+        if (!isValidEmail(operatore.getEmail()) || !isValidCodiceFiscale(operatore.getCodFiscale())) {
+            throw new IllegalArgumentException("Email o Codice Fiscale non valido.");
+        }
+
+        if (emailEsistente(operatore.getEmail())) {
+            throw new IllegalArgumentException("L'email è già in uso.");
+        }
+
+        if (codiceFiscaleEsistente(operatore.getCodFiscale())) {
+            throw new IllegalArgumentException("Il codice fiscale è già in uso.");
+        }
+
+        String username = generateUsername(operatore.getNome(), operatore.getCognome(), operatore.getCodFiscale());
+        if (isUsernameExist(username)) {
+            throw new IllegalArgumentException("Lo username è già in uso.");
+        }
+
+        String query = "INSERT INTO operatori (nome, cognome, codice_fiscale, email, password, centro_monitoraggio, username) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            for (int i = 0; i < params.length; i++) {
-                stmt.setObject(i + 1, params[i]);
+            conn.setAutoCommit(false); // Inizia transazione
+
+            stmt.setString(1, operatore.getNome());
+            stmt.setString(2, operatore.getCognome());
+            stmt.setString(3, operatore.getCodFiscale());
+            stmt.setString(4, operatore.getEmail());
+            stmt.setString(5, operatore.getPassword());
+            stmt.setString(6, operatore.getCentroMonitoraggio());
+            stmt.setString(7, username);
+
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                conn.commit();
+                return true;
+            } else {
+                throw new SQLException("Errore nell'inserimento dell'operatore nel database.");
             }
-            return stmt.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("Errore esecuzione query: " + e.getMessage());
-            System.err.println("Query: " + query);
-            throw e;
+            conn.rollback();
+            throw new SQLException("Errore durante il salvataggio dell'operatore.", e);
+        } finally {
+            conn.setAutoCommit(true); // Ripristina auto commit
         }
     }
 
@@ -65,6 +121,37 @@ public class QueryExecutorImpl {
             }
         }
         return coordinates;
+    }
+
+
+    // Validazione email
+    private boolean isValidEmail(String email) {
+        return email != null && email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+    }
+
+    // Validazione codice fiscale
+    private boolean isValidCodiceFiscale(String codiceFiscale) {
+        return codiceFiscale != null && codiceFiscale.matches("[A-Z0-9]{16}");
+    }
+
+    // Verifica se l'email esiste
+    public boolean emailEsistente(String email) throws SQLException {
+        return existsInDatabase("email", email);
+    }
+
+    // Verifica se il codice fiscale esiste
+    public boolean codiceFiscaleEsistente(String codFisc) throws SQLException {
+        return existsInDatabase("codice_fiscale", codFisc);
+    }
+
+    // Verifica se lo username esiste
+    private boolean isUsernameExist(String username) throws SQLException {
+        return existsInDatabase("username", username);
+    }
+
+    // Metodo per generare lo username
+    private String generateUsername(String nome, String cognome, String codFiscale) {
+        return nome.substring(0, 3) + cognome.substring(0, 3) + codFiscale.substring(0, 4);
     }
 
     // Metodo per ottenere coordinate con filtri di latitudine e longitudine
@@ -88,134 +175,4 @@ public class QueryExecutorImpl {
         }
         return coordinates;
     }
-
-    // Metodo per ottenere tutti gli operatori
-    public List<Operatore> getOperatori() throws SQLException {
-        String query = "SELECT * FROM operatori";
-        try (ResultSet rs = executeQuery(query)) {
-            List<Operatore> operatoriList = new ArrayList<>();
-            while (rs.next()) {
-                String nome = rs.getString("nome");
-                String cognome = rs.getString("cognome");
-                String codFiscale = rs.getString("codice_fiscale");
-                String email = rs.getString("email");
-                // Crea un oggetto Operatore con i dati ottenuti
-                Operatore operatore = new Operatore(nome, cognome, codFiscale, email);
-                operatoriList.add(operatore);
-            }
-            return operatoriList;
-        }
-    }
-
-    // Metodo per salvare un operatore nel database con validazione migliorata
-    public boolean salvaOperatore(String nome, String cognome, String codiceFiscale, String email,
-                                  String password, String centroMonitoraggio, String username) throws SQLException {
-        ensureConnection();
-
-        // Eseguiamo alcune validazioni sui parametri prima di eseguire la query
-        if (isNullOrEmpty(nome, cognome, codiceFiscale, email, password, centroMonitoraggio, username)) {
-            throw new IllegalArgumentException("Tutti i campi devono essere compilati.");
-        }
-
-        // Aggiungere eventuali validazioni come quella dell'email
-        if (!isValidEmail(email)) {
-            throw new IllegalArgumentException("Email non valida.");
-        }
-
-        // Validazione del codice fiscale
-        if (!isValidCodiceFiscale(codiceFiscale)) {
-            throw new IllegalArgumentException("Codice Fiscale non valido.");
-        }
-
-        String query = "INSERT INTO operatori (nome, cognome, codice_fiscale, email, password, centro_monitoraggio, username) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            // Imposta i parametri della query
-            stmt.setString(1, nome);
-            stmt.setString(2, cognome);
-            stmt.setString(3, codiceFiscale);
-            stmt.setString(4, email);
-            stmt.setString(5, password);
-            stmt.setString(6, centroMonitoraggio);
-            stmt.setString(7, username);
-
-            // Esegui l'aggiornamento
-            int rowsAffected = stmt.executeUpdate();
-
-            // Se l'aggiornamento è stato eseguito correttamente, ritorniamo true
-            return rowsAffected > 0;
-        } catch (SQLException e) {
-            System.err.println("Errore durante il salvataggio dell'operatore: " + e.getMessage());
-            throw e;  // Rilancia l'eccezione per una gestione successiva
-        }
-    }
-
-    // Metodo per validare l'email
-    private boolean isValidEmail(String email) {
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
-        return email.matches(emailRegex);
-    }
-
-    // Metodo per validare il codice fiscale (semplificato per esempio)
-    private boolean isValidCodiceFiscale(String codiceFiscale) {
-        return codiceFiscale != null && codiceFiscale.matches("[A-Z0-9]{16}");
-    }
-
-    // Metodo per verificare se un campo è nullo o vuoto
-    private boolean isNullOrEmpty(String... fields) {
-        for (String field : fields) {
-            if (field == null || field.trim().isEmpty()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // Metodo per verificare se un codice fiscale esiste già nel database
-    public boolean codiceFiscaleEsistente(String codiceFiscale) throws SQLException {
-        ensureConnection();
-        String query = "SELECT COUNT(*) FROM operatori WHERE codice_fiscale = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, codiceFiscale);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    int count = rs.getInt(1);
-                    return count > 0; // Se count è maggiore di 0, significa che il codice fiscale esiste
-                }
-            }
-        }
-        return false; // Se il codice fiscale non esiste, ritorniamo false
-    }
-
-    // Metodo per verificare se un'email esiste già nel database
-    public boolean emailEsistente(String email) throws SQLException {
-        ensureConnection();
-        String query = "SELECT COUNT(*) FROM operatori WHERE email = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, email);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;  // Se il conteggio è maggiore di 0, significa che l'email esiste già
-                }
-            }
-        }
-        return false;
-    }
-    // Metodo per verificare se un username esiste già nel database
-    public boolean isUsernameExist(String username) throws SQLException {
-        ensureConnection();
-        String query = "SELECT COUNT(*) FROM operatori WHERE username = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, username);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    int count = rs.getInt(1);
-                    return count > 0; // Se count è maggiore di 0, significa che l'username esiste
-                }
-            }
-        }
-        return false; // Se l'username non esiste, ritorniamo false
-    }
-
 }

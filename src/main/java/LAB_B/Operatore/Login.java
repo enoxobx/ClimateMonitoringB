@@ -2,6 +2,7 @@ package LAB_B.Operatore;
 
 import LAB_B.Client.Client;
 import LAB_B.Common.Home;
+import LAB_B.Common.LayoutStandard;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,36 +11,28 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Properties;
 
-public class Login extends JFrame {
+public class Login extends LayoutStandard {  // Estensione da LayoutStandard per condividere il layout e la configurazione del DB
 
     private final JTextField usernameOrCodiceFiscaleField;
     private final JPasswordField passwordField;
     private final JButton loginButton;
     private final JButton registerButton;
-    private final JButton homeButton;
 
-    private static final int MAX_RETRIES = 3;
     private String dbUrl;
     private String dbUsername;
     private String dbPassword;
 
-
-    //TODO non estende la classe layoutStandard
+    // Costruttore
     public Login() {
+        super(); // Inizializza la classe LayoutStandard (es. carica DB e altre risorse)
         loadDatabaseConfig(); // Carica la configurazione dal file di proprietà
         setTitle("Login");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setSize(400, 350);
         setResizable(false);
 
         // Layout principale con BorderLayout
         JPanel mainPanel = new JPanel(new BorderLayout());
-
-        // Pulsante "Home" posizionato a sinistra
-        homeButton = new JButton("Home");
-        homeButton.setPreferredSize(new Dimension(70, 0));
-        mainPanel.add(homeButton, BorderLayout.WEST);
 
         // Pannello centrale per i campi di input e i bottoni
         JPanel centerPanel = new JPanel();
@@ -58,7 +51,7 @@ public class Login extends JFrame {
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         loginButton = new JButton("Login");
-        registerButton = new JButton("Register");
+        registerButton = new JButton("Registrazione");
         buttonPanel.add(loginButton);
         buttonPanel.add(registerButton);
 
@@ -72,9 +65,8 @@ public class Login extends JFrame {
         setVisible(true);
     }
 
-    //metodo inutile,se estendi da layout standard è già persente un istanza del db, al massimo puoi controllore se è istanziata o meno
+    // Carica la configurazione del database dal file properties
     private void loadDatabaseConfig() {
-        // Carica la configurazione dal file config.properties
         Properties properties = new Properties();
         try {
             properties.load(getClass().getClassLoader().getResourceAsStream("config.properties"));
@@ -87,7 +79,9 @@ public class Login extends JFrame {
         }
     }
 
+    // Configura le azioni dei bottoni (login, registrazione)
     private void configureButtons() {
+        // Azione del pulsante Login
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -99,16 +93,15 @@ public class Login extends JFrame {
                 } else if (password.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Il campo password non può essere vuoto!", "Errore", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    // Crea l'istanza di Client e verifica le credenziali
-                    Client client = new Client(dbUrl, dbUsername, dbPassword); // Passa i dettagli del database
+                    // Verifica le credenziali con il client
+                    Client client = new Client(dbUrl, dbUsername, dbPassword);
                     boolean success = client.login(usernameOrCodiceFiscale, password);
 
-                    // Verifica se il login è riuscito
+                    // Verifica il login
                     if (success) {
                         JOptionPane.showMessageDialog(null, "Login effettuato con successo!", "Successo", JOptionPane.INFORMATION_MESSAGE);
-                        // Passa l'username come argomento a LayoutOperatore
-                        new LayoutOperatore(usernameOrCodiceFiscale); // Apre il layout dell'operatore passando l'username
-                        dispose();
+                        new LayoutOperatore(usernameOrCodiceFiscale); // Passa l'username come parametro
+                        dispose(); // Chiude la finestra di login
                     } else {
                         JOptionPane.showMessageDialog(null, "Username, codice fiscale o password errati!", "Errore", JOptionPane.ERROR_MESSAGE);
                     }
@@ -116,25 +109,19 @@ public class Login extends JFrame {
             }
         });
 
+        // Azione del pulsante Registrazione
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                // Apre la finestra di registrazione
-                SignUp signUpWindow = new SignUp();
-                dispose();
+                new SignUp();  // Apre la finestra di registrazione
+                dispose(); // Chiude la finestra di login
             }
         });
 
-        homeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new Home(); // Crea la finestra Home
-                dispose();  // Chiude la finestra corrente
-            }
-        });
+        // Il bottone "Home" viene già gestito da LayoutStandard, quindi non è necessario aggiungere altre azioni
     }
 
     public static void main(String[] args) {
-        new Login();
+        new Login();  // Avvia l'applicazione di login
     }
 }

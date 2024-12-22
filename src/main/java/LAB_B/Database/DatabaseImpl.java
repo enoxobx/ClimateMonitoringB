@@ -1,125 +1,87 @@
 package LAB_B.Database;
 
-import LAB_B.Common.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import LAB_B.Common.Coordinate;
+import LAB_B.Common.Operatore;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.*;
-import java.io.InputStream;
-import java.io.IOException;
-import java.util.logging.Logger;
+import java.util.List;
+import java.util.Properties;
 
-// Classe che implementa l'interfaccia Database e estende UnicastRemoteObject per la gestione di RMI (Remote Method Invocation).
 public class DatabaseImpl extends UnicastRemoteObject implements Database {
-    private static Connection connection;
-    private static final Logger logger = Logger.getLogger(DatabaseImpl.class.getName());
-    private static QueryExecutorImpl queryExecutorImpl;
 
+    // Connessione al database
+    private static Connection connection;
+
+    // Oggetto per l'esecuzione delle query
+    private QueryExecutorImpl queryExecutorImpl;
+
+    // Blocco statico per inizializzare la connessione al database al momento del caricamento della classe
     static {
         try {
-            if (connection == null || connection.isClosed()) {
-                System.out.println("Tentativo di connessione al database...");
-                try (InputStream input = DatabaseImpl.class.getClassLoader()
-                        .getResourceAsStream("config.properties")) {
-                    if (input == null) {
-                        System.err.println("Impossibile trovare il file di configurazione.");
-                    } else {
-                        Properties config = new Properties();
-                        config.load(input);
-                        String dbUrl = config.getProperty("db.url");
-                        String dbUsername = config.getProperty("db.username");
-                        String dbPassword = config.getProperty("db.password");
+            initializeConnection();
+        } catch (SQLException | IOException e) {
+            System.err.println("Errore durante l'inizializzazione della connessione al database: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
+    /// Costruttore per inizializzare la connessione
+    public DatabaseImpl() throws IOException, SQLException {
+        super();
+        if (connection == null || connection.isClosed()) {
+            initializeConnection();  // Solo al primo utilizzo
+        }
+        this.queryExecutorImpl = new QueryExecutorImpl();
+    }
+
+
+    // Metodo per inizializzare la connessione al database
+    private static void initializeConnection() throws SQLException, IOException {
+        if (connection == null || connection.isClosed()) {
+            System.out.println("Tentativo di connessione al database...");
+            try (InputStream input = DatabaseImpl.class.getClassLoader().getResourceAsStream("config.properties")) {
+                if (input == null) {
+                    System.err.println("Impossibile trovare il file di configurazione.");
+                } else {
+                    Properties config = new Properties();
+                    config.load(input);
+
+                    String dbUrl = config.getProperty("db.url");
+                    String dbUsername = config.getProperty("db.username");
+                    String dbPassword = config.getProperty("db.password");
+
+                    if (connection == null || connection.isClosed()) {
                         connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+                        connection.setAutoCommit(false); // Disabilita autocommit per le transazioni
                         System.out.println("Connessione al database riuscita!");
-
-                        queryExecutorImpl = new QueryExecutorImpl(connection);
                     }
                 }
             }
-        } catch (SQLException | IOException e) {
-            System.err.println("Errore durante la connessione al database: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
-    // Costruttore che non richiede un proxy (necessario per RMI)
-    public DatabaseImpl() throws RemoteException {
-        super(); // Chiama il costruttore della classe UnicastRemoteObject per preparare
-                 
-    }
-
-    // Metodo per eseguire una query di selezione (SELECT) su un database
-
-    public ResultSet executeQuery(String query, Object... params) throws RemoteException {
-        try {
-            if (queryExecutorImpl != null) {
-                return queryExecutorImpl.executeQuery(query, params);
-            }
-            return null;
-
-        } catch (SQLException e) {
-            System.err.println("Errore eseguzione query: " + e.getMessage());
-            e.printStackTrace();
-            throw new RemoteException("QueryExecutorImpl non è stato inizializzato.");
-
-        }
-    }
-
-    // Metodo per eseguire una query di modifica (INSERT, UPDATE, DELETE) su un
-    // database
-
-    public int executeUpdate(String query, Object... params) throws RemoteException {
-
-        try {
-            if (queryExecutorImpl != null) {
-                return queryExecutorImpl.executeUpdate(query, params);
-            }
-            return 0;
-
-        } catch (SQLException e) {
-            System.err.println("Errore eseguzione query: " + e.getMessage());
-            e.printStackTrace();
-            throw new RemoteException("QueryExecutorImpl non è stato inizializzato.");
-
-        }
-
-    }
-
-    // Metodo per ottenere la connessione (esistente o nuova)
+    // Metodo per ottenere la connessione
     public static Connection getConnection() {
         try {
             if (connection == null || connection.isClosed()) {
-                System.out.println("Tentativo di connessione al database...");
-                try (InputStream input = DatabaseImpl.class.getClassLoader().getResourceAsStream("config.properties")) {
-                    if (input == null) {
-                        System.err.println("Impossibile trovare il file di configurazione.");
-                    } else {
-                        Properties config = new Properties();
-                        config.load(input);
-                        String dbUrl = config.getProperty("db.url");
-                        String dbUsername = config.getProperty("db.username");
-                        String dbPassword = config.getProperty("db.password");
-
-                        connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
-                        System.out.println("Connessione al database riuscita!");
-                    }
-                }
+                initializeConnection(); // Riavvia la connessione se è chiusa
             }
         } catch (SQLException | IOException e) {
             System.err.println("Errore durante la connessione al database: " + e.getMessage());
-            e.printStackTrace();
         }
         return connection;
     }
 
-    // Metodo per chiudere la connessione al database
+    // Metodo per chiudere la connessione (richiamato solo alla fine, quando l'applicazione termina)
     public static void closeConnection() {
         try {
             if (connection != null && !connection.isClosed()) {
                 connection.close();
+                System.out.println("Connessione al database chiusa.");
             }
         } catch (SQLException e) {
             System.err.println("Errore durante la chiusura della connessione: " + e.getMessage());
@@ -127,52 +89,54 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
         }
     }
 
+    // Implementazione dei metodi dell'interfaccia Database
+
     @Override
-    public boolean registrazione(Operatore op) throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'registrazione'");
+    public ResultSet executeQuery(String query, Object... params) throws RemoteException, SQLException {
+        // Implementazione di executeQuery, se necessario
+        return null; // Placeholder
     }
 
     @Override
-    public boolean login(String cf, String psw) throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'login'");
+    public int executeUpdate(String query, Object... params) throws RemoteException, SQLException {
+        // Implementazione di executeUpdate, se necessario
+        return 0; // Placeholder
     }
 
-    private String getDatabaseHost() {
-        // TODO
-        String host = "localhost";
-
-        return host;
-    }
-
-
-    //prendere da   ESEMPIO
     @Override
-    public List<Coordinate> getCoordinaResultSet(double latitude, double longitude, double tollerance) throws RemoteException {
+    public boolean login(String codiceFiscale, String password) throws RemoteException, SQLException {
+        // Implementazione di login, se necessario
+        return false; // Placeholder
+    }
 
+    // Metodo per la registrazione di un operatore
+    @Override
+    public boolean registrazione(Operatore operatore) throws RemoteException, SQLException {
         try {
-            if(queryExecutorImpl == null)queryExecutorImpl = new QueryExecutorImpl(connection);
-            return queryExecutorImpl.getCoordinate(latitude,longitude,tollerance);
+            // Usa il metodo salvaOperatore del QueryExecutorImpl per registrare l'operatore nel database
+            return queryExecutorImpl.salvaOperatore(operatore);
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            System.err.println("Errore durante la registrazione dell'operatore: " + e.getMessage());
             e.printStackTrace();
-            return null;
+            return false;
         }
-
     }
 
+    // Metodo per ottenere le coordinate in base a latitudine, longitudine e tolleranza
+    @Override
+    public List<Coordinate> getCoordinaResultSet(double latitude, double longitude, double tolerance) throws RemoteException, SQLException {
+        return queryExecutorImpl.getCoordinate(latitude, longitude, tolerance);
+    }
+
+    // Metodo per ottenere tutte le coordinate
     @Override
     public List<Coordinate> getCoordinaResultSet() throws RemoteException {
-        
         try {
-            if(queryExecutorImpl == null)queryExecutorImpl = new QueryExecutorImpl(connection);
             return queryExecutorImpl.getCoordinate();
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
+            System.err.println("Errore durante l'ottenimento delle coordinate: " + e.getMessage());
             e.printStackTrace();
             return null;
         }
     }
-
 }

@@ -5,11 +5,11 @@ import LAB_B.Database.DatabaseImpl;
 import LAB_B.Database.Server;
 
 import javax.swing.*;
-
+import java.sql.SQLException;
 
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         try {
             // Avvia il server in un thread separato
             Server serverThread = new Server();
