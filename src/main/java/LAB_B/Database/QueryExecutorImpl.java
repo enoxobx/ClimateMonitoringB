@@ -28,6 +28,25 @@ public class QueryExecutorImpl {
 
 
 
+    // Metodo per salvare i dati nella tabella centrimonitoraggio
+    public boolean salvaCentroMonitoraggio(String nomeCentro, String descrizione, String id) throws SQLException {
+        ensureConnection();
+
+        String query = "INSERT INTO centrimonitoraggio (id, nomeCentro, descrizione) VALUES (?, ?, ?)";
+
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, id);
+            stmt.setString(2, nomeCentro);
+            stmt.setString(3, descrizione);
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0; // Ritorna true se almeno una riga è stata modificata
+        }
+    }
+
+
+
+
 
     // Verifica se un campo è vuoto o nullo
     public boolean isNullOrEmpty(String... fields) {

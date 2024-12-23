@@ -85,5 +85,8 @@ abstract public class LayoutStandard extends JFrame {
     public Gestore getGestore() {
         return gestore;
     }
-    
+
+
+
+
 }

@@ -13,7 +13,10 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.Random;
 
+
+
 public class SignUp extends LayoutStandard {
+
 
     // Campi di input per la registrazione
     private final JTextField nomeField = new JTextField(15);
