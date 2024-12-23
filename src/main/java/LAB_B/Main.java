@@ -14,7 +14,6 @@ public class Main {
             // Avvia il server in un thread separato
             Server serverThread = new Server();
 
-
             // Avvia la finestra principale Home
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
@@ -29,10 +28,14 @@ public class Main {
         } catch (Exception e) {
             // Gestione delle eccezioni generali
             e.printStackTrace();
-        } finally {
-            // Chiusura della connessione al database
-            DatabaseImpl.closeConnection();
         }
-    }
 
+        // Aggiungi un hook per chiudere la connessione al database quando l'applicazione termina
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                DatabaseImpl.closeConnection();
+            }
+        });
+    }
 }
