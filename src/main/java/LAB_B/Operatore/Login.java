@@ -72,6 +72,14 @@ public class Login extends LayoutStandard {
         // Configura le azioni dei bottoni
         configureButtons();
 
+        // Imposta il bottone Home, se vuoi cambiarne l'azione
+        home.addActionListener(e -> {
+            // Puoi aggiungere il comportamento del bottone Home
+            // Ad esempio, qui puoi chiudere la finestra di login e aprire la home
+            new Home().setVisible(true);
+            dispose(); // Chiudi la finestra di login
+        });
+
         setVisible(true);
     }
 

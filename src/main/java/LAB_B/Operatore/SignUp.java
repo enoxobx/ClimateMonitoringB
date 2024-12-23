@@ -1,9 +1,8 @@
 package LAB_B.Operatore;
 
-import LAB_B.Common.Home;
 import LAB_B.Common.LayoutStandard;
-import LAB_B.Database.QueryExecutorImpl;
 import LAB_B.Common.Operatore;
+import LAB_B.Database.QueryExecutorImpl;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,10 +12,7 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.Random;
 
-
-
 public class SignUp extends LayoutStandard {
-
 
     // Campi di input per la registrazione
     private final JTextField nomeField = new JTextField(15);
@@ -28,7 +24,6 @@ public class SignUp extends LayoutStandard {
     private final JTextField centroField = new JTextField(15);
 
     private final JButton helpButton = new JButton("?");
-    private JButton homeButton;
 
     // Costruttore
     public SignUp() {
@@ -46,9 +41,6 @@ public class SignUp extends LayoutStandard {
     private void initializeUI() {
         Container body = getBody(); // Ottieni il corpo principale
         body.setLayout(new BorderLayout(10, 10)); // Layout con margini
-
-        // Aggiungi il pannello "Home" a sinistra
-        body.add(createHomePanel(), BorderLayout.WEST);
 
         // Aggiungi il pannello con il titolo
         JPanel titlePanel = new JPanel(new BorderLayout());
@@ -69,6 +61,9 @@ public class SignUp extends LayoutStandard {
         addField(inputPanel, "Conferma Password:", confermaPasswordField);
         addField(inputPanel, "Centro di Monitoraggio:", centroField);
         body.add(inputPanel, BorderLayout.CENTER);
+
+        // Aggiungi il bottone "Home" che è già stato creato in LayoutStandard
+        body.add(home, BorderLayout.WEST);
 
         // Aggiungi i pulsanti in basso
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -167,31 +162,6 @@ public class SignUp extends LayoutStandard {
         }
     }
 
-    // Metodo per creare il pannello "Home"
-    private JPanel createHomePanel() {
-        // Crea un pannello per la home
-        JPanel homePanel = new JPanel();
-        homePanel.setLayout(new BoxLayout(homePanel, BoxLayout.Y_AXIS)); // Layout verticale
-        homePanel.setPreferredSize(new Dimension(100, 500)); // Larghezza 100, altezza flessibile
-        homePanel.setMaximumSize(new Dimension(100, Integer.MAX_VALUE)); // Larghezza 100, altezza massima
-
-        // Aggiungi il pulsante "Home"
-        homeButton = new JButton("Home");
-        homeButton.setPreferredSize(new Dimension(100, 60)); // Imposta la dimensione del pulsante
-        homeButton.addActionListener(e -> {
-            new Home().setVisible(true);
-            dispose();
-        });
-
-        // Aggiungi il pulsante al pannello
-        homePanel.add(Box.createVerticalGlue()); // Per centrare il pulsante
-        homePanel.add(homeButton);
-        homePanel.add(Box.createVerticalGlue()); // Per centrare il pulsante verticalmente
-
-        return homePanel;
-    }
-
-
     // Metodo per creare il pannello di aiuto
     private JPanel createHelpPanel() {
         JPanel helpPanel = new JPanel();
@@ -207,21 +177,18 @@ public class SignUp extends LayoutStandard {
                 "<ul>" +
                 "<li><strong>Nome:</strong> Inserisci il tuo nome (max 30 caratteri).</li>" +
                 "<li><strong>Cognome:</strong> Inserisci il tuo cognome (max 30 caratteri).</li>" +
-                "<li><strong>Codice Fiscale:</strong> Inserisci il tuo codice fiscale (16 caratteri).</li>" +
-                "<li><strong>Email:</strong> Inserisci un'email valida.</li>" +
-                "<li><strong>Password:</strong> La password deve essere lunga almeno 8 caratteri e contenere lettere maiuscole, minuscole, numeri e simboli.</li>" +
-                "<li><strong>Centro Monitoraggio:</strong> Inserisci il centro di monitoraggio.</li>" +
+                "<li><strong>Codice Fiscale:</strong> Inserisci il tuo codice fiscale.</li>" +
+                "<li><strong>Email:</strong> Inserisci una email valida.</li>" +
+                "<li><strong>Password:</strong> La password deve contenere almeno una lettera maiuscola, una minuscola, un numero e un simbolo.</li>" +
+                "<li><strong>Centro di Monitoraggio:</strong> Inserisci il centro di monitoraggio assegnato.</li>" +
                 "</ul></html>";
-
-        JOptionPane.showMessageDialog(this, helpMessage, "Come compilare i campi", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, helpMessage, "Guida", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // Metodo per aggiungere un campo con etichetta
-    private void addField(JPanel panel, String label, JTextField field) {
-        JLabel fieldLabel = new JLabel(label);
-        fieldLabel.setLabelFor(field);
-        field.setToolTipText("Inserisci " + label.toLowerCase());
-        panel.add(fieldLabel);
+    // Metodo per aggiungere un campo di input al pannello
+    private void addField(JPanel panel, String labelText, JTextField field) {
+        panel.add(new JLabel(labelText));
         panel.add(field);
     }
+
 }

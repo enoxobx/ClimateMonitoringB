@@ -13,7 +13,7 @@ import java.awt.event.ActionListener;
 abstract public class LayoutStandard extends JFrame {
 
     // Dichiarazione dei componenti dell'interfaccia
-    private final JButton home;    // Bottone "Home"
+    protected final JButton home;    // Bottone "Home"
     private final Container body;  // Corpo della finestra (contenitore principale)
     private final Gestore gestore; // Gestore degli eventi (ActionListener)
     public Database db;
