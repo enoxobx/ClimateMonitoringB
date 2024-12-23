@@ -21,7 +21,13 @@ public class Operatore {
         this.email = email;
         this.password = password;
         this.centroMonitoraggio = centroMonitoraggio;
-        this.username = (username != null && !username.isEmpty()) ? username : generateUsername(nome, cognome, codFiscale);
+
+        // Usa generateUsername solo se username non è stato passato
+        if (username == null || username.isEmpty()) {
+            this.username = generateUsername(nome, cognome, codFiscale); // Genera un username
+        } else {
+            this.username = username; // Usa quello passato
+        }
     }
 
     // Getter per ottenere i vari campi
@@ -112,12 +118,17 @@ public class Operatore {
                 password.matches(".*[!@#\\$%^&*].*"); // almeno un simbolo
     }
 
-
     // Metodo per generare il nome utente
     private String generateUsername(String nome, String cognome, String codFiscale) {
         // Assicurati che nome e cognome abbiano almeno 3 caratteri
         String nomeParte = nome.length() >= 3 ? nome.substring(0, 3) : nome;
         String cognomeParte = cognome.length() >= 3 ? cognome.substring(0, 3) : cognome;
-        return nomeParte + cognomeParte + codFiscale.substring(0, 4); // Esempio di generazione
+        // Gestione caso codFiscale più corto di 4 caratteri
+        String codFiscaleParte = codFiscale.length() >= 4 ? codFiscale.substring(0, 4) : codFiscale;
+
+        String usernameGenerato = nomeParte + cognomeParte + codFiscaleParte;
+        System.out.println("Username generato: " + usernameGenerato); // Debug
+        return usernameGenerato;
     }
+
 }

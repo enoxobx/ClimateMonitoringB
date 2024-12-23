@@ -55,28 +55,38 @@ public class QueryExecutorImpl {
     public boolean salvaOperatore(Operatore operatore) throws SQLException {
         ensureConnection();
 
+        // Verifica che tutti i campi siano validi
         if (isNullOrEmpty(operatore.getNome(), operatore.getCognome(), operatore.getCodFiscale(),
                 operatore.getEmail(), operatore.getPassword(), operatore.getCentroMonitoraggio())) {
             throw new IllegalArgumentException("Tutti i campi devono essere compilati.");
         }
 
-        if (!isValidEmail(operatore.getEmail()) || !isValidCodiceFiscale(operatore.getCodFiscale())) {
-            throw new IllegalArgumentException("Email o Codice Fiscale non valido.");
+        // Verifica la validità di email e codice fiscale
+        if (!isValidEmail(operatore.getEmail())) {
+            throw new IllegalArgumentException("Email non valida.");
         }
 
+        if (!isValidCodiceFiscale(operatore.getCodFiscale())) {
+            throw new IllegalArgumentException("Codice Fiscale non valido.");
+        }
+
+        // Verifica che l'email non sia già in uso
         if (emailEsistente(operatore.getEmail())) {
             throw new IllegalArgumentException("L'email è già in uso.");
         }
 
+        // Verifica che il codice fiscale non sia già in uso
         if (codiceFiscaleEsistente(operatore.getCodFiscale())) {
             throw new IllegalArgumentException("Il codice fiscale è già in uso.");
         }
 
+        // Genera lo username
         String username = generateUsername(operatore.getNome(), operatore.getCognome(), operatore.getCodFiscale());
         if (isUsernameExist(username)) {
             throw new IllegalArgumentException("Lo username è già in uso.");
         }
 
+        // Query per inserire l'operatore nel database
         String query = "INSERT INTO operatori (nome, cognome, codice_fiscale, email, password, centro_monitoraggio, username) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
@@ -105,6 +115,8 @@ public class QueryExecutorImpl {
             conn.setAutoCommit(true); // Ripristina auto commit
         }
     }
+
+
 
     // Metodo per ottenere coordinate senza filtri
     public List<Coordinate> getCoordinate() throws SQLException {
@@ -139,20 +151,43 @@ public class QueryExecutorImpl {
         return existsInDatabase("email", email);
     }
 
-    // Verifica se il codice fiscale esiste
+    // Verifica se il codice fiscale esiste nel database
     public boolean codiceFiscaleEsistente(String codFisc) throws SQLException {
-        return existsInDatabase("codice_fiscale", codFisc);
+        ensureConnection();
+        String query = "SELECT 1 FROM operatori WHERE codice_fiscale = ? LIMIT 1";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, codFisc);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
+        }
     }
 
-    // Verifica se lo username esiste
+
+    // Metodo per verificare se lo username esiste nel database
     private boolean isUsernameExist(String username) throws SQLException {
         return existsInDatabase("username", username);
     }
 
-    // Metodo per generare lo username
-    private String generateUsername(String nome, String cognome, String codFiscale) {
-        return nome.substring(0, 3) + cognome.substring(0, 3) + codFiscale.substring(0, 4);
+
+    // Metodo per generare uno username unico
+    private String generateUsername(String nome, String cognome, String codFiscale) throws SQLException {
+        String nomeParte = nome.length() >= 3 ? nome.substring(0, 3) : nome;
+        String cognomeParte = cognome.length() >= 3 ? cognome.substring(0, 3) : cognome;
+        String codFiscaleParte = codFiscale.length() >= 4 ? codFiscale.substring(0, 4) : codFiscale;
+
+        String baseUsername = nomeParte + cognomeParte + codFiscaleParte;
+        String username = baseUsername;
+        int counter = 1;
+
+        while (isUsernameExist(username)) {
+            username = baseUsername + counter;
+            counter++;
+        }
+        return username;
     }
+
+
 
     // Metodo per ottenere coordinate con filtri di latitudine e longitudine
     public List<Coordinate> getCoordinate(double latitude, double longitude, double tolerance) throws SQLException {

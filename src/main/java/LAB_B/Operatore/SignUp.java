@@ -11,6 +11,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.Random;
 
 public class SignUp extends LayoutStandard {
 
@@ -23,52 +24,40 @@ public class SignUp extends LayoutStandard {
     private final JPasswordField confermaPasswordField = new JPasswordField(15);
     private final JTextField centroField = new JTextField(15);
 
-    // Pulsante aiuto
     private final JButton helpButton = new JButton("?");
-
-    // Pulsante "Home"
     private JButton homeButton;
 
     // Costruttore
     public SignUp() {
-        super(); // Inizializza LayoutStandard (incluso il bottone "Home")
+        super(); // Inizializza LayoutStandard
         setTitle("Registrazione Operatore");
-        setSize(600, 500); // Dimensioni personalizzate
-        setLocationRelativeTo(null); // Centra la finestra
+        setSize(600, 500);
+        setLocationRelativeTo(null);
         setResizable(false); // Disabilita il ridimensionamento
 
-        // Configura l'interfaccia utente
-        initializeUI();
-
-        setVisible(true); // Rendi visibile la finestra
+        initializeUI(); // Configura l'interfaccia utente
+        setVisible(true); // Mostra la finestra
     }
 
     // Metodo per inizializzare l'interfaccia utente
     private void initializeUI() {
-        Container body = getBody(); // Ottieni il corpo principale da LayoutStandard
-        body.setLayout(new BorderLayout(10, 10)); // Imposta il layout principale
+        Container body = getBody(); // Ottieni il corpo principale
+        body.setLayout(new BorderLayout(10, 10)); // Layout con margini
 
-        // Pannello "Home" a sinistra
-        JPanel homePanel = createHomePanel();
-        body.add(homePanel, BorderLayout.WEST);
+        // Aggiungi il pannello "Home" a sinistra
+        body.add(createHomePanel(), BorderLayout.WEST);
 
-        // Pannello superiore con il titolo
+        // Aggiungi il pannello con il titolo
         JPanel titlePanel = new JPanel(new BorderLayout());
         JLabel titleLabel = new JLabel("Registra un nuovo Operatore", JLabel.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         titlePanel.add(titleLabel, BorderLayout.CENTER);
-
-        // Pannello di aiuto in alto a destra
-        JPanel helpPanel = createHelpPanel();
-        titlePanel.add(helpPanel, BorderLayout.EAST); // Aggiungi il pannello di aiuto accanto al titolo
-
+        titlePanel.add(createHelpPanel(), BorderLayout.EAST); // Aggiungi il pannello di aiuto a destra
         body.add(titlePanel, BorderLayout.NORTH);
 
-        // Pannello centrale con i campi di input
+        // Aggiungi il pannello con i campi di input
         JPanel inputPanel = new JPanel(new GridLayout(7, 2, 10, 10));
         inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-
-        // Usa addField per aggiungere i campi
         addField(inputPanel, "Nome:", nomeField);
         addField(inputPanel, "Cognome:", cognomeField);
         addField(inputPanel, "Codice Fiscale:", codiceFiscaleField);
@@ -76,25 +65,19 @@ public class SignUp extends LayoutStandard {
         addField(inputPanel, "Password:", passwordField);
         addField(inputPanel, "Conferma Password:", confermaPasswordField);
         addField(inputPanel, "Centro di Monitoraggio:", centroField);
-
         body.add(inputPanel, BorderLayout.CENTER);
 
-        // Pannello inferiore con i pulsanti
+        // Aggiungi i pulsanti in basso
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton saveButton = new JButton("Salva");
-        saveButton.setPreferredSize(new Dimension(150, 40));
-        saveButton.addActionListener(e -> handleRegistration());
-
+        saveButton.addActionListener(e -> handleRegistration()); // Gestisce la registrazione
         JButton backButton = new JButton("Torna indietro");
-        backButton.setPreferredSize(new Dimension(150, 40));
         backButton.addActionListener(e -> {
             new Login().setVisible(true); // Torna alla schermata di login
             dispose(); // Chiudi la finestra di registrazione
         });
-
         buttonPanel.add(backButton);
         buttonPanel.add(saveButton);
-
         body.add(buttonPanel, BorderLayout.SOUTH);
     }
 
@@ -108,57 +91,44 @@ public class SignUp extends LayoutStandard {
         String confermaPassword = new String(confermaPasswordField.getPassword()).trim();
         String centro = centroField.getText().trim();
 
-        // Crea un nuovo oggetto Operatore
-        Operatore operatore = new Operatore(nome, cognome, codiceFiscale, email, password, centro, "username");
+        Operatore operatore = new Operatore(nome, cognome, codiceFiscale, email, password, centro, generateUsername());
 
-        // Verifica preliminare dei dati
+        // Verifica che i dati siano validi
         if (!operatore.validate()) {
             JOptionPane.showMessageDialog(this, operatore.getErrorMessages(), "Errore di Registrazione", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Verifica che le password coincidano
+        // Controlla che le password coincidano
         if (!password.equals(confermaPassword)) {
             JOptionPane.showMessageDialog(this, "Le password non coincidono", "Errore di Registrazione", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Verifica che la password soddisfi i requisiti di formato, usando il metodo isValidPassword dell'oggetto operatore
+        // Controlla che la password soddisfi i requisiti
         if (!operatore.isValidPassword(password)) {
             JOptionPane.showMessageDialog(this, "La password deve contenere almeno una lettera maiuscola, una minuscola, un numero e un simbolo.", "Errore di Registrazione", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Verifica che l'email non sia già registrata
+        // Verifica che l'email e il codice fiscale non siano già in uso
         try {
             QueryExecutorImpl queryExecutor = new QueryExecutorImpl();
             if (queryExecutor.emailEsistente(email)) {
                 JOptionPane.showMessageDialog(this, "L'email è già in uso.", "Errore di Registrazione", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
-            // Verifica che il codice fiscale non sia già registrato
             if (queryExecutor.codiceFiscaleEsistente(codiceFiscale)) {
                 JOptionPane.showMessageDialog(this, "Il codice fiscale è già in uso.", "Errore di Registrazione", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            // Salvataggio dei dati nel database
+            // Salva l'operatore nel database
             if (queryExecutor.salvaOperatore(operatore)) {
-                String usernameGenerato = operatore.getUsername(); // Username generato nel salvataggio
-                JOptionPane.showMessageDialog(this,
-                        "Operatore registrato con successo!\n" +
-                                "Email: " + email + "\n" +
-                                "Username: " + usernameGenerato,
-                        "Registrazione completata",
-                        JOptionPane.INFORMATION_MESSAGE);
-
-                // Chiude la finestra di registrazione
-                dispose(); // Chiude la finestra di registrazione
-
-                // Apertura della finestra di login
-                new Login();  // Mostra la finestra di login
-
+                String usernameGenerato = operatore.getUsername();
+                JOptionPane.showMessageDialog(this, "Operatore registrato con successo!\n" + "Email: " + email + "\n" + "Username: " + usernameGenerato, "Registrazione completata", JOptionPane.INFORMATION_MESSAGE);
+                dispose(); // Chiudi la finestra di registrazione
+                new Login().setVisible(true); // Mostra la finestra di login
             } else {
                 JOptionPane.showMessageDialog(this, "Errore nella registrazione dell'operatore. Riprova.", "Errore", JOptionPane.ERROR_MESSAGE);
             }
@@ -168,13 +138,20 @@ public class SignUp extends LayoutStandard {
         }
     }
 
+    // Metodo per generare lo username
+    public String generateUsername() {
+        String nomePart = nomeField.getText().length() >= 3 ? nomeField.getText().substring(0, 3) : nomeField.getText();
+        String cognomePart = cognomeField.getText().length() >= 3 ? cognomeField.getText().substring(0, 3) : cognomeField.getText();
+        int randomNum = new Random().nextInt(1000);
+        return nomePart.toLowerCase() + "_" + cognomePart.toLowerCase() + randomNum;
+    }
+
     // Metodo per loggare gli errori imprevisti
     private void logUnexpectedError(Exception e, String context) {
         System.err.println("Errore imprevisto: " + e.getMessage());
         System.err.println("Contesto: " + context);
-        e.printStackTrace(); // Stampa dello stack trace
+        e.printStackTrace();
 
-        // Salvataggio dell'errore in un file di log
         try (FileWriter writer = new FileWriter("logs/error.log", true);
              PrintWriter logWriter = new PrintWriter(writer)) {
             logWriter.println("Errore imprevisto: " + e.getMessage());
@@ -189,32 +166,35 @@ public class SignUp extends LayoutStandard {
 
     // Metodo per creare il pannello "Home"
     private JPanel createHomePanel() {
+        // Crea un pannello per la home
         JPanel homePanel = new JPanel();
-        homePanel.setLayout(new BoxLayout(homePanel, BoxLayout.Y_AXIS));
-        homePanel.setPreferredSize(new Dimension(100, 0)); // Impostiamo una larghezza fissa per il pannello
-        homePanel.setMaximumSize(new Dimension(100, Integer.MAX_VALUE)); // Impostiamo una dimensione massima per la parte verticale
+        homePanel.setLayout(new BoxLayout(homePanel, BoxLayout.Y_AXIS)); // Layout verticale
+        homePanel.setPreferredSize(new Dimension(100, 500)); // Larghezza 100, altezza flessibile
+        homePanel.setMaximumSize(new Dimension(100, Integer.MAX_VALUE)); // Larghezza 100, altezza massima
 
-        homePanel.add(Box.createVerticalGlue()); // Allinea il pulsante al centro verticale
-
+        // Aggiungi il pulsante "Home"
         homeButton = new JButton("Home");
-        homeButton.setMaximumSize(new Dimension(100, Integer.MAX_VALUE)); // Impostiamo una larghezza fissa per il pulsante
+        homeButton.setPreferredSize(new Dimension(100, 60)); // Imposta la dimensione del pulsante
         homeButton.addActionListener(e -> {
-            new Home().setVisible(true);  // Mostra la finestra Home
-            dispose();  // Chiude la finestra attuale
+            new Home().setVisible(true);
+            dispose();
         });
 
-        homePanel.add(homeButton);  // Aggiungi il pulsante al pannello
-        homePanel.add(Box.createVerticalGlue());  // Allinea il pulsante al centro
+        // Aggiungi il pulsante al pannello
+        homePanel.add(Box.createVerticalGlue()); // Per centrare il pulsante
+        homePanel.add(homeButton);
+        homePanel.add(Box.createVerticalGlue()); // Per centrare il pulsante verticalmente
 
         return homePanel;
     }
+
 
     // Metodo per creare il pannello di aiuto
     private JPanel createHelpPanel() {
         JPanel helpPanel = new JPanel();
         helpPanel.setLayout(new BorderLayout());
         helpPanel.add(helpButton, BorderLayout.CENTER);
-        helpButton.addActionListener(e -> showHelpDialog()); // Usa il metodo per mostrare la guida
+        helpButton.addActionListener(e -> showHelpDialog());
         return helpPanel;
     }
 
@@ -238,7 +218,6 @@ public class SignUp extends LayoutStandard {
         JLabel fieldLabel = new JLabel(label);
         fieldLabel.setLabelFor(field);
         field.setToolTipText("Inserisci " + label.toLowerCase());
-
         panel.add(fieldLabel);
         panel.add(field);
     }
