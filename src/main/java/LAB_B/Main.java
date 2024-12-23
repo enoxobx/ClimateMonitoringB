@@ -7,13 +7,12 @@ import LAB_B.Database.Server;
 import javax.swing.*;
 import java.sql.SQLException;
 
-
 public class Main {
     public static void main(String[] args) throws SQLException {
-        try {
-            // Avvia il server in un thread separato
-            Server serverThread = new Server();
+        // Avvia il server in un thread separato
+        Server serverThread = new Server();
 
+        try {
             // Avvia la finestra principale Home
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
@@ -30,11 +29,13 @@ public class Main {
             e.printStackTrace();
         }
 
-        // Aggiungi un hook per chiudere la connessione al database quando l'applicazione termina
+        // Aggiungi un hook per chiudere la connessione al database e fermare il server quando l'applicazione termina
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                DatabaseImpl.closeConnection();
+                System.out.println("Chiusura dell'applicazione...");
+                DatabaseImpl.closeConnection();  // Chiude la connessione al database
+                serverThread.stopServer();  // Ferma il server RMI
             }
         });
     }
