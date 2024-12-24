@@ -1,78 +1,88 @@
 package LAB_B.Operatore;
 
 import LAB_B.Client.Client;
+import LAB_B.Common.LayoutStandard;
 import LAB_B.Common.Home;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Properties;
 
-public class Login extends JFrame {
+public class Login extends LayoutStandard {
 
-    private final JTextField usernameOrCodiceFiscaleField;
-    private final JPasswordField passwordField;
-    private final JButton loginButton;
-    private final JButton registerButton;
-    private final JButton homeButton;
+    private JTextField usernameOrCodiceFiscaleField;
+    private JPasswordField passwordField;
+    private JButton loginButton;
+    private JButton registerButton;
 
     private static final int MAX_RETRIES = 3;
     private String dbUrl;
     private String dbUsername;
     private String dbPassword;
 
-
-    //TODO non estende la classe layoutStandard
     public Login() {
+        super(); // Richiama il costruttore di LayoutStandard
+
         loadDatabaseConfig(); // Carica la configurazione dal file di proprietà
         setTitle("Login");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
-        setSize(400, 350);
-        setResizable(false);
-
-        // Layout principale con BorderLayout
-        JPanel mainPanel = new JPanel(new BorderLayout());
-
-        // Pulsante "Home" posizionato a sinistra
-        homeButton = new JButton("Home");
-        homeButton.setPreferredSize(new Dimension(70, 0));
-        mainPanel.add(homeButton, BorderLayout.WEST);
 
         // Pannello centrale per i campi di input e i bottoni
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-        centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
+        centerPanel.setBackground(new Color(240, 248, 255));
 
-        usernameOrCodiceFiscaleField = new JTextField(20);
+        usernameOrCodiceFiscaleField = new JTextField(10);
         usernameOrCodiceFiscaleField.setBorder(BorderFactory.createTitledBorder("Username o Codice Fiscale"));
+        usernameOrCodiceFiscaleField.setFont(new Font("SansSerif", Font.PLAIN, 14));
         centerPanel.add(usernameOrCodiceFiscaleField);
         centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        passwordField = new JPasswordField(20);
+        passwordField = new JPasswordField(10);
         passwordField.setBorder(BorderFactory.createTitledBorder("Password"));
+        passwordField.setFont(new Font("SansSerif", Font.PLAIN, 14));
         centerPanel.add(passwordField);
         centerPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        buttonPanel.setBackground(new Color(240, 248, 255));
+
         loginButton = new JButton("Login");
+        loginButton.setBackground(new Color(60, 179, 113)); // Verde moderno
+        loginButton.setForeground(Color.WHITE);
+        loginButton.setFocusPainted(false);
+        loginButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+
         registerButton = new JButton("Register");
+        registerButton.setBackground(new Color(100, 149, 237)); // Blu chiaro
+        registerButton.setForeground(Color.WHITE);
+        registerButton.setFocusPainted(false);
+        registerButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+
         buttonPanel.add(loginButton);
         buttonPanel.add(registerButton);
 
         centerPanel.add(buttonPanel);
-        mainPanel.add(centerPanel, BorderLayout.CENTER);
+
+        // Aggiungi il pannello centrale al corpo ereditato da LayoutStandard
+        getBody().add(centerPanel, BorderLayout.CENTER);
 
         // Configura le azioni dei bottoni
         configureButtons();
 
-        add(mainPanel);
+        // Imposta il bottone Home, se vuoi cambiarne l'azione
+        home.addActionListener(e -> {
+            // Puoi aggiungere il comportamento del bottone Home
+            // Ad esempio, qui puoi chiudere la finestra di login e aprire la home
+            new Home().setVisible(true);
+            dispose(); // Chiudi la finestra di login
+        });
+
         setVisible(true);
     }
 
-    //metodo inutile,se estendi da layout standard è già persente un istanza del db, al massimo puoi controllore se è istanziata o meno
     private void loadDatabaseConfig() {
         // Carica la configurazione dal file config.properties
         Properties properties = new Properties();
@@ -88,49 +98,34 @@ public class Login extends JFrame {
     }
 
     private void configureButtons() {
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String usernameOrCodiceFiscale = usernameOrCodiceFiscaleField.getText().trim();
-                String password = new String(passwordField.getPassword()).trim();
+        loginButton.addActionListener(e -> {
+            String usernameOrCodiceFiscale = usernameOrCodiceFiscaleField.getText().trim();
+            String password = new String(passwordField.getPassword()).trim();
 
-                if (usernameOrCodiceFiscale.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Inserisci uno username o un codice fiscale!", "Errore", JOptionPane.ERROR_MESSAGE);
-                } else if (password.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Il campo password non può essere vuoto!", "Errore", JOptionPane.ERROR_MESSAGE);
+            if (usernameOrCodiceFiscale.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Inserisci uno username o un codice fiscale!", "Errore", JOptionPane.ERROR_MESSAGE);
+            } else if (password.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Il campo password non può essere vuoto!", "Errore", JOptionPane.ERROR_MESSAGE);
+            } else {
+                // Crea l'istanza di Client e verifica le credenziali
+                Client client = new Client(dbUrl, dbUsername, dbPassword); // Passa i dettagli del database
+                boolean success = client.login(usernameOrCodiceFiscale, password);
+
+                // Verifica se il login è riuscito
+                if (success) {
+                    JOptionPane.showMessageDialog(this, "Login effettuato con successo!", "Successo", JOptionPane.INFORMATION_MESSAGE);
+                    new LayoutOperatore(usernameOrCodiceFiscale); // Apre il layout dell'operatore passando l'username
+                    dispose();
                 } else {
-                    // Crea l'istanza di Client e verifica le credenziali
-                    Client client = new Client(dbUrl, dbUsername, dbPassword); // Passa i dettagli del database
-                    boolean success = client.login(usernameOrCodiceFiscale, password);
-
-                    // Verifica se il login è riuscito
-                    if (success) {
-                        JOptionPane.showMessageDialog(null, "Login effettuato con successo!", "Successo", JOptionPane.INFORMATION_MESSAGE);
-                        // Passa l'username come argomento a LayoutOperatore
-                        new LayoutOperatore(usernameOrCodiceFiscale); // Apre il layout dell'operatore passando l'username
-                        dispose();
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Username, codice fiscale o password errati!", "Errore", JOptionPane.ERROR_MESSAGE);
-                    }
+                    JOptionPane.showMessageDialog(this, "Username, codice fiscale o password errati!", "Errore", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
 
-        registerButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                // Apre la finestra di registrazione
-                SignUp signUpWindow = new SignUp();
-                dispose();
-            }
-        });
-
-        homeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new Home(); // Crea la finestra Home
-                dispose();  // Chiude la finestra corrente
-            }
+        registerButton.addActionListener(e -> {
+            // Apre la finestra di registrazione
+            SignUp signUpWindow = new SignUp();
+            dispose();
         });
     }
 

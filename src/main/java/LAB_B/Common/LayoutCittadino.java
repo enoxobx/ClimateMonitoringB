@@ -15,6 +15,7 @@ import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.*;
 import java.rmi.RemoteException;
+import java.sql.SQLException;
 import java.util.List;
 
 public class LayoutCittadino extends LayoutStandard {
@@ -227,6 +228,8 @@ public class LayoutCittadino extends LayoutStandard {
                     newDot.setVisible(false);
             } catch (RemoteException e1) {
                 e1.printStackTrace();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
         } else {
             System.err.println("Errore: db non è stato inizializzato.");

@@ -1,156 +1,134 @@
 package LAB_B.Common.Interface;
 
-import java.io.Serializable;
 import java.util.regex.Pattern;
 
-public class Operatore implements Serializable {
-    // Versione seriale per la serializzazione della classe
-    private static final long serialVersionUID = 1L;
+public class Operatore {
 
-    // Dichiarazione dei campi della classe (informazioni dell'operatore)
-    private String cf;        // Codice Fiscale
-    private String name;      // Nome
-    private String surname;   // Cognome
-    private String email;     // Email
-    private String username;  // Nome utente
-    private String password;  // Password
+    private String nome;
+    private String cognome;
+    private String codFiscale;
+    private String email;
+    private String password;
+    private String centroMonitoraggio;
+    private String username;
+    private StringBuilder err = new StringBuilder();
 
-    // Costruttore della classe Operatore
-    public Operatore(String cf, String name, String surname, String email, String username, String password) throws Exception {
-        // Esegui le validazioni sui dati prima di settarli
-        if (!(this.checkCf(cf) & this.checkName(name) & this.checkSurname(surname) & this.checkEmail(email) & this.checkUsername(username) & this.checkPassword(password))) {
-            // Se una delle validazioni fallisce, stampa un errore e non inizializza l'operatore
-            System.out.println("Errore nei dati inseriti");
+    // Costruttore completo con tutti i parametri
+    public Operatore(String nome, String cognome, String codFiscale, String email, String password, String centroMonitoraggio, String username) {
+        this.nome = nome;
+        this.cognome = cognome;
+        this.codFiscale = codFiscale != null ? codFiscale.toUpperCase() : ""; // Assicurati che il codice fiscale sia in maiuscolo
+        this.email = email;
+        this.password = password;
+        this.centroMonitoraggio = centroMonitoraggio;
+
+        // Usa generateUsername solo se username non è stato passato
+        if (username == null || username.isEmpty()) {
+            this.username = generateUsername(nome, cognome, codFiscale); // Genera un username
         } else {
-            // Se tutte le validazioni passano, assegna i valori ai campi
-            this.cf = cf;
-            this.name = name;
-            this.surname = surname;
-            this.email = email;
-            this.username = username;
-            this.password = password;
+            this.username = username; // Usa quello passato
         }
     }
 
-    // Metodo per validare la password
-    private boolean checkPassword(String password) {
-        // Regola per una password sicura: almeno un numero, una lettera maiuscola, una minuscola, un simbolo e lunghezza minima di 8 caratteri
-        Pattern PASSWORD_PATTERN = Pattern.compile(
-                "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$"
-        );
-        // Se la password è nulla o vuota, ritorna falso
-        if (password == null || password.isEmpty()) {
-            System.out.println("Password errata");
-            return false;
-        }
-        // Ritorna vero se la password corrisponde al pattern
-        return PASSWORD_PATTERN.matcher(password).matches();
+    // Getter per ottenere i vari campi
+    public String getNome() {
+        return nome;
     }
 
-    // Metodo per validare l'email
-    private boolean checkEmail(String email) {
-        // Se l'email è nulla o vuota, ritorna falso
-        if (email == null || email.isEmpty()) return false;
-
-        // Rimuove gli spazi all'inizio e alla fine dell'email
-        email = email.trim();
-        // Pattern per validare l'email (simile alla struttura di un'email standard)
-        Pattern EMAIL_PATTERN = Pattern.compile(
-                "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
-        );
-        // Ritorna vero se l'email corrisponde al pattern
-        return EMAIL_PATTERN.matcher(email).matches();
+    public String getCognome() {
+        return cognome;
     }
 
-    // Metodo per validare il nome (non deve essere nullo e deve avere lunghezza massima di 30 caratteri)
-    private boolean checkName(String name) {
-        // Se il nome è nullo o supera la lunghezza massima, ritorna falso
-        return name != null && name.length() <= 30;
-        // Altrimenti ritorna vero
+    public String getCodFiscale() {
+        return codFiscale;
     }
 
-    // Metodo per validare il cognome (stessa logica della validazione del nome)
-    private boolean checkSurname(String surname) {
-        // Se il cognome è nullo o supera la lunghezza massima, ritorna falso
-        return surname != null && surname.length() <= 30;
-        // Altrimenti ritorna vero
-    }
-
-    // Metodo per validare il codice fiscale (deve rispettare un formato specifico di 16 caratteri)
-    private boolean checkCf(String cf) {
-        // Pattern che rappresenta il formato del codice fiscale italiano
-        Pattern CF_PATTERN = Pattern.compile("^[A-Z]{6}[0-9]{2}[A-EHLMPRST][0-9]{2}[A-Z][0-9]{3}[A-Z]$");
-
-        // Se il codice fiscale è nullo o ha una lunghezza diversa da 16, ritorna falso
-        if (cf == null || cf.length() != 16) return false;
-
-        // Ritorna vero se il codice fiscale corrisponde al pattern
-        return CF_PATTERN.matcher(cf).matches();
-    }
-
-    // Metodo per validare l'username (deve essere non nullo, avere una lunghezza minima di 3 e massima di 50 caratteri)
-    private boolean checkUsername(String username) {
-        // Se l'username è nullo, ha una lunghezza minore di 3 o maggiore di 50, ritorna falso
-        if (username == null || username.length() < 3 || username.length() > 50) {
-            System.out.println("Username non valido");
-            return false;
-        }
-        // Altrimenti ritorna vero
-        return true;
-    }
-
-    // Getter per il codice fiscale
-    public String getCodiceFiscale() {
-        return cf;
-    }
-
-    // Getter per il nome
-    public String getName() {
-        return name;
-    }
-
-    // Setter per il nome
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    // Getter per il cognome
-    public String getSurname() {
-        return surname;
-    }
-
-    // Setter per il cognome
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    // Getter per l'email
     public String getEmail() {
         return email;
     }
 
-    // Setter per l'email
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    // Getter per l'username
-    public String getUsername() {
-        return username;
-    }
-
-    // Setter per l'username
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    // Getter per la password
     public String getPassword() {
         return password;
     }
 
-    // Setter per la password
-    public void setPassword(String password) {
-        this.password = password;
+    public String getCentroMonitoraggio() {
+        return centroMonitoraggio;
     }
+
+    public String getUsername() {
+        return username;
+    }
+
+    // Metodo per validare i dati dell'operatore
+    public boolean validate() {
+        // Reset degli errori
+        err.setLength(0);
+
+        // Nome e cognome (max 30 caratteri)
+        if (nome == null || nome.isEmpty() || nome.length() > 30) {
+            err.append("Nome non valido. Deve essere non vuoto e massimo 30 caratteri.\n");
+        }
+
+        if (cognome == null || cognome.isEmpty() || cognome.length() > 30) {
+            err.append("Cognome non valido. Deve essere non vuoto e massimo 30 caratteri.\n");
+        }
+
+        // Codice fiscale (deve essere 16 caratteri)
+        if (codFiscale == null || codFiscale.length() != 16 || !Pattern.matches("[A-Z0-9]{16}", codFiscale)) {
+            err.append("Codice Fiscale non valido. Deve essere di 16 caratteri alfanumerici.\n");
+        }
+
+        // Email (deve essere una email valida)
+        if (!isValidEmail(email)) {
+            err.append("Email non valida. Formato non corretto.\n");
+        }
+
+        // Password (minimo 8 caratteri con almeno un numero, una lettera maiuscola, una minuscola e un simbolo)
+        if (password == null || password.length() < 8 || !isValidPassword(password)) {
+            err.append("Password non valida. Deve essere lunga almeno 8 caratteri e contenere almeno un numero, una lettera maiuscola, una minuscola e un simbolo.\n");
+        }
+
+        // Centro monitoraggio (non deve essere vuoto)
+        if (centroMonitoraggio == null || centroMonitoraggio.isEmpty()) {
+            err.append("Centro Monitoraggio non valido. Non può essere vuoto.\n");
+        }
+
+        return err.length() == 0; // Restituisce true se non ci sono errori
+    }
+
+    // Metodo per ottenere i messaggi di errore
+    public String getErrorMessages() {
+        return err.toString();
+    }
+
+    // Verifica se la email è valida
+    private boolean isValidEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            return false;  // Email vuota
+        }
+        // Regex per validare email con almeno una lettera e simbolo '@' e '.'
+        return email.matches("^[\\w-\\.]+@[\\w-]+\\.[a-zA-Z]{2,6}$");
+    }
+
+    // Metodo per validare la password con i requisiti specifici
+    public boolean isValidPassword(String password) {
+        return password.matches(".*[A-Z].*") && // almeno una lettera maiuscola
+                password.matches(".*[a-z].*") && // almeno una lettera minuscola
+                password.matches(".*[0-9].*") && // almeno un numero
+                password.matches(".*[!@#\\$%^&*].*"); // almeno un simbolo
+    }
+
+    // Metodo per generare il nome utente
+    private String generateUsername(String nome, String cognome, String codFiscale) {
+        // Assicurati che nome e cognome abbiano almeno 3 caratteri
+        String nomeParte = nome.length() >= 3 ? nome.substring(0, 3) : nome;
+        String cognomeParte = cognome.length() >= 3 ? cognome.substring(0, 3) : cognome;
+        // Gestione caso codFiscale più corto di 4 caratteri
+        String codFiscaleParte = codFiscale.length() >= 4 ? codFiscale.substring(0, 4) : codFiscale;
+
+        String usernameGenerato = nomeParte + cognomeParte + codFiscaleParte;
+        System.out.println("Username generato: " + usernameGenerato); // Debug
+        return usernameGenerato;
+    }
+
 }

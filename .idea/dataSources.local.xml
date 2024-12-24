@@ -14,10 +14,12 @@
             <node kind="database" qname="@">
               <node kind="schema" qname="@" />
             </node>
-            <node kind="database" qname="climate_monitoring">
+            <node kind="database">
+              <name qname="climate_monitoring" />
+              <name qname="postgres" />
               <node kind="schema" qname="public" />
             </node>
-            <node kind="database" qname="postgres" />
+            <node kind="database" qname="ClimateMonitoring" />
           </node>
         </introspection-scope>
       </schema-mapping>
