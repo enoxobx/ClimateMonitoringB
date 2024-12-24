@@ -1,4 +1,4 @@
-package LAB_B.Common;
+package LAB_B.Common.Interface;
 
 import java.io.Serializable;
 import java.util.regex.Pattern;

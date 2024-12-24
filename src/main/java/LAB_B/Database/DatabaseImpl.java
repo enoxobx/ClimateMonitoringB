@@ -1,6 +1,9 @@
 package LAB_B.Database;
 
 import LAB_B.Common.*;
+import LAB_B.Common.Interface.Coordinate;
+import LAB_B.Common.Interface.Operatore;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -154,6 +157,19 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
         try {
             if(queryExecutorImpl == null)queryExecutorImpl = new QueryExecutorImpl(connection);
             return queryExecutorImpl.getCoordinate(latitude,longitude,tollerance);
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+    @Override
+    public List<Coordinate> getCoordinaResultSet(String name) throws RemoteException {
+
+        try {
+            if(queryExecutorImpl == null)queryExecutorImpl = new QueryExecutorImpl(connection);
+            return queryExecutorImpl.getCoordinate(name);
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
