@@ -112,16 +112,21 @@ public class Operatore {
 
     // Metodo per validare la password con i requisiti specifici
     public boolean isValidPassword(String password) {
+        // Verifica se la password è nulla o troppo corta
         if (password == null || password.length() < 8) {
             return false; // Password troppo corta o nulla
         }
 
+        // Pattern per verificare la presenza di caratteri speciali
         Pattern specialCharPattern = Pattern.compile("[!@#\\$%^&*()_+\\-=\\[\\]{};':\",\\\\|,.<>\\/?]");
+
+        // Verifica che la password contenga almeno una lettera maiuscola, una minuscola, un numero e un simbolo
         return password.matches(".*[A-Z].*") && // almeno una lettera maiuscola
                 password.matches(".*[a-z].*") && // almeno una lettera minuscola
                 password.matches(".*[0-9].*") && // almeno un numero
                 specialCharPattern.matcher(password).find(); // almeno un simbolo
     }
+
 
     // Metodo per generare il nome utente
     private String generateUsername(String nome, String cognome, String codFiscale) {

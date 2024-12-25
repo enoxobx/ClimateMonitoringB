@@ -89,6 +89,7 @@ public class SignUp extends LayoutStandard {
         String confermaPassword = new String(confermaPasswordField.getPassword()).trim();
         String centro = centroField.getText().trim();
 
+        // Crea un oggetto Operatore con i dati inseriti
         Operatore operatore = new Operatore(nome, cognome, codiceFiscale, email, password, centro, generateUsername());
 
         // Verifica che i dati siano validi
@@ -109,10 +110,8 @@ public class SignUp extends LayoutStandard {
             return;
         }
 
-        //
         try {
-            // Salva l'operatore nel database
-            // non usare queryImpl, usare solo DbImpl (ereditato da classe LayoutStandard)
+            // Usa l'istanza di `db` per salvare l'operatore
             if (db.registrazione(operatore)) {
                 String usernameGenerato = operatore.getUsername();
                 JOptionPane.showMessageDialog(this, "Operatore registrato con successo!\n" + "Email: " + email + "\n" + "Username: " + usernameGenerato, "Registrazione completata", JOptionPane.INFORMATION_MESSAGE);
@@ -122,10 +121,12 @@ public class SignUp extends LayoutStandard {
                 JOptionPane.showMessageDialog(this, "Errore nella registrazione dell'operatore. Riprova.", "Errore", JOptionPane.ERROR_MESSAGE);
             }
         } catch (RemoteException ex) {
-            logUnexpectedError(ex, ex.getMessage());
+            // Log dell'errore e messaggio all'utente
+            logUnexpectedError(ex, "Errore durante la registrazione dell'operatore");
             JOptionPane.showMessageDialog(this, "Errore nel database: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
         }
     }
+
 
     // Metodo per generare lo username
     public String generateUsername() {
