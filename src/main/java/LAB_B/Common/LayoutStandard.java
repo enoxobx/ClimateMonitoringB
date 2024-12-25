@@ -1,6 +1,6 @@
 package LAB_B.Common;
 import LAB_B.Client.Client;
-import LAB_B.Database.*;
+import LAB_B.Database.Database;
 
 import javax.swing.*;
 import java.awt.*;

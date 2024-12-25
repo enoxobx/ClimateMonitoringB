@@ -1,11 +1,10 @@
 package LAB_B.Database;
 
-import LAB_B.Common.Coordinate;
-import LAB_B.Common.Operatore;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import LAB_B.Common.Interface.*;
 
 public class QueryExecutorImpl {
     private static final String SELECT_OPERATORI_QUERY = "SELECT 1 FROM operatori WHERE %s = ? LIMIT 1";
@@ -141,18 +140,24 @@ public class QueryExecutorImpl {
     public List<Coordinate> getCoordinate() throws SQLException {
         ensureConnection();
         List<Coordinate> coordinates = new ArrayList<>();
-        String query = "SELECT name, longitude, latitude FROM citta";
-        try (PreparedStatement stmt = conn.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
+        String query = "SELECT * FROM citta";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                String name = rs.getString("name");
+                String geoname_id = rs.getString("geoname_id");
+                String nam = rs.getString("name");
+                String ascii_name = rs.getString("ascii_name");
+                String country_code = rs.getString("country_code");
+                String country_name = rs.getString("country_name");
                 double lat = rs.getDouble("latitude");
                 double lon = rs.getDouble("longitude");
-                coordinates.add(new Coordinate(name, lat, lon));
+                Citta temp = new Citta(geoname_id, nam, ascii_name, country_code, country_name, lon, lat);
+                coordinates.add(new Coordinate(temp));
             }
         }
         return coordinates;
     }
+
 
 
     // Validazione email
@@ -182,13 +187,33 @@ public class QueryExecutorImpl {
         }
     }
 
+                public List<Coordinate> getCoordinate(String text) throws SQLException {
+                    ensureConnection();
+                    List<Coordinate> coordinates = new ArrayList<>();
+                    String query = "select geoname_id,name,ascii_name,country_code,country_name,latitude,longitude from citta where name like ? ";
+                    try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                        text = "%"+text+"%";
+                        stmt.setString(1,text);
+                        ResultSet rs = stmt.executeQuery();
+                        while (rs.next()) {
+                            String geoname_id = rs.getString("geoname_id");
+                            String nam = rs.getString("name");
+                            String ascii_name = rs.getString("ascii_name");
+                            String country_code = rs.getString("country_code");
+                            String country_name = rs.getString("country_name");
+                            double lat = rs.getDouble("latitude");
+                            double lon = rs.getDouble("longitude");
+                            Citta temp = new Citta(geoname_id, nam, ascii_name, country_code, country_name, lon, lat);
+                            coordinates.add(new Coordinate(temp));
+                        }
+                    }
+                    return coordinates;
+                }
 
     // Metodo per verificare se lo username esiste nel database
     private boolean isUsernameExist(String username) throws SQLException {
         return existsInDatabase("username", username);
     }
-
-
     // Metodo per generare uno username unico
     private String generateUsername(String nome, String cognome, String codFiscale) throws SQLException {
         String nomeParte = nome.length() >= 3 ? nome.substring(0, 3) : nome;
@@ -212,19 +237,23 @@ public class QueryExecutorImpl {
     public List<Coordinate> getCoordinate(double latitude, double longitude, double tolerance) throws SQLException {
         ensureConnection();
         List<Coordinate> coordinates = new ArrayList<>();
-        String query = "SELECT name, longitude, latitude FROM citta WHERE latitude BETWEEN ? AND ? AND longitude BETWEEN ? AND ?";
+        String query = "SELECT * FROM citta WHERE latitude BETWEEN ? AND ? AND longitude BETWEEN ? AND ?";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setDouble(1, latitude - tolerance);
             stmt.setDouble(2, latitude + tolerance);
             stmt.setDouble(3, longitude - tolerance);
             stmt.setDouble(4, longitude + tolerance);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    String name = rs.getString("name");
-                    double lat = rs.getDouble("latitude");
-                    double lon = rs.getDouble("longitude");
-                    coordinates.add(new Coordinate(name, lat, lon));
-                }
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                String geoname_id = rs.getString("geoname_id");
+                String nam = rs.getString("name");
+                String ascii_name = rs.getString("ascii_name");
+                String country_code = rs.getString("country_code");
+                String country_name = rs.getString("country_name");
+                double lat = rs.getDouble("latitude");
+                double lon = rs.getDouble("longitude");
+                Citta temp = new Citta(geoname_id, nam, ascii_name, country_code, country_name, lon, lat);
+                coordinates.add(new Coordinate(temp));;
             }
         }
         return coordinates;

@@ -1,6 +1,6 @@
 package LAB_B.Common;
 
-import LAB_B.Operatore.Login;
+import LAB_B.Common.Operatore.Login;
 
 import javax.swing.*;
 import java.awt.*;

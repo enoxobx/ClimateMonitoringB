@@ -1,15 +1,14 @@
 package LAB_B.Database;
 
-import LAB_B.Common.Coordinate;
-import LAB_B.Common.Operatore;
+import LAB_B.Common.Interface.*;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.List;
+import java.util.Properties;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.*;
-import java.util.List;
-import java.util.Properties;
+import java.io.InputStream;
+import java.io.IOException;
 
 public class DatabaseImpl extends UnicastRemoteObject implements Database {
 
@@ -111,7 +110,7 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
 
     // Metodo per la registrazione di un operatore
     @Override
-    public boolean registrazione(Operatore operatore) throws RemoteException, SQLException {
+    public boolean registrazione(Operatore operatore) throws RemoteException {
         try {
             // Usa il metodo salvaOperatore del QueryExecutorImpl per registrare l'operatore nel database
             return queryExecutorImpl.salvaOperatore(operatore);
@@ -121,14 +120,33 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
             return false;
         }
     }
-
-    // Metodo per ottenere le coordinate in base a latitudine, longitudine e tolleranza
     @Override
-    public List<Coordinate> getCoordinaResultSet(double latitude, double longitude, double tolerance) throws RemoteException, SQLException {
-        return queryExecutorImpl.getCoordinate(latitude, longitude, tolerance);
+    public List<Coordinate> getCoordinaResultSet(double latitude, double longitude, double tollerance) throws RemoteException {
+
+        try {
+            if(queryExecutorImpl == null)queryExecutorImpl = new QueryExecutorImpl();
+            return queryExecutorImpl.getCoordinate(latitude,longitude,tollerance);
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+    @Override
+    public List<Coordinate> getCoordinaResultSet(String name) throws RemoteException {
+
+        try {
+            if(queryExecutorImpl == null)queryExecutorImpl = new QueryExecutorImpl();
+            return queryExecutorImpl.getCoordinate(name);
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
-    // Metodo per ottenere tutte le coordinate
     @Override
     public List<Coordinate> getCoordinaResultSet() throws RemoteException {
         try {
@@ -139,4 +157,6 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
             return null;
         }
     }
+
+
 }

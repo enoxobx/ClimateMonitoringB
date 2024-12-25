@@ -1,4 +1,4 @@
-package LAB_B.Common;
+package LAB_B.Common.Interface;
 
 import java.io.Serializable;
 
@@ -6,21 +6,15 @@ import org.openstreetmap.gui.jmapviewer.interfaces.ICoordinate;
 
 public class Coordinate implements ICoordinate,Serializable{
     private static final long serialVersionUID = 1L;
-    private final String name;
+    private final Citta citta;
     private double latitude;
     private double longitude;
 
     // Costruttore
-    public Coordinate(double latitude, double longitude) {
-        this.name = "None";
-        this.latitude = latitude;
-        this.longitude = longitude;
-    }
-
-    public Coordinate(String name,double latitude, double longitude) {
-        this.name = name;
-        this.latitude = latitude;
-        this.longitude = longitude;
+    public Coordinate(Citta citta) {
+        this.citta=citta;
+        this.latitude = citta.getLatitide();
+        this.longitude = citta.getLongitude();
     }
 
     @Override
@@ -42,7 +36,13 @@ public class Coordinate implements ICoordinate,Serializable{
     public void setLon(double lon) {
         this.longitude=lon;
     }
-    public String getName(){
-        return this.name;
+    public Citta getCitta(){
+        return citta;
     }
+
+    @Override
+    public String toString(){
+        return citta.toString();
+    }
+    
 }

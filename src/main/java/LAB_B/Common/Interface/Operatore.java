@@ -1,4 +1,4 @@
-package LAB_B.Common;
+package LAB_B.Common.Interface;
 
 import java.util.regex.Pattern;
 
@@ -112,10 +112,15 @@ public class Operatore {
 
     // Metodo per validare la password con i requisiti specifici
     public boolean isValidPassword(String password) {
+        if (password == null || password.length() < 8) {
+            return false; // Password troppo corta o nulla
+        }
+
+        Pattern specialCharPattern = Pattern.compile("[!@#\\$%^&*()_+\\-=\\[\\]{};':\",\\\\|,.<>\\/?]");
         return password.matches(".*[A-Z].*") && // almeno una lettera maiuscola
                 password.matches(".*[a-z].*") && // almeno una lettera minuscola
                 password.matches(".*[0-9].*") && // almeno un numero
-                password.matches(".*[!@#\\$%^&*].*"); // almeno un simbolo
+                specialCharPattern.matcher(password).find(); // almeno un simbolo
     }
 
     // Metodo per generare il nome utente
