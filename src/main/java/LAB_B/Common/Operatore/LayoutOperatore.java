@@ -1,4 +1,4 @@
-package LAB_B.Operatore;
+package LAB_B.Common.Operatore;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.util.Locale;
 
 import LAB_B.Common.*;
-import LAB_B.Client.Client;
 import LAB_B.Database.*;
 
 public class LayoutOperatore extends LayoutStandard {

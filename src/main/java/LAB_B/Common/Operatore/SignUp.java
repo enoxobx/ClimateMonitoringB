@@ -1,15 +1,15 @@
-package LAB_B.Operatore;
+package LAB_B.Common.Operatore;
 
+import LAB_B.Common.Interface.*;
 import LAB_B.Common.LayoutStandard;
-import LAB_B.Common.Operatore;
-import LAB_B.Database.QueryExecutorImpl;
+
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
+import java.rmi.RemoteException;
 import java.util.Random;
 
 public class SignUp extends LayoutStandard {
@@ -109,20 +109,11 @@ public class SignUp extends LayoutStandard {
             return;
         }
 
-        // Verifica che l'email e il codice fiscale non siano già in uso
+        //
         try {
-            QueryExecutorImpl queryExecutor = new QueryExecutorImpl();
-            if (queryExecutor.emailEsistente(email)) {
-                JOptionPane.showMessageDialog(this, "L'email è già in uso.", "Errore di Registrazione", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            if (queryExecutor.codiceFiscaleEsistente(codiceFiscale)) {
-                JOptionPane.showMessageDialog(this, "Il codice fiscale è già in uso.", "Errore di Registrazione", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
             // Salva l'operatore nel database
-            if (queryExecutor.salvaOperatore(operatore)) {
+            // non usare queryImpl, usare solo DbImpl (ereditato da classe LayoutStandard)
+            if (db.registrazione(operatore)) {
                 String usernameGenerato = operatore.getUsername();
                 JOptionPane.showMessageDialog(this, "Operatore registrato con successo!\n" + "Email: " + email + "\n" + "Username: " + usernameGenerato, "Registrazione completata", JOptionPane.INFORMATION_MESSAGE);
                 dispose(); // Chiudi la finestra di registrazione
@@ -130,8 +121,8 @@ public class SignUp extends LayoutStandard {
             } else {
                 JOptionPane.showMessageDialog(this, "Errore nella registrazione dell'operatore. Riprova.", "Errore", JOptionPane.ERROR_MESSAGE);
             }
-        } catch (SQLException ex) {
-            logUnexpectedError(ex, "Errore nella connessione al database durante la registrazione.");
+        } catch (RemoteException ex) {
+            logUnexpectedError(ex, ex.getMessage());
             JOptionPane.showMessageDialog(this, "Errore nel database: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
         }
     }

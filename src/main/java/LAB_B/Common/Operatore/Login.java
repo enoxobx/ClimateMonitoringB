@@ -1,4 +1,4 @@
-package LAB_B.Operatore;
+package LAB_B.Common.Operatore;
 
 import LAB_B.Client.Client;
 import LAB_B.Common.LayoutStandard;
@@ -6,7 +6,6 @@ import LAB_B.Common.Home;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.Properties;
 

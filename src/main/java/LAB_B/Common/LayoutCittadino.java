@@ -228,8 +228,6 @@ public class LayoutCittadino extends LayoutStandard {
                     newDot.setVisible(false);
             } catch (RemoteException e1) {
                 e1.printStackTrace();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
             }
         } else {
             System.err.println("Errore: db non è stato inizializzato.");

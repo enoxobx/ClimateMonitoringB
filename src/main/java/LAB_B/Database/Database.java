@@ -22,7 +22,7 @@ public interface Database extends Remote{
     boolean login(String codiceFiscale, String password) throws RemoteException, SQLException;
 
     // Metodo per la registrazione di un nuovo operatore
-    boolean registrazione(Operatore operatore) throws RemoteException, SQLException;
+    boolean registrazione(Operatore operatore) throws RemoteException;
 
     List<Coordinate> getCoordinaResultSet()throws RemoteException ;
     public List<Coordinate> getCoordinaResultSet(String name) throws RemoteException;

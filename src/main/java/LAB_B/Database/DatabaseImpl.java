@@ -1,10 +1,7 @@
 package LAB_B.Database;
 
-import LAB_B.Common.*;
-import LAB_B.Common.Interface.Coordinate;
-import LAB_B.Common.Interface.Operatore;
+import LAB_B.Common.Interface.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.rmi.RemoteException;
@@ -12,7 +9,6 @@ import java.rmi.server.UnicastRemoteObject;
 import java.sql.*;
 import java.io.InputStream;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 public class DatabaseImpl extends UnicastRemoteObject implements Database {
 
@@ -114,7 +110,7 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
 
     // Metodo per la registrazione di un operatore
     @Override
-    public boolean registrazione(Operatore operatore) throws RemoteException, SQLException {
+    public boolean registrazione(Operatore operatore) throws RemoteException {
         try {
             // Usa il metodo salvaOperatore del QueryExecutorImpl per registrare l'operatore nel database
             return queryExecutorImpl.salvaOperatore(operatore);
@@ -128,7 +124,7 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
     public List<Coordinate> getCoordinaResultSet(double latitude, double longitude, double tollerance) throws RemoteException {
 
         try {
-            if(queryExecutorImpl == null)queryExecutorImpl = new QueryExecutorImpl(connection);
+            if(queryExecutorImpl == null)queryExecutorImpl = new QueryExecutorImpl();
             return queryExecutorImpl.getCoordinate(latitude,longitude,tollerance);
         } catch (SQLException e) {
             // TODO Auto-generated catch block
@@ -141,7 +137,7 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
     public List<Coordinate> getCoordinaResultSet(String name) throws RemoteException {
 
         try {
-            if(queryExecutorImpl == null)queryExecutorImpl = new QueryExecutorImpl(connection);
+            if(queryExecutorImpl == null)queryExecutorImpl = new QueryExecutorImpl();
             return queryExecutorImpl.getCoordinate(name);
         } catch (SQLException e) {
             // TODO Auto-generated catch block
