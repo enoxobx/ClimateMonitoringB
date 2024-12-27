@@ -76,11 +76,13 @@ public class SignUp extends LayoutStandard {
         body.add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    // Aggiungi un campo di input con etichetta
-    private void addField(JPanel panel, String label, JComponent field) {
-        panel.add(new JLabel(label));
+    // Metodo per aggiungere un campo con etichetta
+    private void addField(JPanel panel, String label, JTextField field) {
+        JLabel fieldLabel = new JLabel(label);
+        fieldLabel.setLabelFor(field);
+        field.setToolTipText("Inserisci " + label.toLowerCase());
+        panel.add(fieldLabel);
         panel.add(field);
-
     }
 
     // Pannello di aiuto
