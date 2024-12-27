@@ -1,5 +1,8 @@
 package LAB_B.Common.Interface;
 
+import LAB_B.Database.QueryExecutorImpl;
+
+import java.sql.SQLException;
 import java.util.regex.Pattern;
 
 public class Operatore {
@@ -9,25 +12,21 @@ public class Operatore {
     private String codFiscale;
     private String email;
     private String password;
+    private String confermaPassword;  // Aggiunto campo per conferma password
     private String centroMonitoraggio;
     private String username;
     private StringBuilder err = new StringBuilder();
 
     // Costruttore completo con tutti i parametri
-    public Operatore(String nome, String cognome, String codFiscale, String email, String password, String centroMonitoraggio, String username) {
+    public Operatore(String nome, String cognome, String codFiscale, String email, String password, String confermaPassword, String centroMonitoraggio, String username) {
         this.nome = nome;
         this.cognome = cognome;
         this.codFiscale = codFiscale != null ? codFiscale.toUpperCase() : ""; // Assicurati che il codice fiscale sia in maiuscolo
         this.email = email;
         this.password = password;
+        this.confermaPassword = confermaPassword;
         this.centroMonitoraggio = centroMonitoraggio;
-
-        // Usa generateUsername solo se username non è stato passato
-        if (username == null || username.isEmpty()) {
-            this.username = generateUsername(nome, cognome, codFiscale); // Genera un username
-        } else {
-            this.username = username; // Usa quello passato
-        }
+        this.username = username; // Username può essere null o vuoto
     }
 
     // Getter per ottenere i vari campi
@@ -88,9 +87,25 @@ public class Operatore {
             err.append("Password non valida. Deve essere lunga almeno 8 caratteri e contenere almeno un numero, una lettera maiuscola, una minuscola e un simbolo.\n");
         }
 
+        // Verifica che le password coincidano
+        if (!password.equals(confermaPassword)) {
+            err.append("Le password non coincidono.\n");
+        }
+
         // Centro monitoraggio (non deve essere vuoto)
         if (centroMonitoraggio == null || centroMonitoraggio.isEmpty()) {
             err.append("Centro Monitoraggio non valido. Non può essere vuoto.\n");
+        }
+
+        // Se non ci sono errori, generiamo lo username, se necessario
+        if (err.length() == 0 && (username == null || username.isEmpty())) {
+            // Crea una nuova istanza di QueryExecutorImpl per generare lo username
+            QueryExecutorImpl queryExecutor = new QueryExecutorImpl();
+            try {
+                this.username = queryExecutor.generateUsername(nome, cognome, codFiscale); // Genera un username tramite QueryExecutorImpl
+            } catch (SQLException e) {
+                err.append("Errore nella generazione dello username: " + e.getMessage() + "\n");
+            }
         }
 
         return err.length() == 0; // Restituisce true se non ci sono errori
@@ -111,12 +126,7 @@ public class Operatore {
     }
 
     // Metodo per validare la password con i requisiti specifici
-    public boolean isValidPassword(String password) {
-        // Verifica se la password è nulla o troppo corta
-        if (password == null || password.length() < 8) {
-            return false; // Password troppo corta o nulla
-        }
-
+    private boolean isValidPassword(String password) {
         // Pattern per verificare la presenza di caratteri speciali
         Pattern specialCharPattern = Pattern.compile("[!@#\\$%^&*()_+\\-=\\[\\]{};':\",\\\\|,.<>\\/?]");
 
@@ -126,19 +136,4 @@ public class Operatore {
                 password.matches(".*[0-9].*") && // almeno un numero
                 specialCharPattern.matcher(password).find(); // almeno un simbolo
     }
-
-
-    // Metodo per generare il nome utente
-    private String generateUsername(String nome, String cognome, String codFiscale) {
-        // Assicurati che nome e cognome abbiano almeno 3 caratteri
-        String nomeParte = nome.length() >= 3 ? nome.substring(0, 3) : nome;
-        String cognomeParte = cognome.length() >= 3 ? cognome.substring(0, 3) : cognome;
-        // Gestione caso codFiscale più corto di 4 caratteri
-        String codFiscaleParte = codFiscale.length() >= 4 ? codFiscale.substring(0, 4) : codFiscale;
-
-        String usernameGenerato = nomeParte + cognomeParte + codFiscaleParte;
-        System.out.println("Username generato: " + usernameGenerato); // Debug
-        return usernameGenerato;
-    }
-
 }

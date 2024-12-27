@@ -1,16 +1,13 @@
 package LAB_B.Common.Operatore;
 
-import LAB_B.Common.Interface.*;
+import LAB_B.Common.Interface.Operatore;
 import LAB_B.Common.LayoutStandard;
-
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.rmi.RemoteException;
-import java.util.Random;
 
 public class SignUp extends LayoutStandard {
 
@@ -74,92 +71,23 @@ public class SignUp extends LayoutStandard {
             new Login().setVisible(true); // Torna alla schermata di login
             dispose(); // Chiudi la finestra di registrazione
         });
-        buttonPanel.add(backButton);
         buttonPanel.add(saveButton);
+        buttonPanel.add(backButton);
         body.add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    // Metodo per gestire la registrazione
-    private void handleRegistration() {
-        String nome = nomeField.getText().trim();
-        String cognome = cognomeField.getText().trim();
-        String codiceFiscale = codiceFiscaleField.getText().trim();
-        String email = emailField.getText().trim();
-        String password = new String(passwordField.getPassword()).trim();
-        String confermaPassword = new String(confermaPasswordField.getPassword()).trim();
-        String centro = centroField.getText().trim();
+    // Aggiungi un campo di input con etichetta
+    private void addField(JPanel panel, String label, JComponent field) {
+        panel.add(new JLabel(label));
+        panel.add(field);
 
-        // Crea un oggetto Operatore con i dati inseriti
-        Operatore operatore = new Operatore(nome, cognome, codiceFiscale, email, password, centro, generateUsername());
-
-        // Verifica che i dati siano validi
-        if (!operatore.validate()) {
-            JOptionPane.showMessageDialog(this, operatore.getErrorMessages(), "Errore di Registrazione", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        // Controlla che le password coincidano
-        if (!password.equals(confermaPassword)) {
-            JOptionPane.showMessageDialog(this, "Le password non coincidono", "Errore di Registrazione", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        // Controlla che la password soddisfi i requisiti
-        if (!operatore.isValidPassword(password)) {
-            JOptionPane.showMessageDialog(this, "La password deve contenere almeno una lettera maiuscola, una minuscola, un numero e un simbolo.", "Errore di Registrazione", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        try {
-            // Usa l'istanza di `db` per salvare l'operatore
-            if (db.registrazione(operatore)) {
-                String usernameGenerato = operatore.getUsername();
-                JOptionPane.showMessageDialog(this, "Operatore registrato con successo!\n" + "Email: " + email + "\n" + "Username: " + usernameGenerato, "Registrazione completata", JOptionPane.INFORMATION_MESSAGE);
-                dispose(); // Chiudi la finestra di registrazione
-                new Login().setVisible(true); // Mostra la finestra di login
-            } else {
-                JOptionPane.showMessageDialog(this, "Errore nella registrazione dell'operatore. Riprova.", "Errore", JOptionPane.ERROR_MESSAGE);
-            }
-        } catch (RemoteException ex) {
-            // Log dell'errore e messaggio all'utente
-            logUnexpectedError(ex, "Errore durante la registrazione dell'operatore");
-            JOptionPane.showMessageDialog(this, "Errore nel database: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
-        }
     }
 
-
-    // Metodo per generare lo username
-    public String generateUsername() {
-        String nomePart = nomeField.getText().length() >= 3 ? nomeField.getText().substring(0, 3) : nomeField.getText();
-        String cognomePart = cognomeField.getText().length() >= 3 ? cognomeField.getText().substring(0, 3) : cognomeField.getText();
-        int randomNum = new Random().nextInt(1000);
-        return nomePart.toLowerCase() + "_" + cognomePart.toLowerCase() + randomNum;
-    }
-
-    // Metodo per loggare gli errori imprevisti
-    private void logUnexpectedError(Exception e, String context) {
-        System.err.println("Errore imprevisto: " + e.getMessage());
-        System.err.println("Contesto: " + context);
-        e.printStackTrace();
-
-        try (FileWriter writer = new FileWriter("logs/error.log", true);
-             PrintWriter logWriter = new PrintWriter(writer)) {
-            logWriter.println("Errore imprevisto: " + e.getMessage());
-            logWriter.println("Contesto: " + context);
-            for (StackTraceElement element : e.getStackTrace()) {
-                logWriter.println("\t" + element.toString());
-            }
-        } catch (IOException ioException) {
-            System.err.println("Errore nel salvataggio del log: " + ioException.getMessage());
-        }
-    }
-
-    // Metodo per creare il pannello di aiuto
+    // Pannello di aiuto
     private JPanel createHelpPanel() {
         JPanel helpPanel = new JPanel();
-        helpPanel.setLayout(new BorderLayout());
-        helpPanel.add(helpButton, BorderLayout.CENTER);
-        helpButton.addActionListener(e -> showHelpDialog());
+        helpPanel.add(helpButton); // Aggiungi il bottone di aiuto
+        helpButton.addActionListener(e -> showHelpDialog()); // Mostra la finestra di aiuto
         return helpPanel;
     }
 
@@ -177,10 +105,50 @@ public class SignUp extends LayoutStandard {
         JOptionPane.showMessageDialog(this, helpMessage, "Guida", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // Metodo per aggiungere un campo di input al pannello
-    private void addField(JPanel panel, String labelText, JTextField field) {
-        panel.add(new JLabel(labelText));
-        panel.add(field);
+
+
+    // Gestisce la registrazione dell'operatore
+    private void handleRegistration() {
+        String nome = nomeField.getText().trim();
+        String cognome = cognomeField.getText().trim();
+        String codiceFiscale = codiceFiscaleField.getText().trim().toUpperCase();
+        String email = emailField.getText().trim();
+        String password = new String(passwordField.getPassword());
+        String confermaPassword = new String(confermaPasswordField.getPassword());
+        String centroMonitoraggio = centroField.getText().trim();
+
+        // Crea un nuovo oggetto operatore
+        Operatore operatore = new Operatore(nome, cognome, codiceFiscale, email, password, confermaPassword, centroMonitoraggio, null);
+
+        // Verifica la validità dei dati
+        if (!operatore.validate()) {
+            // Verifica che ci siano errori e li mostri
+            String errorMessages = operatore.getErrorMessages();
+            if (!errorMessages.isEmpty()) {
+                JOptionPane.showMessageDialog(this, errorMessages, "Errore di Registrazione", JOptionPane.ERROR_MESSAGE);
+            }
+            return;  // Termina se ci sono errori
+        }
+
+        // Registrazione nel sistema
+        try {
+            // Salvataggio dei dati
+            if (db.registrazione(operatore)) {
+                // Mostra il messaggio di successo includendo l'email e lo username
+                String successMessage = "Operatore registrato con successo!\n";
+                successMessage += "Email: " + email + "\n";
+                successMessage += "Username: " + operatore.getUsername();  // Usa il metodo getUsername() per ottenere lo username generato
+
+                JOptionPane.showMessageDialog(this, successMessage, "Successo", JOptionPane.INFORMATION_MESSAGE);
+                new Login().setVisible(true); // Vai alla schermata di login
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, "Errore durante la registrazione. Riprovare.", "Errore", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Errore nel contatto con il server.", "Errore", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
 }

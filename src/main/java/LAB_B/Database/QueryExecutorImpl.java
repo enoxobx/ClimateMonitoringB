@@ -6,6 +6,8 @@ import java.util.List;
 
 import LAB_B.Common.Interface.*;
 
+import javax.swing.*;
+
 public class QueryExecutorImpl {
     private static final String SELECT_OPERATORI_QUERY = "SELECT 1 FROM operatori WHERE %s = ? LIMIT 1";
     private Connection conn;
@@ -69,7 +71,7 @@ public class QueryExecutorImpl {
         }
     }
 
-    // Metodo per salvare l'operatore
+    // Metodo per salvare l'operatore nel database
     public boolean salvaOperatore(Operatore operatore) throws SQLException {
         ensureConnection();
 
@@ -88,20 +90,25 @@ public class QueryExecutorImpl {
             throw new IllegalArgumentException("Codice Fiscale non valido.");
         }
 
-        // Verifica che l'email non sia già in uso
+        // Verifica se l'email esiste già
         if (emailEsistente(operatore.getEmail())) {
-            throw new IllegalArgumentException("L'email è già in uso.");
+            // Mostra un messaggio di errore con un pop-up
+            JOptionPane.showMessageDialog(null, "L'email è già in uso.", "Errore", JOptionPane.ERROR_MESSAGE);
+            return false;  // Ferma l'esecuzione se l'email esiste già
         }
 
-        // Verifica che il codice fiscale non sia già in uso
+        // Verifica se il codice fiscale esiste già
         if (codiceFiscaleEsistente(operatore.getCodFiscale())) {
-            throw new IllegalArgumentException("Il codice fiscale è già in uso.");
+            // Mostra un messaggio di errore con un pop-up
+            JOptionPane.showMessageDialog(null, "Il codice fiscale è già in uso.", "Errore", JOptionPane.ERROR_MESSAGE);
+            return false;  // Ferma l'esecuzione se il codice fiscale esiste già
         }
 
-        // Genera lo username
+        // Genera lo username solo dopo aver validato tutti i dati
         String username = generateUsername(operatore.getNome(), operatore.getCognome(), operatore.getCodFiscale());
         if (isUsernameExist(username)) {
-            throw new IllegalArgumentException("Lo username è già in uso.");
+            JOptionPane.showMessageDialog(null, "Lo username è già in uso.", "Errore", JOptionPane.ERROR_MESSAGE);
+            return false;
         }
 
         // Query per inserire l'operatore nel database
@@ -136,6 +143,7 @@ public class QueryExecutorImpl {
 
 
 
+
     // Metodo per ottenere coordinate senza filtri
     public List<Coordinate> getCoordinate() throws SQLException {
         ensureConnection();
@@ -158,8 +166,6 @@ public class QueryExecutorImpl {
         return coordinates;
     }
 
-
-
     // Validazione email
     private boolean isValidEmail(String email) {
         return email != null && email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
@@ -176,62 +182,41 @@ public class QueryExecutorImpl {
     }
 
     // Verifica se il codice fiscale esiste nel database
-    public boolean codiceFiscaleEsistente(String codFisc) throws SQLException {
-        ensureConnection();
-        String query = "SELECT 1 FROM operatori WHERE codice_fiscale = ? LIMIT 1";
+    public boolean codiceFiscaleEsistente(String codiceFiscale) throws SQLException {
+        String query = "SELECT COUNT(*) FROM operatori WHERE codice_fiscale = ?";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, codFisc);
+            stmt.setString(1, codiceFiscale);
             try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next();
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;  // Restituisce true se il codice fiscale esiste
+                }
             }
         }
+        return false;  // Restituisce false se il codice fiscale non esiste
     }
 
-                public List<Coordinate> getCoordinate(String text) throws SQLException {
-                    ensureConnection();
-                    List<Coordinate> coordinates = new ArrayList<>();
-                    String query = "select geoname_id,name,ascii_name,country_code,country_name,latitude,longitude from citta where name like ? ";
-                    try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                        text = "%"+text+"%";
-                        stmt.setString(1,text);
-                        ResultSet rs = stmt.executeQuery();
-                        while (rs.next()) {
-                            String geoname_id = rs.getString("geoname_id");
-                            String nam = rs.getString("name");
-                            String ascii_name = rs.getString("ascii_name");
-                            String country_code = rs.getString("country_code");
-                            String country_name = rs.getString("country_name");
-                            double lat = rs.getDouble("latitude");
-                            double lon = rs.getDouble("longitude");
-                            Citta temp = new Citta(geoname_id, nam, ascii_name, country_code, country_name, lon, lat);
-                            coordinates.add(new Coordinate(temp));
-                        }
-                    }
-                    return coordinates;
-                }
-
-    // Metodo per verificare se lo username esiste nel database
-    private boolean isUsernameExist(String username) throws SQLException {
-        return existsInDatabase("username", username);
-    }
-    // Metodo per generare uno username unico
-    private String generateUsername(String nome, String cognome, String codFiscale) throws SQLException {
-        String nomeParte = nome.length() >= 3 ? nome.substring(0, 3) : nome;
-        String cognomeParte = cognome.length() >= 3 ? cognome.substring(0, 3) : cognome;
-        String codFiscaleParte = codFiscale.length() >= 4 ? codFiscale.substring(0, 4) : codFiscale;
-
-        String baseUsername = nomeParte + cognomeParte + codFiscaleParte;
-        String username = baseUsername;
-        int counter = 1;
-
-        while (isUsernameExist(username)) {
-            username = baseUsername + counter;
-            counter++;
+    public List<Coordinate> getCoordinate(String text) throws SQLException {
+        ensureConnection();
+        List<Coordinate> coordinates = new ArrayList<>();
+        String query = "select geoname_id,name,ascii_name,country_code,country_name,latitude,longitude from citta where name like ? ";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            text = "%"+text+"%";
+            stmt.setString(1,text);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                String geoname_id = rs.getString("geoname_id");
+                String nam = rs.getString("name");
+                String ascii_name = rs.getString("ascii_name");
+                String country_code = rs.getString("country_code");
+                String country_name = rs.getString("country_name");
+                double lat = rs.getDouble("latitude");
+                double lon = rs.getDouble("longitude");
+                Citta temp = new Citta(geoname_id, nam, ascii_name, country_code, country_name, lon, lat);
+                coordinates.add(new Coordinate(temp));
+            }
         }
-        return username;
+        return coordinates;
     }
-
-
 
     // Metodo per ottenere coordinate con filtri di latitudine e longitudine
     public List<Coordinate> getCoordinate(double latitude, double longitude, double tolerance) throws SQLException {
@@ -253,9 +238,66 @@ public class QueryExecutorImpl {
                 double lat = rs.getDouble("latitude");
                 double lon = rs.getDouble("longitude");
                 Citta temp = new Citta(geoname_id, nam, ascii_name, country_code, country_name, lon, lat);
-                coordinates.add(new Coordinate(temp));;
+                coordinates.add(new Coordinate(temp));
             }
         }
         return coordinates;
     }
+
+    // Metodo per verificare se lo username esiste nel database
+    private boolean isUsernameExist(String username) throws SQLException {
+        return existsInDatabase("username", username);
+    }
+
+    public String generateUsername(String nome, String cognome, String codFiscale) throws SQLException {
+        // Verifica la validità dei parametri
+        if (nome == null || cognome == null || codFiscale == null) {
+            throw new IllegalArgumentException("Nome, cognome e codice fiscale non possono essere nulli.");
+        }
+
+        // Assicurati che il codice fiscale abbia almeno 16 caratteri
+        if (codFiscale.length() != 16) {
+            throw new IllegalArgumentException("Il codice fiscale deve avere esattamente 16 caratteri.");
+        }
+
+        // Estrai la parte del nome (primi 4 caratteri) e rendi la prima lettera maiuscola
+        String nomeParte = nome.length() >= 4 ? nome.substring(0, 4).toUpperCase() : nome.toUpperCase();
+
+        // Estrai la parte del cognome (primi 4 caratteri) e rendi la prima lettera maiuscola
+        String cognomeParte = cognome.length() >= 4 ? cognome.substring(0, 4).toUpperCase() : cognome.toUpperCase();
+
+        // Estrai i caratteri dal 6° al 9° del codice fiscale
+        String codFiscaleParte = codFiscale.substring(5, 9);
+
+        // Combina le parti per creare il baseUsername
+        String baseUsername = nomeParte + cognomeParte + codFiscaleParte;
+
+        // Assicurati che il nome utente generato non superi una lunghezza massima
+        int maxLength = 20;  // Limite di lunghezza per lo username
+        if (baseUsername.length() > maxLength) {
+            baseUsername = baseUsername.substring(0, maxLength);
+        }
+
+        // Variabili per gestire il controllo dell'unicità
+        String username = baseUsername;
+        int counter = 1;
+
+        // Ciclo per verificare se lo username è unico
+        while (isUsernameExist(username)) {
+            // Se lo username esiste già, aggiungi un numero incrementato
+            username = baseUsername + counter;
+            counter++;
+
+            // Se lo username supera la lunghezza massima, interrompi
+            if (username.length() > maxLength) {
+                throw new SQLException("Impossibile generare uno username unico con il formato richiesto.");
+            }
+        }
+
+        // Restituisci lo username unico
+        return username;
+    }
+
+
+
 }
