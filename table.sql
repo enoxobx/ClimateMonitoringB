@@ -1,17 +1,5 @@
--- Database: ClimateMonitoring
-
+-- Elimina il database esistente, se presente
 DROP DATABASE IF EXISTS "ClimateMonitoring";
-
-CREATE DATABASE "ClimateMonitoring"
-    WITH
-    OWNER = postgres
-    ENCODING = 'UTF8'
-    LC_COLLATE = 'Italian_Italy.1252'
-    LC_CTYPE = 'Italian_Italy.1252'
-    LOCALE_PROVIDER = 'libc'
-    TABLESPACE = pg_default
-    CONNECTION LIMIT = -1
-    IS_TEMPLATE = False;
 
 COMMENT ON DATABASE "ClimateMonitoring"
     IS 'DB per LAB B';
@@ -22,6 +10,7 @@ GRANT ALL ON DATABASE "ClimateMonitoring" TO agent1;
 
 GRANT ALL ON DATABASE "ClimateMonitoring" TO postgres;
 
+-- Tabella Citta
 CREATE TABLE Citta (
                        Geoname_ID BIGINT PRIMARY KEY,
                        Name VARCHAR(100) NOT NULL,
@@ -32,7 +21,7 @@ CREATE TABLE Citta (
                        latitude FLOAT8 NOT NULL
 );
 
-
+-- Tabella operatori
 CREATE TABLE operatori (
                            codice_fiscale VARCHAR(16) PRIMARY KEY,
                            nome VARCHAR(100) NOT NULL,
@@ -40,51 +29,48 @@ CREATE TABLE operatori (
                            username VARCHAR(12) NOT NULL UNIQUE,
                            email VARCHAR(100) NOT NULL UNIQUE,
                            password VARCHAR(100) NOT NULL,
-                           centro_monitoraggio VARCHAR(100) NOT NULL
+                           centro_monitoraggio VARCHAR(50) NOT NULL
 );
 
-
-CREATE TABLE CentriMonitoraggio (
-                                    id VARCHAR(100) PRIMARY KEY,
+-- Tabella centrimonitoraggio
+CREATE TABLE centrimonitoraggio (
+                                    id VARCHAR(50) PRIMARY KEY,
                                     nomeCentro VARCHAR(100) NOT NULL,
-                                    Indirizzo VARCHAR(50) NOT NULL
-
+                                    descrizione TEXT NOT NULL
 );
 
-ALTER TABLE CentriMonitoraggio
-    ALTER COLUMN id TYPE VARCHAR(100);
-
-
-CREATE TABLE Parametro(
-                          ID VARCHAR(100) PRIMARY KEY,
-                          wind VARCHAR(10),
-                          humidity VARCHAR(10),
-                          pressure VARCHAR(10),
-                          temperature VARCHAR(10),
-                          precipitation  VARCHAR(10),
-                          glacier_altitude VARCHAR(10),
-                          glacier_mass VARCHAR(10),
-                          wind_comment VARCHAR(255),
-                          humidity_comment VARCHAR(255),
-                          pressure_comment VARCHAR(255),
-                          temperature_comment VARCHAR(255),
-                          precipitation_comment VARCHAR(255),
-                          glacier_altitude_comment VARCHAR(255),
-                          glacier_mass_comment VARCHAR(255),
-                          wind_score DECIMAL(5),
-                          humidity_score DECIMAL(5),
-                          pressure_score DECIMAL(5),
-                          temperature_score DECIMAL(5),
-                          precipitation_score DECIMAL(5),
-                          glacier_altitude_score DECIMAL(5),
-                          glacier_mass_score DECIMAL(5)
+-- Tabella Parametro
+CREATE TABLE Parametro (
+                           ID VARCHAR(100) PRIMARY KEY,
+                           wind VARCHAR(10),
+                           humidity VARCHAR(10),
+                           pressure VARCHAR(10),
+                           temperature VARCHAR(10),
+                           precipitation VARCHAR(10),
+                           glacier_altitude VARCHAR(10),
+                           glacier_mass VARCHAR(10),
+                           wind_comment VARCHAR(255),
+                           humidity_comment VARCHAR(255),
+                           pressure_comment VARCHAR(255),
+                           temperature_comment VARCHAR(255),
+                           precipitation_comment VARCHAR(255),
+                           glacier_altitude_comment VARCHAR(255),
+                           glacier_mass_comment VARCHAR(255),
+                           wind_score DECIMAL(5),
+                           humidity_score DECIMAL(5),
+                           pressure_score DECIMAL(5),
+                           temperature_score DECIMAL(5),
+                           precipitation_score DECIMAL(5),
+                           glacier_altitude_score DECIMAL(5),
+                           glacier_mass_score DECIMAL(5)
 );
 
+-- Tabella Rilevazione
 CREATE TABLE Rilevazione (
-                             CF VARCHAR(16) NOT NULL REFERENCES Operatori(codice_fiscale)
+                             CF VARCHAR(16) NOT NULL REFERENCES operatori(codice_fiscale)
                                  ON UPDATE CASCADE
                                  ON DELETE NO ACTION,
-                             CentriMonitoraggio_ID VARCHAR(100) NOT NULL REFERENCES CentriMonitoraggio(id)
+                             CentriMonitoraggio_ID VARCHAR(50) NOT NULL REFERENCES centrimonitoraggio(id)
                                  ON UPDATE CASCADE
                                  ON DELETE NO ACTION,
                              Geoname_ID BIGINT NOT NULL REFERENCES Citta(Geoname_ID)
@@ -97,8 +83,9 @@ CREATE TABLE Rilevazione (
                              PRIMARY KEY (CF, CentriMonitoraggio_ID, Geoname_ID, Par_ID, date_r)
 );
 
+-- Tabella Osservano
 CREATE TABLE Osservano (
-                           CentriMonitoraggio_ID VARCHAR(100) REFERENCES CentriMonitoraggio(id)
+                           CentriMonitoraggio_ID VARCHAR(50) REFERENCES centrimonitoraggio(id)
                                ON UPDATE CASCADE
                                ON DELETE NO ACTION,
                            Geoname_ID BIGINT REFERENCES Citta(Geoname_ID)
@@ -107,14 +94,20 @@ CREATE TABLE Osservano (
                            PRIMARY KEY (CentriMonitoraggio_ID, Geoname_ID)
 );
 
+-- Assicurati che la colonna CF sia una chiave primaria (già definita nello script precedente)
+ALTER TABLE lavora
+    ADD CONSTRAINT lavora_lavora_fk
+        FOREIGN KEY (centrimonitoraggio_id) REFERENCES lavora(cf);
+
+
+-- Tabella Lavora
 CREATE TABLE Lavora (
-                        CF VARCHAR(16) NOT NULL REFERENCES Operatori(codice_fiscale)
+                        CF VARCHAR(16) NOT NULL REFERENCES operatori(codice_fiscale)
                             ON UPDATE CASCADE
                             ON DELETE NO ACTION,
-                        CentriMonitoraggio_ID VARCHAR(100) NOT NULL REFERENCES CentriMonitoraggio(id)
+                        CentriMonitoraggio_ID VARCHAR(50) NOT NULL REFERENCES centrimonitoraggio(id)
                             ON UPDATE CASCADE
                             ON DELETE NO ACTION,
                         PRIMARY KEY (CF, CentriMonitoraggio_ID)
 );
-
 

@@ -29,21 +29,24 @@ public class QueryExecutorImpl {
 
 
 
-    // Metodo per salvare i dati nella tabella centrimonitoraggio
     public boolean salvaCentroMonitoraggio(String nomeCentro, String descrizione, String id) throws SQLException {
         ensureConnection();
-
         String query = "INSERT INTO centrimonitoraggio (id, nomeCentro, descrizione) VALUES (?, ?, ?)";
 
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, id);
-            stmt.setString(2, nomeCentro);
-            stmt.setString(3, descrizione);
+            stmt.setString(3, id);
+            stmt.setString(1, nomeCentro);
+            stmt.setString(2, descrizione);
 
             int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0; // Ritorna true se almeno una riga è stata modificata
+            conn.commit(); // Forza il salvataggio nel database
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            conn.rollback(); // Annulla la transazione in caso di errore
+            throw e;
         }
     }
+
 
 
 
@@ -139,6 +142,36 @@ public class QueryExecutorImpl {
         } finally {
             conn.setAutoCommit(true); // Ripristina auto commit
         }
+    }
+
+
+    public boolean isIdExist(String id) throws SQLException {
+
+        if (isIdExist(id)) {
+            throw new IllegalArgumentException("ID già esistente: " + id);
+        }
+
+
+        ensureConnection();
+        String query = "SELECT 1 FROM centrimonitoraggio WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
+        }
+    } public List<String> getCentriMonitoraggio() throws SQLException {
+        ensureConnection();
+        List<String> centri = new ArrayList<>();
+        String query = "SELECT nomeCentro FROM centrimonitoraggio";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    centri.add(rs.getString("nomeCentro"));
+                }
+            }
+        }
+        return centri;
     }
 
 
