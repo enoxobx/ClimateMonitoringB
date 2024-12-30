@@ -299,9 +299,4 @@ public class LayoutOperatore extends LayoutStandard {
         }
     }
 
-    public static void main(String[] args) {
-        // Questo username dovrebbe provenire da un altro contesto, ad esempio da una classe di registrazione
-        String usernameRegistrato = "nomeOperatore";  // Sostituisci con il nome dell'operatore registrato
-        new LayoutOperatore(usernameRegistrato);
-    }
-}
+
