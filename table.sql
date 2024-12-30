@@ -36,7 +36,8 @@ CREATE TABLE operatori (
 CREATE TABLE centrimonitoraggio (
                                     id VARCHAR(50) PRIMARY KEY,
                                     nomeCentro VARCHAR(100) NOT NULL,
-                                    descrizione TEXT NOT NULL
+                                    descrizione TEXT NOT NULL,
+                                    username_operatore varchar not null
 );
 
 -- Tabella Parametro
@@ -98,6 +99,9 @@ CREATE TABLE Osservano (
 ALTER TABLE lavora
     ADD CONSTRAINT lavora_lavora_fk
         FOREIGN KEY (centrimonitoraggio_id) REFERENCES lavora(cf);
+
+DELETE FROM centrimonitoraggio
+WHERE username_operatore = null;
 
 
 -- Tabella Lavora

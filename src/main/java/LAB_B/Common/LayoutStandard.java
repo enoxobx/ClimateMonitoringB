@@ -55,7 +55,7 @@ abstract public class LayoutStandard extends JFrame {
     }
 
     // Gestore degli eventi per il bottone "Home"
-    private class Gestore implements ActionListener {
+    public class Gestore implements ActionListener {
 
         // Metodo che gestisce l'evento quando il bottone viene cliccato
         @Override

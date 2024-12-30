@@ -13,7 +13,7 @@ import java.io.IOException;
 public class DatabaseImpl extends UnicastRemoteObject implements Database {
 
     // Connessione al database
-    private static Connection connection;
+    public static Connection connection;
 
     // Oggetto per l'esecuzione delle query
     private QueryExecutorImpl queryExecutorImpl;

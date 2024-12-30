@@ -8,6 +8,8 @@ import LAB_B.Common.Interface.*;
 
 import javax.swing.*;
 
+import static LAB_B.Database.DatabaseImpl.connection;
+
 public class QueryExecutorImpl {
     private static final String SELECT_OPERATORI_QUERY = "SELECT 1 FROM operatori WHERE %s = ? LIMIT 1";
     private Connection conn;
@@ -29,14 +31,17 @@ public class QueryExecutorImpl {
 
 
 
-    public boolean salvaCentroMonitoraggio(String nomeCentro, String descrizione, String id) throws SQLException {
+    public boolean salvaCentroMonitoraggio(String id, String nomeCentro, String descrizione, String currentUsername) throws SQLException {
         ensureConnection();
-        String query = "INSERT INTO centrimonitoraggio (id, nomeCentro, descrizione) VALUES (?, ?, ?)";
+
+        // La query aggiornata ora include la colonna 'username_operatore'
+        String query = "INSERT INTO centrimonitoraggio (id, nomeCentro, descrizione, username_operatore) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(3, id);
             stmt.setString(1, nomeCentro);
             stmt.setString(2, descrizione);
+            stmt.setString(4, currentUsername);  // Aggiungi l'operatore corrente
 
             int rowsAffected = stmt.executeUpdate();
             conn.commit(); // Forza il salvataggio nel database
@@ -46,7 +51,6 @@ public class QueryExecutorImpl {
             throw e;
         }
     }
-
 
 
 
@@ -113,6 +117,9 @@ public class QueryExecutorImpl {
             JOptionPane.showMessageDialog(null, "Lo username è già in uso.", "Errore", JOptionPane.ERROR_MESSAGE);
             return false;
         }
+
+
+
 
         // Query per inserire l'operatore nel database
         String query = "INSERT INTO operatori (nome, cognome, codice_fiscale, email, password, centro_monitoraggio, username) " +
@@ -199,6 +206,8 @@ public class QueryExecutorImpl {
         return coordinates;
     }
 
+
+
     // Validazione email
     private boolean isValidEmail(String email) {
         return email != null && email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
@@ -276,6 +285,54 @@ public class QueryExecutorImpl {
         }
         return coordinates;
     }
+
+    public List<String> getCentriPerOperatore(String username) throws SQLException {
+        List<String> centrimonitoraggio = new ArrayList<>();
+        String query = "SELECT id FROM centrimonitoraggio " +
+                "JOIN operatori ON username = username_operatore " +
+                "WHERE username = ?";
+
+        ensureConnection(); // Assicurati che la connessione sia attiva
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, username);  // Imposta il parametro correttamente
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    centrimonitoraggio.add(rs.getString("id"));
+                }
+            }
+        }
+        return centrimonitoraggio;
+    }
+
+
+    private List<String> recuperaCentriAssociati(String username) {
+        List<String> centri = new ArrayList<>();
+
+        // Esegui la query sul database per recuperare i centri associati
+        // Usa una classe QueryExecutorImpl o un'altra classe di accesso al database
+        QueryExecutorImpl queryExecutor = new QueryExecutorImpl();
+
+        try {
+            // Verifica che lo username non sia nullo o vuoto
+            if (username == null || username.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Nome utente non valido.", "Errore", JOptionPane.ERROR_MESSAGE);
+                return centri;
+            }
+
+            // Recupera i centri dal database
+            centri = queryExecutor.getCentriPerOperatore(username);
+            if (centri.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Nessun centro trovato per l'operatore: " + username, "Nessun dato", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (SQLException e) {
+            // Stampa l'errore completo per un debug più dettagliato
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Errore durante il recupero dei centri: " + e.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
+        }
+
+        return centri;
+    }
+
 
     // Metodo per verificare se lo username esiste nel database
     private boolean isUsernameExist(String username) throws SQLException {

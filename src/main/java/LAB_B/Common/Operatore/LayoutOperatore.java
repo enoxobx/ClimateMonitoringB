@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Locale;
 
 import LAB_B.Common.*;
@@ -20,13 +21,12 @@ public class LayoutOperatore extends LayoutStandard {
     private final JButton creaCentroButton;
     private final JList<String> centriList;
     private final DefaultListModel<String> listaCentriModel;
-    private final JLabel titleLable;
-
-
+    private JLabel titleLable;
 
     public LayoutOperatore(String username) {
         super(); // Chiamata al costruttore della classe padre LayoutStandard
         this.username = username;
+
 
         // Ottieni il contenitore dalla classe LayoutStandard
         Container container = getBody();
@@ -57,14 +57,14 @@ public class LayoutOperatore extends LayoutStandard {
         gbc.gridx = 1;
         contentPanel.add(centriScrollPane, gbc);
 
-        // Bottone per creare un centro di monitoraggio (ora viene aggiunto prima)
+        // Bottone per creare un centro di monitoraggio
         creaCentroButton = new JButton("Crea Centro Monitoraggio");
         customizeButton(creaCentroButton);
         gbc.gridx = 1;
         gbc.gridy = 1;  // Cambiato la riga per farlo apparire prima
         contentPanel.add(creaCentroButton, gbc);
 
-        // Bottone per aggiungere parametri climatici (ora viene aggiunto dopo)
+        // Bottone per aggiungere parametri climatici
         aggiungiDatiClimatici = new JButton("Aggiungi Parametri Climatici");
         customizeButton(aggiungiDatiClimatici);
         gbc.gridx = 1;
@@ -72,8 +72,6 @@ public class LayoutOperatore extends LayoutStandard {
         contentPanel.add(aggiungiDatiClimatici, gbc);
 
         container.add(contentPanel, BorderLayout.CENTER);
-
-
 
         // Pannello inferiore per i bottoni di azione
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
@@ -96,7 +94,41 @@ public class LayoutOperatore extends LayoutStandard {
         creaCentroButton.addActionListener(gestore);
 
         setVisible(true);
-        titleLable = null;
+
+        // Recupera i centri associati all'operatore e aggiorna la lista
+        aggiornaCentriAssociati();
+    }
+
+    // Metodo per recuperare i centri associati all'operatore
+    private List<String> recuperaCentriAssociati(String username) {
+        QueryExecutorImpl queryExecutor = new QueryExecutorImpl();
+        try {
+            return queryExecutor.getCentriPerOperatore(username);  // Recupera i centri associati all'operatore
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Errore durante il recupero dei centri: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
+            return List.of();  // Restituisce una lista vuota in caso di errore
+        }
+    }
+
+    // Metodo per aggiornare la lista dei centri associati
+    private void aggiornaCentriAssociati() {
+        List<String> centriAssociati = recuperaCentriAssociati(username);
+        listaCentriModel.clear();  // Pulisce la lista precedente
+        for (String centro : centriAssociati) {
+            listaCentriModel.addElement(centro);  // Aggiunge i centri associati alla lista
+        }
+    }
+
+    // Metodo per personalizzare i bottoni
+    private void customizeButton(JButton button) {
+        button.setPreferredSize(new Dimension(220, 45));
+        button.setBackground(new Color(34, 139, 34));  // Verde
+        button.setForeground(Color.WHITE);
+        button.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createLineBorder(new Color(70, 130, 180), 2));
+        button.setBorderPainted(true);
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }
 
     private void apriFinestraDatiClimatici() {
@@ -132,6 +164,9 @@ public class LayoutOperatore extends LayoutStandard {
         }
         gbc.gridx = 1;
         panel.add(centriDropdown, gbc);
+
+
+
 
         // Parametri climatici con score e area di testo per severità
         String[] parametri = {"Velocità Vento", "Temperatura", "Umidità", "Precipitazioni"};
@@ -176,6 +211,8 @@ public class LayoutOperatore extends LayoutStandard {
 
         container.add(panel, BorderLayout.CENTER);
 
+
+
         // Bottone per salvare i parametri
         JButton salvaButton = new JButton("Salva Parametri");
         salvaButton.setPreferredSize(new Dimension(150, 40));
@@ -205,21 +242,14 @@ public class LayoutOperatore extends LayoutStandard {
     }
 
 
-    private void customizeButton(JButton button) {
-        button.setPreferredSize(new Dimension(220, 45));
-        button.setBackground(new Color(34, 139, 34));  // Verde
-        button.setForeground(Color.WHITE);
-        button.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createLineBorder(new Color(70, 130, 180), 2));
-        button.setBorderPainted(true);
-        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-    }
 
     // Metodo per aggiornare lo username (se necessario)
     public void aggiornaUsername(String nuovoUsername) {
         titleLable.setText("Benvenuto " + nuovoUsername.toUpperCase(Locale.ROOT));
     }
+
+
+
 
     // Metodo per aprire la finestra di creazione del centro
     private void apriFinestraCreaCentro() {
@@ -232,6 +262,8 @@ public class LayoutOperatore extends LayoutStandard {
         Container container = createCenterFrame.getContentPane();
         container.setLayout(new GridLayout(5, 2));
         container.setBackground(new Color(245, 245, 245)); // Colore chiaro per lo sfondo
+
+
 
         // Aggiungi i campi per creare il centro di monitoraggio
         container.add(new JLabel("id:"));
@@ -260,7 +292,7 @@ public class LayoutOperatore extends LayoutStandard {
                 boolean success = false;
 
                 try {
-                    success = queryExecutor.salvaCentroMonitoraggio(nomeCentro, descrizione, id);
+                    success = queryExecutor.salvaCentroMonitoraggio(id,nomeCentro, descrizione, username);
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(createCenterFrame, "Errore nel database: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
                 }
@@ -298,6 +330,7 @@ public class LayoutOperatore extends LayoutStandard {
             }
         }
     }
+
 
     public static void main(String[] args) {
         // Questo username dovrebbe provenire da un altro contesto, ad esempio da una classe di registrazione
