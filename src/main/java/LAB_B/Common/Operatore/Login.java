@@ -128,7 +128,4 @@ public class Login extends LayoutStandard {
         });
     }
 
-    public static void main(String[] args) {
-        new Login();
-    }
 }

@@ -166,8 +166,6 @@ public class LayoutOperatore extends LayoutStandard {
         panel.add(centriDropdown, gbc);
 
 
-
-
         // Parametri climatici con score e area di testo per severità
         String[] parametri = {"Velocità Vento", "Temperatura", "Umidità", "Precipitazioni"};
         JComboBox<Integer>[] scoreDropdowns = new JComboBox[parametri.length]; // Array per i dropdown di score
@@ -212,7 +210,6 @@ public class LayoutOperatore extends LayoutStandard {
         container.add(panel, BorderLayout.CENTER);
 
 
-
         // Bottone per salvare i parametri
         JButton salvaButton = new JButton("Salva Parametri");
         salvaButton.setPreferredSize(new Dimension(150, 40));
@@ -242,13 +239,10 @@ public class LayoutOperatore extends LayoutStandard {
     }
 
 
-
     // Metodo per aggiornare lo username (se necessario)
     public void aggiornaUsername(String nuovoUsername) {
         titleLable.setText("Benvenuto " + nuovoUsername.toUpperCase(Locale.ROOT));
     }
-
-
 
 
     // Metodo per aprire la finestra di creazione del centro
@@ -262,7 +256,6 @@ public class LayoutOperatore extends LayoutStandard {
         Container container = createCenterFrame.getContentPane();
         container.setLayout(new GridLayout(5, 2));
         container.setBackground(new Color(245, 245, 245)); // Colore chiaro per lo sfondo
-
 
 
         // Aggiungi i campi per creare il centro di monitoraggio
@@ -292,7 +285,7 @@ public class LayoutOperatore extends LayoutStandard {
                 boolean success = false;
 
                 try {
-                    success = queryExecutor.salvaCentroMonitoraggio(id,nomeCentro, descrizione, username);
+                    success = queryExecutor.salvaCentroMonitoraggio(id, nomeCentro, descrizione, username);
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(createCenterFrame, "Errore nel database: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
                 }
@@ -329,12 +322,5 @@ public class LayoutOperatore extends LayoutStandard {
                 apriFinestraCreaCentro(); // Apri la finestra per creare un centro
             }
         }
-    }
-
-
-    public static void main(String[] args) {
-        // Questo username dovrebbe provenire da un altro contesto, ad esempio da una classe di registrazione
-        String usernameRegistrato = "nomeOperatore";  // Sostituisci con il nome dell'operatore registrato
-        new LayoutOperatore(usernameRegistrato);
     }
 }
