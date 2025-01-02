@@ -39,6 +39,8 @@ CREATE TABLE centrimonitoraggio (
                                     descrizione TEXT NOT NULL
 );
 
+
+
 -- Tabella Parametro
 CREATE TABLE Parametro (
                            ID VARCHAR(100) PRIMARY KEY,
@@ -111,3 +113,14 @@ CREATE TABLE Lavora (
                         PRIMARY KEY (CF, CentriMonitoraggio_ID)
 );
 
+-- Aggiungere una colonna operatore_username alla tabella centrimonitoraggio
+ALTER TABLE centrimonitoraggio
+    ADD COLUMN username_operatore VARCHAR(12) NOT NULL;
+
+-- Creare un vincolo di chiave esterna per collegare operatore_username a operatori.username
+ALTER TABLE centrimonitoraggio
+    ADD CONSTRAINT fk_operatore_username
+        FOREIGN KEY (username_operatore)
+            REFERENCES operatori(username)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE;
