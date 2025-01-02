@@ -242,7 +242,11 @@ public class LayoutOperatore extends LayoutStandard {
             }
 
             QueryExecutorImpl q = new QueryExecutorImpl();
-            q.salvaDatiClimatici(key,centro,scoreDropdowns,severitaTextAreas);
+            try {
+                q.salvaDatiClimatici(key,centro,scoreDropdowns,severitaTextAreas);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
 
             // Mostra un messaggio di conferma
             JOptionPane.showMessageDialog(datiClimaticiFrame, "Dati salvati localmente:\n" + datiInseriti, "Successo", JOptionPane.INFORMATION_MESSAGE);

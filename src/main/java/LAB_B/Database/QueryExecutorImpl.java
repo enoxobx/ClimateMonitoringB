@@ -53,7 +53,7 @@ public class QueryExecutorImpl {
     }
 
 
-    public void salvaDatiClimatici(String key, String centroID, JComboBox<Integer>[] scoreDropdowns, JTextArea[] severitaTextAreas) {
+    public void salvaDatiClimatici(String key, String centroID, JComboBox<Integer>[] scoreDropdowns, JTextArea[] severitaTextAreas) throws SQLException {
         try {
             ensureConnection();
         } catch (SQLException e) {
@@ -77,8 +77,10 @@ public class QueryExecutorImpl {
             stmt.setString(10, severitaTextAreas[3].getText()); // precipitazioni_note
 
             stmt.executeUpdate();
+            connection.commit(); // Conferma le modifiche
             JOptionPane.showMessageDialog(null, "Dati climatici salvati con successo.");
         } catch (SQLException e) {
+            connection.rollback(); // Annulla le modifiche in caso di errore
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Errore durante il salvataggio dei dati climatici: " + e.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
         }
