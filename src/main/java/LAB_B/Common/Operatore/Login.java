@@ -11,7 +11,7 @@ import java.util.Properties;
 
 public class Login extends LayoutStandard {
 
-    private JTextField usernameOrCodiceFiscaleField;
+    private JTextField usernameField;
     private JPasswordField passwordField;
     private JButton loginButton;
     private JButton registerButton;
@@ -33,10 +33,10 @@ public class Login extends LayoutStandard {
         centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
         centerPanel.setBackground(new Color(240, 248, 255));
 
-        usernameOrCodiceFiscaleField = new JTextField(10);
-        usernameOrCodiceFiscaleField.setBorder(BorderFactory.createTitledBorder("Username o Codice Fiscale"));
-        usernameOrCodiceFiscaleField.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        centerPanel.add(usernameOrCodiceFiscaleField);
+        usernameField = new JTextField(10);
+        usernameField.setBorder(BorderFactory.createTitledBorder("Username"));
+        usernameField.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        centerPanel.add(usernameField);
         centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
         passwordField = new JPasswordField(10);
@@ -73,8 +73,6 @@ public class Login extends LayoutStandard {
 
         // Imposta il bottone Home, se vuoi cambiarne l'azione
         home.addActionListener(e -> {
-            // Puoi aggiungere il comportamento del bottone Home
-            // Ad esempio, qui puoi chiudere la finestra di login e aprire la home
             new Home().setVisible(true);
             dispose(); // Chiudi la finestra di login
         });
@@ -98,25 +96,25 @@ public class Login extends LayoutStandard {
 
     private void configureButtons() {
         loginButton.addActionListener(e -> {
-            String usernameOrCodiceFiscale = usernameOrCodiceFiscaleField.getText().trim();
+            String username = usernameField.getText().trim();
             String password = new String(passwordField.getPassword()).trim();
 
-            if (usernameOrCodiceFiscale.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Inserisci uno username o un codice fiscale!", "Errore", JOptionPane.ERROR_MESSAGE);
+            if (username.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Inserisci uno username!", "Errore", JOptionPane.ERROR_MESSAGE);
             } else if (password.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Il campo password non può essere vuoto!", "Errore", JOptionPane.ERROR_MESSAGE);
             } else {
                 // Crea l'istanza di Client e verifica le credenziali
                 Client client = new Client(dbUrl, dbUsername, dbPassword); // Passa i dettagli del database
-                boolean success = client.login(usernameOrCodiceFiscale, password);
+                boolean success = client.login(username, password);
 
                 // Verifica se il login è riuscito
                 if (success) {
                     JOptionPane.showMessageDialog(this, "Login effettuato con successo!", "Successo", JOptionPane.INFORMATION_MESSAGE);
-                    new LayoutOperatore(usernameOrCodiceFiscale); // Apre il layout dell'operatore passando l'username
+                    new LayoutOperatore(username); // Apre il layout dell'operatore passando l'username
                     dispose();
                 } else {
-                    JOptionPane.showMessageDialog(this, "Username, codice fiscale o password errati!", "Errore", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Username o password errati!", "Errore", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
