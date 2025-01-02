@@ -3,6 +3,7 @@ package LAB_B.Common.Operatore;
 import LAB_B.Client.Client;
 import LAB_B.Common.LayoutStandard;
 import LAB_B.Common.Home;
+import LAB_B.Database.QueryExecutorImpl;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,12 +12,20 @@ import java.util.Properties;
 
 public class Login extends LayoutStandard {
 
+    private static final int MAX_RETRIES = 3;
+    private static final Color BACKGROUND_COLOR = new Color(240, 248, 255);
+    private static final Color BUTTON_LOGIN_COLOR = new Color(60, 179, 113);
+    private static final Color BUTTON_REGISTER_COLOR = new Color(100, 149, 237);
+    private static final Font FIELD_FONT = new Font("SansSerif", Font.PLAIN, 14);
+    private static final Font BUTTON_FONT = new Font("SansSerif", Font.BOLD, 14);
+
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JButton loginButton;
     private JButton registerButton;
 
-    private static final int MAX_RETRIES = 3;
+    private int loginAttempts = 0;
+
     private String dbUrl;
     private String dbUsername;
     private String dbPassword;
@@ -24,64 +33,16 @@ public class Login extends LayoutStandard {
     public Login() {
         super(); // Richiama il costruttore di LayoutStandard
 
-        loadDatabaseConfig(); // Carica la configurazione dal file di proprietà
+        loadDatabaseConfig();
         setTitle("Login");
 
-        // Pannello centrale per i campi di input e i bottoni
-        JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-        centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
-        centerPanel.setBackground(new Color(240, 248, 255));
-
-        usernameField = new JTextField(10);
-        usernameField.setBorder(BorderFactory.createTitledBorder("Username"));
-        usernameField.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        centerPanel.add(usernameField);
-        centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-
-        passwordField = new JPasswordField(10);
-        passwordField.setBorder(BorderFactory.createTitledBorder("Password"));
-        passwordField.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        centerPanel.add(passwordField);
-        centerPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
-        buttonPanel.setBackground(new Color(240, 248, 255));
-
-        loginButton = new JButton("Login");
-        loginButton.setBackground(new Color(60, 179, 113)); // Verde moderno
-        loginButton.setForeground(Color.WHITE);
-        loginButton.setFocusPainted(false);
-        loginButton.setFont(new Font("SansSerif", Font.BOLD, 14));
-
-        registerButton = new JButton("Register");
-        registerButton.setBackground(new Color(100, 149, 237)); // Blu chiaro
-        registerButton.setForeground(Color.WHITE);
-        registerButton.setFocusPainted(false);
-        registerButton.setFont(new Font("SansSerif", Font.BOLD, 14));
-
-        buttonPanel.add(loginButton);
-        buttonPanel.add(registerButton);
-
-        centerPanel.add(buttonPanel);
-
-        // Aggiungi il pannello centrale al corpo ereditato da LayoutStandard
-        getBody().add(centerPanel, BorderLayout.CENTER);
-
-        // Configura le azioni dei bottoni
+        setupUI();
         configureButtons();
-
-        // Imposta il bottone Home, se vuoi cambiarne l'azione
-        home.addActionListener(e -> {
-            new Home().setVisible(true);
-            dispose(); // Chiudi la finestra di login
-        });
 
         setVisible(true);
     }
 
     private void loadDatabaseConfig() {
-        // Carica la configurazione dal file config.properties
         Properties properties = new Properties();
         try {
             properties.load(getClass().getClassLoader().getResourceAsStream("config.properties"));
@@ -94,36 +55,120 @@ public class Login extends LayoutStandard {
         }
     }
 
-    private void configureButtons() {
-        loginButton.addActionListener(e -> {
-            String username = usernameField.getText().trim();
-            String password = new String(passwordField.getPassword()).trim();
+    private void setupUI() {
+        // Pannello centrale per input e bottoni
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
+        centerPanel.setBackground(BACKGROUND_COLOR);
 
-            if (username.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Inserisci uno username!", "Errore", JOptionPane.ERROR_MESSAGE);
-            } else if (password.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Il campo password non può essere vuoto!", "Errore", JOptionPane.ERROR_MESSAGE);
-            } else {
-                // Crea l'istanza di Client e verifica le credenziali
-                Client client = new Client(dbUrl, dbUsername, dbPassword); // Passa i dettagli del database
-                boolean success = client.login(username, password);
+        usernameField = createTextField("Username");
+        centerPanel.add(usernameField);
+        centerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
-                // Verifica se il login è riuscito
-                if (success) {
-                    JOptionPane.showMessageDialog(this, "Login effettuato con successo!", "Successo", JOptionPane.INFORMATION_MESSAGE);
-                    new LayoutOperatore(username); // Apre il layout dell'operatore passando l'username
-                    dispose();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Username o password errati!", "Errore", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
+        passwordField = createPasswordField("Password");
+        centerPanel.add(passwordField);
+        centerPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        registerButton.addActionListener(e -> {
-            // Apre la finestra di registrazione
-            SignUp signUpWindow = new SignUp();
-            dispose();
-        });
+        JPanel buttonPanel = createButtonPanel();
+        centerPanel.add(buttonPanel);
+
+        getBody().add(centerPanel, BorderLayout.CENTER);
     }
 
+    private JTextField createTextField(String title) {
+        JTextField field = new JTextField(10);
+        field.setBorder(BorderFactory.createTitledBorder(title));
+        field.setFont(FIELD_FONT);
+        return field;
+    }
+
+    private JPasswordField createPasswordField(String title) {
+        JPasswordField field = new JPasswordField(10);
+        field.setBorder(BorderFactory.createTitledBorder(title));
+        field.setFont(FIELD_FONT);
+        return field;
+    }
+
+    private JPanel createButtonPanel() {
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        buttonPanel.setBackground(BACKGROUND_COLOR);
+
+        loginButton = createButton("Login", BUTTON_LOGIN_COLOR);
+        registerButton = createButton("Register", BUTTON_REGISTER_COLOR);
+
+        buttonPanel.add(loginButton);
+        buttonPanel.add(registerButton);
+        return buttonPanel;
+    }
+
+    private JButton createButton(String text, Color color) {
+        JButton button = new JButton(text);
+        button.setBackground(color);
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setFont(BUTTON_FONT);
+        return button;
+    }
+
+    private void configureButtons() {
+        loginButton.addActionListener(e -> handleLogin());
+        registerButton.addActionListener(e -> handleRegistration());
+        home.addActionListener(e -> navigateToHome());
+    }
+
+    private void handleLogin() {
+        String usernameOrCodiceFiscale = usernameField.getText().trim();
+        String password = new String(passwordField.getPassword()).trim();
+
+        if (usernameOrCodiceFiscale.isEmpty()) {
+            showErrorMessage("Inserisci uno username o codice fiscale!");
+        } else if (password.isEmpty()) {
+            showErrorMessage("Il campo password non può essere vuoto!");
+        } else {
+            performLogin(usernameOrCodiceFiscale, password);
+        }
+    }
+
+    private void performLogin(String username, String password) {
+        try {
+            QueryExecutorImpl queryExecutor = new QueryExecutorImpl();
+            boolean success = queryExecutor.login(username, password);
+
+            if (success) {
+                showSuccessMessage("Login effettuato con successo!");
+                new LayoutOperatore(username);
+                dispose();
+            } else {
+                loginAttempts++;
+                if (loginAttempts >= MAX_RETRIES) {
+                    showErrorMessage("Troppi tentativi falliti. Contatta l'amministratore.");
+                    loginButton.setEnabled(false);
+                } else {
+                    showErrorMessage("Username, codice fiscale o password errati!");
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            showErrorMessage("Si è verificato un errore durante il login: " + ex.getMessage());
+        }
+    }
+
+    private void handleRegistration() {
+        new SignUp();
+        dispose();
+    }
+
+    private void navigateToHome() {
+        new Home().setVisible(true);
+        dispose();
+    }
+
+    private void showErrorMessage(String message) {
+        JOptionPane.showMessageDialog(this, message, "Errore", JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void showSuccessMessage(String message) {
+        JOptionPane.showMessageDialog(this, message, "Successo", JOptionPane.INFORMATION_MESSAGE);
+    }
 }

@@ -32,28 +32,7 @@ public class Client {
         return connection;
     }
 
-    //TODO assolutamente non va messo qui
-    // Metodo per il login (esistente)
-    public boolean login(String usernameOrCodiceFiscale, String password) {
-        boolean loginSuccess = false;
-        try (Connection connection = getDbConnection()) {  // Usa il metodo getDbConnection()
-            String query = "SELECT * FROM operatori WHERE (username = ? OR codice_fiscale = ?) AND password = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                stmt.setString(1, usernameOrCodiceFiscale);
-                stmt.setString(2, usernameOrCodiceFiscale);
-                stmt.setString(3, password);
 
-                try (ResultSet resultSet = stmt.executeQuery()) {
-                    if (resultSet.next()) {
-                        loginSuccess = true;
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return loginSuccess;
-    }
         //private static Database db;
 
         public static Database getDb() {

@@ -30,6 +30,34 @@ public class QueryExecutorImpl {
     }
 
 
+    // Metodo di login
+    public boolean login(String usernameOrCodiceFiscale, String password) {
+        boolean loginSuccess = false;
+
+        try {
+            ensureConnection(); // Verifica che la connessione sia attiva
+
+            String query = "SELECT * FROM operatori WHERE (username = ? OR codice_fiscale = ?) AND password = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, usernameOrCodiceFiscale);
+                stmt.setString(2, usernameOrCodiceFiscale);
+                stmt.setString(3, password);
+
+                try (ResultSet resultSet = stmt.executeQuery()) {
+                    if (resultSet.next()) {
+                        loginSuccess = true; // Se il risultato esiste, login riuscito
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();  // Per il debug, è possibile loggare l'errore
+        }
+
+        return loginSuccess;
+    }
+
+
+
 
     public boolean salvaCentroMonitoraggio(String id, String nomeCentro, String descrizione, String currentUsername) throws SQLException {
         ensureConnection();
