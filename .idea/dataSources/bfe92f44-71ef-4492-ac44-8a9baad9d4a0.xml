@@ -13,7 +13,7 @@
 16690||10|C|G
 16690||-9223372036854775808|T|G
 16690||10|T|G</Grants>
-      <IntrospectionStateNumber>1338</IntrospectionStateNumber>
+      <IntrospectionStateNumber>1419</IntrospectionStateNumber>
       <ServerVersion>16.4</ServerVersion>
       <StartupTime>1734057593</StartupTime>
       <TimeZones>true ACDT
@@ -810,7 +810,7 @@ false Zulu
 14697||10|C|G
 14697||-9223372036854775808|U|G
 14697||10|U|G</Grants>
-      <IntrospectionStateNumber>1339</IntrospectionStateNumber>
+      <IntrospectionStateNumber>1415</IntrospectionStateNumber>
       <ObjectId>16690</ObjectId>
       <OwnerName>postgres</OwnerName>
     </database>
@@ -826,7 +826,7 @@ false Zulu
 14697||10|C|G
 14697||-9223372036854775808|U|G
 14697||10|U|G</Grants>
-      <IntrospectionStateNumber>1338</IntrospectionStateNumber>
+      <IntrospectionStateNumber>1419</IntrospectionStateNumber>
       <ObjectId>16398</ObjectId>
       <OwnerName>postgres</OwnerName>
     </database>
@@ -4260,8 +4260,8 @@ false Zulu
     <schema id="265" parent="2" name="public">
       <Comment>standard public schema</Comment>
       <Current>1</Current>
-      <IntrospectionStateNumber>1339</IntrospectionStateNumber>
-      <LastIntrospectionLocalTimestamp>2024-12-30.20:54:11</LastIntrospectionLocalTimestamp>
+      <IntrospectionStateNumber>1415</IntrospectionStateNumber>
+      <LastIntrospectionLocalTimestamp>2025-01-02.12:34:04</LastIntrospectionLocalTimestamp>
       <ObjectId>2200</ObjectId>
       <StateNumber>524</StateNumber>
       <OwnerName>pg_database_owner</OwnerName>
@@ -7617,8 +7617,8 @@ false Zulu
     <schema id="509" parent="3" name="public">
       <Comment>standard public schema</Comment>
       <Current>1</Current>
-      <IntrospectionStateNumber>1338</IntrospectionStateNumber>
-      <LastIntrospectionLocalTimestamp>2024-12-30.20:54:10</LastIntrospectionLocalTimestamp>
+      <IntrospectionStateNumber>1419</IntrospectionStateNumber>
+      <LastIntrospectionLocalTimestamp>2025-01-02.12:37:57</LastIntrospectionLocalTimestamp>
       <ObjectId>2200</ObjectId>
       <StateNumber>524</StateNumber>
       <OwnerName>pg_database_owner</OwnerName>
@@ -11006,107 +11006,119 @@ false Zulu
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
-    <table id="757" parent="265" name="lavora">
+    <table id="757" parent="265" name="dati_climatici">
+      <ObjectId>17029</ObjectId>
+      <StateNumber>1348</StateNumber>
+      <AccessMethodId>2</AccessMethodId>
+      <OwnerName>postgres</OwnerName>
+    </table>
+    <table id="758" parent="265" name="lavora">
       <ObjectId>17014</ObjectId>
       <StateNumber>1336</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
-    <table id="758" parent="265" name="operatori">
+    <table id="759" parent="265" name="operatori">
       <ObjectId>16951</ObjectId>
       <StateNumber>1334</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
-    <table id="759" parent="265" name="osservano">
+    <table id="760" parent="265" name="osservano">
       <ObjectId>16999</ObjectId>
       <StateNumber>1335</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
-    <table id="760" parent="265" name="parametro">
+    <table id="761" parent="265" name="parametro">
       <ObjectId>16967</ObjectId>
       <StateNumber>1334</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
-    <table id="761" parent="265" name="rilevazione">
+    <table id="762" parent="265" name="rilevazione">
       <ObjectId>16974</ObjectId>
       <StateNumber>1334</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
-    <table id="762" parent="509" name="centrimonitoraggio">
+    <table id="763" parent="509" name="centrimonitoraggio">
       <ObjectId>16474</ObjectId>
       <StateNumber>1279</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
-    <table id="763" parent="509" name="citta">
+    <table id="764" parent="509" name="citta">
       <ObjectId>16499</ObjectId>
       <StateNumber>1222</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
-    <table id="764" parent="509" name="lavora">
+    <table id="765" parent="509" name="dati_climatici">
+      <ObjectId>17049</ObjectId>
+      <StateNumber>1398</StateNumber>
+      <AccessMethodId>2</AccessMethodId>
+      <OwnerName>postgres</OwnerName>
+    </table>
+    <table id="766" parent="509" name="lavora">
       <ObjectId>16657</ObjectId>
       <StateNumber>1144</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
-    <table id="765" parent="509" name="operatori">
+    <table id="767" parent="509" name="operatori">
       <ObjectId>16431</ObjectId>
       <StateNumber>972</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
-    <table id="766" parent="509" name="osservano">
+    <table id="768" parent="509" name="osservano">
       <ObjectId>16882</ObjectId>
       <StateNumber>1223</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
-    <table id="767" parent="509" name="parametro">
+    <table id="769" parent="509" name="parametro">
       <ObjectId>16504</ObjectId>
       <StateNumber>1222</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
-    <table id="768" parent="509" name="rilevazione">
+    <table id="770" parent="509" name="rilevazione">
       <ObjectId>16857</ObjectId>
       <StateNumber>1222</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
-    <column id="769" parent="755" name="id">
+    <column id="771" parent="755" name="id">
       <DasType>varchar(50)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>1332</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="770" parent="755" name="nomecentro">
+    <column id="772" parent="755" name="nomecentro">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>1332</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="771" parent="755" name="descrizione">
+    <column id="773" parent="755" name="descrizione">
       <DasType>text|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StateNumber>1332</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <column id="772" parent="755" name="username_operatore">
+    <column id="774" parent="755" name="username_operatore">
       <DasType>varchar|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StateNumber>1332</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <index id="773" parent="755" name="centrimonitoraggio_pkey">
+    <index id="775" parent="755" name="centrimonitoraggio_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16965</ObjectId>
@@ -11118,63 +11130,63 @@ false Zulu
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <key id="774" parent="755" name="centrimonitoraggio_pkey">
+    <key id="776" parent="755" name="centrimonitoraggio_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16966</ObjectId>
       <Primary>1</Primary>
       <StateNumber>1332</StateNumber>
       <UnderlyingIndexId>16965</UnderlyingIndexId>
     </key>
-    <column id="775" parent="756" name="geoname_id">
+    <column id="777" parent="756" name="geoname_id">
       <DasType>bigint|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>1330</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <column id="776" parent="756" name="name">
+    <column id="778" parent="756" name="name">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>1330</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="777" parent="756" name="ascii_name">
+    <column id="779" parent="756" name="ascii_name">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StateNumber>1330</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="778" parent="756" name="country_code">
+    <column id="780" parent="756" name="country_code">
       <DasType>varchar(10)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StateNumber>1330</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="779" parent="756" name="country_name">
+    <column id="781" parent="756" name="country_name">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
       <StateNumber>1330</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="780" parent="756" name="longitude">
+    <column id="782" parent="756" name="longitude">
       <DasType>double precision|0s</DasType>
       <NotNull>1</NotNull>
       <Position>6</Position>
       <StateNumber>1330</StateNumber>
       <TypeId>701</TypeId>
     </column>
-    <column id="781" parent="756" name="latitude">
+    <column id="783" parent="756" name="latitude">
       <DasType>double precision|0s</DasType>
       <NotNull>1</NotNull>
       <Position>7</Position>
       <StateNumber>1330</StateNumber>
       <TypeId>701</TypeId>
     </column>
-    <index id="782" parent="756" name="citta_pkey">
+    <index id="784" parent="756" name="citta_pkey">
       <ColNames>geoname_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16949</ObjectId>
@@ -11183,28 +11195,120 @@ false Zulu
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="783" parent="756" name="citta_pkey">
+    <key id="785" parent="756" name="citta_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16950</ObjectId>
       <Primary>1</Primary>
       <StateNumber>1330</StateNumber>
       <UnderlyingIndexId>16949</UnderlyingIndexId>
     </key>
-    <column id="784" parent="757" name="cf">
+    <column id="786" parent="757" name="id">
+      <DasType>varchar(255)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StateNumber>1348</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="787" parent="757" name="centro_id">
+      <DasType>varchar(255)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StateNumber>1348</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="788" parent="757" name="velocita_vento_score">
+      <DasType>integer|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StateNumber>1348</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="789" parent="757" name="velocita_vento_note">
+      <DasType>varchar(256)|0s</DasType>
+      <Position>4</Position>
+      <StateNumber>1348</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="790" parent="757" name="temperatura_score">
+      <DasType>integer|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StateNumber>1348</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="791" parent="757" name="temperatura_note">
+      <DasType>varchar(256)|0s</DasType>
+      <Position>6</Position>
+      <StateNumber>1348</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="792" parent="757" name="umidita_score">
+      <DasType>integer|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>7</Position>
+      <StateNumber>1348</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="793" parent="757" name="umidita_note">
+      <DasType>varchar(256)|0s</DasType>
+      <Position>8</Position>
+      <StateNumber>1348</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="794" parent="757" name="precipitazioni_score">
+      <DasType>integer|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>9</Position>
+      <StateNumber>1348</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="795" parent="757" name="precipitazioni_note">
+      <DasType>varchar(256)|0s</DasType>
+      <Position>10</Position>
+      <StateNumber>1348</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="796" parent="757" name="data_inserimento">
+      <DasType>timestamp|0s</DasType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <Position>11</Position>
+      <StateNumber>1348</StateNumber>
+      <TypeId>1114</TypeId>
+    </column>
+    <index id="797" parent="757" name="dati_climatici_pkey">
+      <ColNames>id</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>17035</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>1348</StateNumber>
+      <Unique>1</Unique>
+      <AccessMethodId>403</AccessMethodId>
+      <CollationNames>default</CollationNames>
+      <CollationIds>100</CollationIds>
+      <CollationParentNames>pg_catalog</CollationParentNames>
+    </index>
+    <key id="798" parent="757" name="dati_climatici_pkey">
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>17036</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>1348</StateNumber>
+      <UnderlyingIndexId>17035</UnderlyingIndexId>
+    </key>
+    <column id="799" parent="758" name="cf">
       <DasType>varchar(16)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>1336</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="785" parent="757" name="centrimonitoraggio_id">
+    <column id="800" parent="758" name="centrimonitoraggio_id">
       <DasType>varchar(50)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>1336</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <foreign-key id="786" parent="757" name="lavora_cf_fkey">
+    <foreign-key id="801" parent="758" name="lavora_cf_fkey">
       <ColNames>cf</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>17019</ObjectId>
@@ -11213,7 +11317,7 @@ false Zulu
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16951</RefTableId>
     </foreign-key>
-    <foreign-key id="787" parent="757" name="lavora_centrimonitoraggio_id_fkey">
+    <foreign-key id="802" parent="758" name="lavora_centrimonitoraggio_id_fkey">
       <ColNames>centrimonitoraggio_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>17024</ObjectId>
@@ -11222,7 +11326,7 @@ false Zulu
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16960</RefTableId>
     </foreign-key>
-    <index id="788" parent="757" name="lavora_pkey">
+    <index id="803" parent="758" name="lavora_pkey">
       <ColNames>cf
 centrimonitoraggio_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
@@ -11238,63 +11342,63 @@ default</CollationNames>
       <CollationParentNames>pg_catalog
 pg_catalog</CollationParentNames>
     </index>
-    <key id="789" parent="757" name="lavora_pkey">
+    <key id="804" parent="758" name="lavora_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>17018</ObjectId>
       <Primary>1</Primary>
       <StateNumber>1336</StateNumber>
       <UnderlyingIndexId>17017</UnderlyingIndexId>
     </key>
-    <column id="790" parent="758" name="codice_fiscale">
+    <column id="805" parent="759" name="codice_fiscale">
       <DasType>varchar(16)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>1331</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="791" parent="758" name="nome">
+    <column id="806" parent="759" name="nome">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>1331</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="792" parent="758" name="cognome">
+    <column id="807" parent="759" name="cognome">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StateNumber>1331</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="793" parent="758" name="username">
+    <column id="808" parent="759" name="username">
       <DasType>varchar(12)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StateNumber>1331</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="794" parent="758" name="email">
+    <column id="809" parent="759" name="email">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
       <StateNumber>1331</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="795" parent="758" name="password">
+    <column id="810" parent="759" name="password">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>6</Position>
       <StateNumber>1331</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="796" parent="758" name="centro_monitoraggio">
+    <column id="811" parent="759" name="centro_monitoraggio">
       <DasType>varchar(50)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>7</Position>
       <StateNumber>1331</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <index id="797" parent="758" name="operatori_pkey">
+    <index id="812" parent="759" name="operatori_pkey">
       <ColNames>codice_fiscale</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16954</ObjectId>
@@ -11306,7 +11410,7 @@ pg_catalog</CollationParentNames>
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <index id="798" parent="758" name="operatori_username_key">
+    <index id="813" parent="759" name="operatori_username_key">
       <ColNames>username</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16956</ObjectId>
@@ -11317,7 +11421,7 @@ pg_catalog</CollationParentNames>
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <index id="799" parent="758" name="operatori_email_key">
+    <index id="814" parent="759" name="operatori_email_key">
       <ColNames>email</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16958</ObjectId>
@@ -11328,40 +11432,40 @@ pg_catalog</CollationParentNames>
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <key id="800" parent="758" name="operatori_pkey">
+    <key id="815" parent="759" name="operatori_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16955</ObjectId>
       <Primary>1</Primary>
       <StateNumber>1331</StateNumber>
       <UnderlyingIndexId>16954</UnderlyingIndexId>
     </key>
-    <key id="801" parent="758" name="operatori_username_key">
+    <key id="816" parent="759" name="operatori_username_key">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16957</ObjectId>
       <StateNumber>1331</StateNumber>
       <UnderlyingIndexId>16956</UnderlyingIndexId>
     </key>
-    <key id="802" parent="758" name="operatori_email_key">
+    <key id="817" parent="759" name="operatori_email_key">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16959</ObjectId>
       <StateNumber>1331</StateNumber>
       <UnderlyingIndexId>16958</UnderlyingIndexId>
     </key>
-    <column id="803" parent="759" name="centrimonitoraggio_id">
+    <column id="818" parent="760" name="centrimonitoraggio_id">
       <DasType>varchar(50)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>1335</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="804" parent="759" name="geoname_id">
+    <column id="819" parent="760" name="geoname_id">
       <DasType>bigint|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>1335</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <foreign-key id="805" parent="759" name="osservano_centrimonitoraggio_id_fkey">
+    <foreign-key id="820" parent="760" name="osservano_centrimonitoraggio_id_fkey">
       <ColNames>centrimonitoraggio_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>17004</ObjectId>
@@ -11370,7 +11474,7 @@ pg_catalog</CollationParentNames>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16960</RefTableId>
     </foreign-key>
-    <foreign-key id="806" parent="759" name="osservano_geoname_id_fkey">
+    <foreign-key id="821" parent="760" name="osservano_geoname_id_fkey">
       <ColNames>geoname_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>17009</ObjectId>
@@ -11379,7 +11483,7 @@ pg_catalog</CollationParentNames>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16946</RefTableId>
     </foreign-key>
-    <index id="807" parent="759" name="osservano_pkey">
+    <index id="822" parent="760" name="osservano_pkey">
       <ColNames>centrimonitoraggio_id
 geoname_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
@@ -11392,147 +11496,147 @@ geoname_id</ColNames>
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <key id="808" parent="759" name="osservano_pkey">
+    <key id="823" parent="760" name="osservano_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>17003</ObjectId>
       <Primary>1</Primary>
       <StateNumber>1335</StateNumber>
       <UnderlyingIndexId>17002</UnderlyingIndexId>
     </key>
-    <column id="809" parent="760" name="id">
+    <column id="824" parent="761" name="id">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>1333</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="810" parent="760" name="wind">
+    <column id="825" parent="761" name="wind">
       <DasType>varchar(10)|0s</DasType>
       <Position>2</Position>
       <StateNumber>1333</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="811" parent="760" name="humidity">
+    <column id="826" parent="761" name="humidity">
       <DasType>varchar(10)|0s</DasType>
       <Position>3</Position>
       <StateNumber>1333</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="812" parent="760" name="pressure">
+    <column id="827" parent="761" name="pressure">
       <DasType>varchar(10)|0s</DasType>
       <Position>4</Position>
       <StateNumber>1333</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="813" parent="760" name="temperature">
+    <column id="828" parent="761" name="temperature">
       <DasType>varchar(10)|0s</DasType>
       <Position>5</Position>
       <StateNumber>1333</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="814" parent="760" name="precipitation">
+    <column id="829" parent="761" name="precipitation">
       <DasType>varchar(10)|0s</DasType>
       <Position>6</Position>
       <StateNumber>1333</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="815" parent="760" name="glacier_altitude">
+    <column id="830" parent="761" name="glacier_altitude">
       <DasType>varchar(10)|0s</DasType>
       <Position>7</Position>
       <StateNumber>1333</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="816" parent="760" name="glacier_mass">
+    <column id="831" parent="761" name="glacier_mass">
       <DasType>varchar(10)|0s</DasType>
       <Position>8</Position>
       <StateNumber>1333</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="817" parent="760" name="wind_comment">
+    <column id="832" parent="761" name="wind_comment">
       <DasType>varchar(255)|0s</DasType>
       <Position>9</Position>
       <StateNumber>1333</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="818" parent="760" name="humidity_comment">
+    <column id="833" parent="761" name="humidity_comment">
       <DasType>varchar(255)|0s</DasType>
       <Position>10</Position>
       <StateNumber>1333</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="819" parent="760" name="pressure_comment">
+    <column id="834" parent="761" name="pressure_comment">
       <DasType>varchar(255)|0s</DasType>
       <Position>11</Position>
       <StateNumber>1333</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="820" parent="760" name="temperature_comment">
+    <column id="835" parent="761" name="temperature_comment">
       <DasType>varchar(255)|0s</DasType>
       <Position>12</Position>
       <StateNumber>1333</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="821" parent="760" name="precipitation_comment">
+    <column id="836" parent="761" name="precipitation_comment">
       <DasType>varchar(255)|0s</DasType>
       <Position>13</Position>
       <StateNumber>1333</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="822" parent="760" name="glacier_altitude_comment">
+    <column id="837" parent="761" name="glacier_altitude_comment">
       <DasType>varchar(255)|0s</DasType>
       <Position>14</Position>
       <StateNumber>1333</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="823" parent="760" name="glacier_mass_comment">
+    <column id="838" parent="761" name="glacier_mass_comment">
       <DasType>varchar(255)|0s</DasType>
       <Position>15</Position>
       <StateNumber>1333</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="824" parent="760" name="wind_score">
+    <column id="839" parent="761" name="wind_score">
       <DasType>numeric(5)|0s</DasType>
       <Position>16</Position>
       <StateNumber>1333</StateNumber>
       <TypeId>1700</TypeId>
     </column>
-    <column id="825" parent="760" name="humidity_score">
+    <column id="840" parent="761" name="humidity_score">
       <DasType>numeric(5)|0s</DasType>
       <Position>17</Position>
       <StateNumber>1333</StateNumber>
       <TypeId>1700</TypeId>
     </column>
-    <column id="826" parent="760" name="pressure_score">
+    <column id="841" parent="761" name="pressure_score">
       <DasType>numeric(5)|0s</DasType>
       <Position>18</Position>
       <StateNumber>1333</StateNumber>
       <TypeId>1700</TypeId>
     </column>
-    <column id="827" parent="760" name="temperature_score">
+    <column id="842" parent="761" name="temperature_score">
       <DasType>numeric(5)|0s</DasType>
       <Position>19</Position>
       <StateNumber>1333</StateNumber>
       <TypeId>1700</TypeId>
     </column>
-    <column id="828" parent="760" name="precipitation_score">
+    <column id="843" parent="761" name="precipitation_score">
       <DasType>numeric(5)|0s</DasType>
       <Position>20</Position>
       <StateNumber>1333</StateNumber>
       <TypeId>1700</TypeId>
     </column>
-    <column id="829" parent="760" name="glacier_altitude_score">
+    <column id="844" parent="761" name="glacier_altitude_score">
       <DasType>numeric(5)|0s</DasType>
       <Position>21</Position>
       <StateNumber>1333</StateNumber>
       <TypeId>1700</TypeId>
     </column>
-    <column id="830" parent="760" name="glacier_mass_score">
+    <column id="845" parent="761" name="glacier_mass_score">
       <DasType>numeric(5)|0s</DasType>
       <Position>22</Position>
       <StateNumber>1333</StateNumber>
       <TypeId>1700</TypeId>
     </column>
-    <index id="831" parent="760" name="parametro_pkey">
+    <index id="846" parent="761" name="parametro_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16972</ObjectId>
@@ -11544,49 +11648,49 @@ geoname_id</ColNames>
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <key id="832" parent="760" name="parametro_pkey">
+    <key id="847" parent="761" name="parametro_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16973</ObjectId>
       <Primary>1</Primary>
       <StateNumber>1333</StateNumber>
       <UnderlyingIndexId>16972</UnderlyingIndexId>
     </key>
-    <column id="833" parent="761" name="cf">
+    <column id="848" parent="762" name="cf">
       <DasType>varchar(16)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>1334</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="834" parent="761" name="centrimonitoraggio_id">
+    <column id="849" parent="762" name="centrimonitoraggio_id">
       <DasType>varchar(50)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>1334</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="835" parent="761" name="geoname_id">
+    <column id="850" parent="762" name="geoname_id">
       <DasType>bigint|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StateNumber>1334</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <column id="836" parent="761" name="par_id">
+    <column id="851" parent="762" name="par_id">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StateNumber>1334</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="837" parent="761" name="date_r">
+    <column id="852" parent="762" name="date_r">
       <DasType>date|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
       <StateNumber>1334</StateNumber>
       <TypeId>1082</TypeId>
     </column>
-    <foreign-key id="838" parent="761" name="rilevazione_cf_fkey">
+    <foreign-key id="853" parent="762" name="rilevazione_cf_fkey">
       <ColNames>cf</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16979</ObjectId>
@@ -11595,7 +11699,7 @@ geoname_id</ColNames>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16951</RefTableId>
     </foreign-key>
-    <foreign-key id="839" parent="761" name="rilevazione_centrimonitoraggio_id_fkey">
+    <foreign-key id="854" parent="762" name="rilevazione_centrimonitoraggio_id_fkey">
       <ColNames>centrimonitoraggio_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16984</ObjectId>
@@ -11604,7 +11708,7 @@ geoname_id</ColNames>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16960</RefTableId>
     </foreign-key>
-    <foreign-key id="840" parent="761" name="rilevazione_geoname_id_fkey">
+    <foreign-key id="855" parent="762" name="rilevazione_geoname_id_fkey">
       <ColNames>geoname_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16989</ObjectId>
@@ -11613,7 +11717,7 @@ geoname_id</ColNames>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16946</RefTableId>
     </foreign-key>
-    <foreign-key id="841" parent="761" name="rilevazione_par_id_fkey">
+    <foreign-key id="856" parent="762" name="rilevazione_par_id_fkey">
       <ColNames>par_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16994</ObjectId>
@@ -11622,7 +11726,7 @@ geoname_id</ColNames>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16967</RefTableId>
     </foreign-key>
-    <index id="842" parent="761" name="rilevazione_pkey">
+    <index id="857" parent="762" name="rilevazione_pkey">
       <ColNames>cf
 centrimonitoraggio_id
 geoname_id
@@ -11647,46 +11751,46 @@ pg_catalog
 
 pg_catalog</CollationParentNames>
     </index>
-    <key id="843" parent="761" name="rilevazione_pkey">
+    <key id="858" parent="762" name="rilevazione_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16978</ObjectId>
       <Primary>1</Primary>
       <StateNumber>1334</StateNumber>
       <UnderlyingIndexId>16977</UnderlyingIndexId>
     </key>
-    <column id="844" parent="762" name="id">
+    <column id="859" parent="763" name="id">
       <DasType>varchar|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>1147</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="845" parent="762" name="nomecentro">
+    <column id="860" parent="763" name="nomecentro">
       <DasType>varchar(255)|0s</DasType>
       <Position>2</Position>
       <StateNumber>996</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="846" parent="762" name="descrizione">
+    <column id="861" parent="763" name="descrizione">
       <DasType>varchar(255)|0s</DasType>
       <Position>3</Position>
       <StateNumber>870</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="847" parent="762" name="username_operatore">
+    <column id="862" parent="763" name="username_operatore">
       <DasType>varchar|0s</DasType>
       <Position>5</Position>
       <StateNumber>1301</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <foreign-key id="848" parent="762" name="username_key">
+    <foreign-key id="863" parent="763" name="username_key">
       <ColNames>username_operatore</ColNames>
       <ObjectId>16941</ObjectId>
       <StateNumber>1280</StateNumber>
       <RefKeyColPositions>4</RefKeyColPositions>
       <RefTableId>16431</RefTableId>
     </foreign-key>
-    <index id="849" parent="762" name="centri_monitoraggio_pkey">
+    <index id="864" parent="763" name="centri_monitoraggio_pkey">
       <ColNames>id</ColNames>
       <ObjectId>16776</ObjectId>
       <Primary>1</Primary>
@@ -11697,62 +11801,62 @@ pg_catalog</CollationParentNames>
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <key id="850" parent="762" name="centri_monitoraggio_pkey">
+    <key id="865" parent="763" name="centri_monitoraggio_pkey">
       <ObjectId>16777</ObjectId>
       <Primary>1</Primary>
       <StateNumber>1147</StateNumber>
       <UnderlyingIndexId>16776</UnderlyingIndexId>
     </key>
-    <column id="851" parent="763" name="geoname_id">
+    <column id="866" parent="764" name="geoname_id">
       <DasType>bigint|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>928</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <column id="852" parent="763" name="name">
+    <column id="867" parent="764" name="name">
       <DasType>varchar(30)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>928</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="853" parent="763" name="ascii_name">
+    <column id="868" parent="764" name="ascii_name">
       <DasType>varchar(30)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StateNumber>928</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="854" parent="763" name="country_code">
+    <column id="869" parent="764" name="country_code">
       <DasType>varchar(3)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StateNumber>928</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="855" parent="763" name="country_name">
+    <column id="870" parent="764" name="country_name">
       <DasType>varchar(30)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
       <StateNumber>928</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="856" parent="763" name="longitude">
+    <column id="871" parent="764" name="longitude">
       <DasType>double precision|0s</DasType>
       <NotNull>1</NotNull>
       <Position>6</Position>
       <StateNumber>928</StateNumber>
       <TypeId>701</TypeId>
     </column>
-    <column id="857" parent="763" name="latitude">
+    <column id="872" parent="764" name="latitude">
       <DasType>double precision|0s</DasType>
       <NotNull>1</NotNull>
       <Position>7</Position>
       <StateNumber>928</StateNumber>
       <TypeId>701</TypeId>
     </column>
-    <index id="858" parent="763" name="citta_pkey">
+    <index id="873" parent="764" name="citta_pkey">
       <ColNames>geoname_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16502</ObjectId>
@@ -11761,28 +11865,120 @@ pg_catalog</CollationParentNames>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="859" parent="763" name="citta_pkey">
+    <key id="874" parent="764" name="citta_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16503</ObjectId>
       <Primary>1</Primary>
       <StateNumber>928</StateNumber>
       <UnderlyingIndexId>16502</UnderlyingIndexId>
     </key>
-    <column id="860" parent="764" name="cf">
+    <column id="875" parent="765" name="key">
+      <DasType>varchar(255)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StateNumber>1398</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="876" parent="765" name="centro_id">
+      <DasType>varchar(255)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StateNumber>1398</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="877" parent="765" name="velocita_vento_score">
+      <DasType>integer|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StateNumber>1398</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="878" parent="765" name="velocita_vento_note">
+      <DasType>varchar(256)|0s</DasType>
+      <Position>4</Position>
+      <StateNumber>1398</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="879" parent="765" name="temperatura_score">
+      <DasType>integer|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StateNumber>1398</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="880" parent="765" name="temperatura_note">
+      <DasType>varchar(256)|0s</DasType>
+      <Position>6</Position>
+      <StateNumber>1398</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="881" parent="765" name="umidita_score">
+      <DasType>integer|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>7</Position>
+      <StateNumber>1398</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="882" parent="765" name="umidita_note">
+      <DasType>varchar(256)|0s</DasType>
+      <Position>8</Position>
+      <StateNumber>1398</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="883" parent="765" name="precipitazioni_score">
+      <DasType>integer|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>9</Position>
+      <StateNumber>1398</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="884" parent="765" name="precipitazioni_note">
+      <DasType>varchar(256)|0s</DasType>
+      <Position>10</Position>
+      <StateNumber>1398</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="885" parent="765" name="data_inserimento">
+      <DasType>timestamp|0s</DasType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <Position>11</Position>
+      <StateNumber>1398</StateNumber>
+      <TypeId>1114</TypeId>
+    </column>
+    <index id="886" parent="765" name="dati_climatici_pkey">
+      <ColNames>key</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>17055</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>1398</StateNumber>
+      <Unique>1</Unique>
+      <AccessMethodId>403</AccessMethodId>
+      <CollationNames>default</CollationNames>
+      <CollationIds>100</CollationIds>
+      <CollationParentNames>pg_catalog</CollationParentNames>
+    </index>
+    <key id="887" parent="765" name="dati_climatici_pkey">
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>17056</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>1398</StateNumber>
+      <UnderlyingIndexId>17055</UnderlyingIndexId>
+    </key>
+    <column id="888" parent="766" name="cf">
       <DasType>varchar(16)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>1136</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="861" parent="764" name="centrimonitoraggio_id">
+    <column id="889" parent="766" name="centrimonitoraggio_id">
       <DasType>varchar|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>1144</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <foreign-key id="862" parent="764" name="lavora_cf_fkey">
+    <foreign-key id="890" parent="766" name="lavora_cf_fkey">
       <ColNames>cf</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16662</ObjectId>
@@ -11791,21 +11987,21 @@ pg_catalog</CollationParentNames>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16431</RefTableId>
     </foreign-key>
-    <foreign-key id="863" parent="764" name="lavora_lavora_cf_fk">
+    <foreign-key id="891" parent="766" name="lavora_lavora_cf_fk">
       <ColNames>centrimonitoraggio_id</ColNames>
       <ObjectId>16784</ObjectId>
       <StateNumber>1153</StateNumber>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16657</RefTableId>
     </foreign-key>
-    <foreign-key id="864" parent="764" name="lavora_lavora_fk">
+    <foreign-key id="892" parent="766" name="lavora_lavora_fk">
       <ColNames>centrimonitoraggio_id</ColNames>
       <ObjectId>16897</ObjectId>
       <StateNumber>1224</StateNumber>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16657</RefTableId>
     </foreign-key>
-    <index id="865" parent="764" name="lavora_pk">
+    <index id="893" parent="766" name="lavora_pk">
       <ColNames>cf</ColNames>
       <ObjectId>16765</ObjectId>
       <StateNumber>1144</StateNumber>
@@ -11815,61 +12011,61 @@ pg_catalog</CollationParentNames>
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <key id="866" parent="764" name="lavora_pk">
+    <key id="894" parent="766" name="lavora_pk">
       <ObjectId>16766</ObjectId>
       <StateNumber>1133</StateNumber>
       <UnderlyingIndexId>16765</UnderlyingIndexId>
     </key>
-    <column id="867" parent="765" name="codice_fiscale">
+    <column id="895" parent="767" name="codice_fiscale">
       <DasType>varchar(16)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>767</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="868" parent="765" name="nome">
+    <column id="896" parent="767" name="nome">
       <DasType>varchar(50)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>767</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="869" parent="765" name="cognome">
+    <column id="897" parent="767" name="cognome">
       <DasType>varchar(50)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StateNumber>767</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="870" parent="765" name="username">
+    <column id="898" parent="767" name="username">
       <DasType>varchar(50)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StateNumber>767</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="871" parent="765" name="email">
+    <column id="899" parent="767" name="email">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
       <StateNumber>767</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="872" parent="765" name="password">
+    <column id="900" parent="767" name="password">
       <DasType>varchar(255)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>6</Position>
       <StateNumber>767</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="873" parent="765" name="centro_monitoraggio">
+    <column id="901" parent="767" name="centro_monitoraggio">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>7</Position>
       <StateNumber>767</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <index id="874" parent="765" name="operatori_pkey">
+    <index id="902" parent="767" name="operatori_pkey">
       <ColNames>codice_fiscale</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16436</ObjectId>
@@ -11881,7 +12077,7 @@ pg_catalog</CollationParentNames>
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <index id="875" parent="765" name="operatori_username_key">
+    <index id="903" parent="767" name="operatori_username_key">
       <ColNames>username</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16438</ObjectId>
@@ -11892,7 +12088,7 @@ pg_catalog</CollationParentNames>
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <index id="876" parent="765" name="operatori_email_key">
+    <index id="904" parent="767" name="operatori_email_key">
       <ColNames>email</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16440</ObjectId>
@@ -11903,40 +12099,40 @@ pg_catalog</CollationParentNames>
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <key id="877" parent="765" name="operatori_pkey">
+    <key id="905" parent="767" name="operatori_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16437</ObjectId>
       <Primary>1</Primary>
       <StateNumber>767</StateNumber>
       <UnderlyingIndexId>16436</UnderlyingIndexId>
     </key>
-    <key id="878" parent="765" name="operatori_username_key">
+    <key id="906" parent="767" name="operatori_username_key">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16439</ObjectId>
       <StateNumber>767</StateNumber>
       <UnderlyingIndexId>16438</UnderlyingIndexId>
     </key>
-    <key id="879" parent="765" name="operatori_email_key">
+    <key id="907" parent="767" name="operatori_email_key">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16441</ObjectId>
       <StateNumber>767</StateNumber>
       <UnderlyingIndexId>16440</UnderlyingIndexId>
     </key>
-    <column id="880" parent="766" name="centrimonitoraggio_id">
+    <column id="908" parent="768" name="centrimonitoraggio_id">
       <DasType>varchar(50)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>1223</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="881" parent="766" name="geoname_id">
+    <column id="909" parent="768" name="geoname_id">
       <DasType>bigint|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>1223</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <foreign-key id="882" parent="766" name="osservano_centrimonitoraggio_id_fkey">
+    <foreign-key id="910" parent="768" name="osservano_centrimonitoraggio_id_fkey">
       <ColNames>centrimonitoraggio_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16887</ObjectId>
@@ -11945,7 +12141,7 @@ pg_catalog</CollationParentNames>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16474</RefTableId>
     </foreign-key>
-    <foreign-key id="883" parent="766" name="osservano_geoname_id_fkey">
+    <foreign-key id="911" parent="768" name="osservano_geoname_id_fkey">
       <ColNames>geoname_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16892</ObjectId>
@@ -11954,7 +12150,7 @@ pg_catalog</CollationParentNames>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16499</RefTableId>
     </foreign-key>
-    <index id="884" parent="766" name="osservano_pkey">
+    <index id="912" parent="768" name="osservano_pkey">
       <ColNames>centrimonitoraggio_id
 geoname_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
@@ -11967,147 +12163,147 @@ geoname_id</ColNames>
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <key id="885" parent="766" name="osservano_pkey">
+    <key id="913" parent="768" name="osservano_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16886</ObjectId>
       <Primary>1</Primary>
       <StateNumber>1223</StateNumber>
       <UnderlyingIndexId>16885</UnderlyingIndexId>
     </key>
-    <column id="886" parent="767" name="id">
+    <column id="914" parent="769" name="id">
       <DasType>varchar(30)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>930</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="887" parent="767" name="wind">
+    <column id="915" parent="769" name="wind">
       <DasType>varchar(10)|0s</DasType>
       <Position>2</Position>
       <StateNumber>930</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="888" parent="767" name="humidity">
+    <column id="916" parent="769" name="humidity">
       <DasType>varchar(10)|0s</DasType>
       <Position>3</Position>
       <StateNumber>930</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="889" parent="767" name="pressure">
+    <column id="917" parent="769" name="pressure">
       <DasType>varchar(10)|0s</DasType>
       <Position>4</Position>
       <StateNumber>930</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="890" parent="767" name="temperature">
+    <column id="918" parent="769" name="temperature">
       <DasType>varchar(10)|0s</DasType>
       <Position>5</Position>
       <StateNumber>930</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="891" parent="767" name="precipitation">
+    <column id="919" parent="769" name="precipitation">
       <DasType>varchar(10)|0s</DasType>
       <Position>6</Position>
       <StateNumber>930</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="892" parent="767" name="glacier_altitude">
+    <column id="920" parent="769" name="glacier_altitude">
       <DasType>varchar(10)|0s</DasType>
       <Position>7</Position>
       <StateNumber>930</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="893" parent="767" name="glacier_mass">
+    <column id="921" parent="769" name="glacier_mass">
       <DasType>varchar(10)|0s</DasType>
       <Position>8</Position>
       <StateNumber>930</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="894" parent="767" name="wind_comment">
+    <column id="922" parent="769" name="wind_comment">
       <DasType>varchar(255)|0s</DasType>
       <Position>9</Position>
       <StateNumber>930</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="895" parent="767" name="humidity_comment">
+    <column id="923" parent="769" name="humidity_comment">
       <DasType>varchar(255)|0s</DasType>
       <Position>10</Position>
       <StateNumber>930</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="896" parent="767" name="pressure_comment">
+    <column id="924" parent="769" name="pressure_comment">
       <DasType>varchar(255)|0s</DasType>
       <Position>11</Position>
       <StateNumber>930</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="897" parent="767" name="temperature_comment">
+    <column id="925" parent="769" name="temperature_comment">
       <DasType>varchar(255)|0s</DasType>
       <Position>12</Position>
       <StateNumber>930</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="898" parent="767" name="precipitation_comment">
+    <column id="926" parent="769" name="precipitation_comment">
       <DasType>varchar(255)|0s</DasType>
       <Position>13</Position>
       <StateNumber>930</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="899" parent="767" name="glacier_altitude_comment">
+    <column id="927" parent="769" name="glacier_altitude_comment">
       <DasType>varchar(255)|0s</DasType>
       <Position>14</Position>
       <StateNumber>930</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="900" parent="767" name="glacier_mass_comment">
+    <column id="928" parent="769" name="glacier_mass_comment">
       <DasType>varchar(255)|0s</DasType>
       <Position>15</Position>
       <StateNumber>930</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="901" parent="767" name="wind_score">
+    <column id="929" parent="769" name="wind_score">
       <DasType>numeric(5)|0s</DasType>
       <Position>16</Position>
       <StateNumber>930</StateNumber>
       <TypeId>1700</TypeId>
     </column>
-    <column id="902" parent="767" name="humidity_score">
+    <column id="930" parent="769" name="humidity_score">
       <DasType>numeric(5)|0s</DasType>
       <Position>17</Position>
       <StateNumber>930</StateNumber>
       <TypeId>1700</TypeId>
     </column>
-    <column id="903" parent="767" name="pressure_score">
+    <column id="931" parent="769" name="pressure_score">
       <DasType>numeric(5)|0s</DasType>
       <Position>18</Position>
       <StateNumber>930</StateNumber>
       <TypeId>1700</TypeId>
     </column>
-    <column id="904" parent="767" name="temperature_score">
+    <column id="932" parent="769" name="temperature_score">
       <DasType>numeric(5)|0s</DasType>
       <Position>19</Position>
       <StateNumber>930</StateNumber>
       <TypeId>1700</TypeId>
     </column>
-    <column id="905" parent="767" name="precipitation_score">
+    <column id="933" parent="769" name="precipitation_score">
       <DasType>numeric(5)|0s</DasType>
       <Position>20</Position>
       <StateNumber>930</StateNumber>
       <TypeId>1700</TypeId>
     </column>
-    <column id="906" parent="767" name="glacier_altitude_score">
+    <column id="934" parent="769" name="glacier_altitude_score">
       <DasType>numeric(5)|0s</DasType>
       <Position>21</Position>
       <StateNumber>930</StateNumber>
       <TypeId>1700</TypeId>
     </column>
-    <column id="907" parent="767" name="glacier_mass_score">
+    <column id="935" parent="769" name="glacier_mass_score">
       <DasType>numeric(5)|0s</DasType>
       <Position>22</Position>
       <StateNumber>930</StateNumber>
       <TypeId>1700</TypeId>
     </column>
-    <index id="908" parent="767" name="parametro_pkey">
+    <index id="936" parent="769" name="parametro_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16509</ObjectId>
@@ -12119,49 +12315,49 @@ geoname_id</ColNames>
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <key id="909" parent="767" name="parametro_pkey">
+    <key id="937" parent="769" name="parametro_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16510</ObjectId>
       <Primary>1</Primary>
       <StateNumber>930</StateNumber>
       <UnderlyingIndexId>16509</UnderlyingIndexId>
     </key>
-    <column id="910" parent="768" name="cf">
+    <column id="938" parent="770" name="cf">
       <DasType>varchar(16)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>1222</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="911" parent="768" name="centrimonitoraggio_id">
+    <column id="939" parent="770" name="centrimonitoraggio_id">
       <DasType>varchar(50)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>1222</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="912" parent="768" name="geoname_id">
+    <column id="940" parent="770" name="geoname_id">
       <DasType>bigint|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StateNumber>1222</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <column id="913" parent="768" name="par_id">
+    <column id="941" parent="770" name="par_id">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StateNumber>1222</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="914" parent="768" name="date_r">
+    <column id="942" parent="770" name="date_r">
       <DasType>date|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
       <StateNumber>1222</StateNumber>
       <TypeId>1082</TypeId>
     </column>
-    <foreign-key id="915" parent="768" name="rilevazione_cf_fkey">
+    <foreign-key id="943" parent="770" name="rilevazione_cf_fkey">
       <ColNames>cf</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16862</ObjectId>
@@ -12170,7 +12366,7 @@ geoname_id</ColNames>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16431</RefTableId>
     </foreign-key>
-    <foreign-key id="916" parent="768" name="rilevazione_centrimonitoraggio_id_fkey">
+    <foreign-key id="944" parent="770" name="rilevazione_centrimonitoraggio_id_fkey">
       <ColNames>centrimonitoraggio_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16867</ObjectId>
@@ -12179,7 +12375,7 @@ geoname_id</ColNames>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16474</RefTableId>
     </foreign-key>
-    <foreign-key id="917" parent="768" name="rilevazione_geoname_id_fkey">
+    <foreign-key id="945" parent="770" name="rilevazione_geoname_id_fkey">
       <ColNames>geoname_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16872</ObjectId>
@@ -12188,7 +12384,7 @@ geoname_id</ColNames>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16499</RefTableId>
     </foreign-key>
-    <foreign-key id="918" parent="768" name="rilevazione_par_id_fkey">
+    <foreign-key id="946" parent="770" name="rilevazione_par_id_fkey">
       <ColNames>par_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16877</ObjectId>
@@ -12197,7 +12393,7 @@ geoname_id</ColNames>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16504</RefTableId>
     </foreign-key>
-    <index id="919" parent="768" name="rilevazione_pkey">
+    <index id="947" parent="770" name="rilevazione_pkey">
       <ColNames>cf
 centrimonitoraggio_id
 geoname_id
@@ -12222,7 +12418,7 @@ pg_catalog
 
 pg_catalog</CollationParentNames>
     </index>
-    <key id="920" parent="768" name="rilevazione_pkey">
+    <key id="948" parent="770" name="rilevazione_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16861</ObjectId>
       <Primary>1</Primary>

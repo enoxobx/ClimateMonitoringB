@@ -166,11 +166,22 @@ public class LayoutOperatore extends LayoutStandard {
         panel.add(centriDropdown, gbc);
 
 
+
         // Parametri climatici con score e area di testo per severità
         String[] parametri = {"Velocità Vento", "Temperatura", "Umidità", "Precipitazioni"};
         JComboBox<Integer>[] scoreDropdowns = new JComboBox[parametri.length]; // Array per i dropdown di score
         JTextArea[] severitaTextAreas = new JTextArea[parametri.length]; // Array per le JTextArea
 
+// Campo per l'inserimento del valore della chiave primaria "key"
+        gbc.gridy++;
+        gbc.gridx = 0;
+        panel.add(new JLabel("Key (ID univoco):"), gbc);
+
+        JTextField keyField = new JTextField(20);
+        gbc.gridx = 1;
+        panel.add(keyField, gbc);
+
+// Loop per aggiungere i parametri climatici
         for (int i = 0; i < parametri.length; i++) {
             gbc.gridy++;
             gbc.gridx = 0;
@@ -207,10 +218,7 @@ public class LayoutOperatore extends LayoutStandard {
             panel.add(scrollPane, gbc);
         }
 
-        container.add(panel, BorderLayout.CENTER);
-
-
-        // Bottone per salvare i parametri
+// Bottone per salvare i parametri
         JButton salvaButton = new JButton("Salva Parametri");
         salvaButton.setPreferredSize(new Dimension(150, 40));
         salvaButton.setBackground(new Color(34, 139, 34));
@@ -219,23 +227,26 @@ public class LayoutOperatore extends LayoutStandard {
         salvaButton.addActionListener(e -> {
             if (centriDropdown.getSelectedItem() == null || centriDropdown.getSelectedItem().equals("Nessun centro disponibile")) {
                 JOptionPane.showMessageDialog(datiClimaticiFrame, "Seleziona un centro prima di salvare!", "Errore", JOptionPane.ERROR_MESSAGE);
+            } else if (keyField.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(datiClimaticiFrame, "Inserisci un valore per la Key!", "Errore", JOptionPane.ERROR_MESSAGE);
             } else {
-                // Salvataggio dei dati e validazione
-                StringBuilder result = new StringBuilder("Parametri salvati:\n");
-                result.append("Centro: ").append(centriDropdown.getSelectedItem()).append("\n");
+                String key = keyField.getText().trim(); // Valore della chiave primaria
+                String centroID = (String) centriDropdown.getSelectedItem();
 
-                for (int i = 0; i < parametri.length; i++) {
-                    result.append(parametri[i]).append(": ");
-                    result.append("Score: ").append(scoreDropdowns[i].getSelectedItem()).append(", ");
-                    result.append("Severità: ").append(severitaTextAreas[i].getText()).append("\n");
-                }
-
-                JOptionPane.showMessageDialog(datiClimaticiFrame, result.toString(), "Parametri salvati con successo!", JOptionPane.INFORMATION_MESSAGE);
+                // Salva i dati nel database
+                QueryExecutorImpl Q = new QueryExecutorImpl();
+                Q.salvaDatiClimatici( key ,centroID, scoreDropdowns, severitaTextAreas);
             }
         });
-        container.add(salvaButton, BorderLayout.SOUTH);
+        gbc.gridy++;
+        gbc.gridx = 0;
+        panel.add(salvaButton, gbc);
 
+// Aggiungi il pannello al contenitore
+        container.add(panel, BorderLayout.CENTER);
+        container.add(salvaButton, BorderLayout.SOUTH);
         datiClimaticiFrame.setVisible(true);
+
     }
 
 
