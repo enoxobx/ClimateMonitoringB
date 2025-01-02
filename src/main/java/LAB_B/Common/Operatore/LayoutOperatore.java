@@ -21,12 +21,15 @@ public class LayoutOperatore extends LayoutStandard {
     private final JButton creaCentroButton;
     private final JList<String> centriList;
     private final DefaultListModel<String> listaCentriModel;
-    private JLabel titleLable;
+    private final JLabel titleLable;
+    private final ScrollPane centriScrollPane;
 
     public LayoutOperatore(String username) {
         super(); // Chiamata al costruttore della classe padre LayoutStandard
         this.username = username;
 
+        // Inizializzazione del componente centriScrollPane
+        centriScrollPane = new ScrollPane(); // Inizializzazione del componente
 
         // Ottieni il contenitore dalla classe LayoutStandard
         Container container = getBody();
@@ -52,30 +55,35 @@ public class LayoutOperatore extends LayoutStandard {
 
         listaCentriModel = new DefaultListModel<>();
         centriList = new JList<>(listaCentriModel);
-        JScrollPane centriScrollPane = new JScrollPane(centriList);
-        centriScrollPane.setPreferredSize(new Dimension(250, 150));  // Ridimensionato per un aspetto più equilibrato
-        gbc.gridx = 1;
+
+        caricaCentri(); // Carica i centri all'avvio
+
+        centriScrollPane.setPreferredSize(new Dimension(250, 150));
+        centriScrollPane.add(new JScrollPane(centriList)); // Usa JScrollPane per il JList
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 2; // Centrare la lista
         contentPanel.add(centriScrollPane, gbc);
 
         // Bottone per creare un centro di monitoraggio
         creaCentroButton = new JButton("Crea Centro Monitoraggio");
         customizeButton(creaCentroButton);
         gbc.gridx = 1;
-        gbc.gridy = 1;  // Cambiato la riga per farlo apparire prima
+        gbc.gridy = 1;
         contentPanel.add(creaCentroButton, gbc);
 
         // Bottone per aggiungere parametri climatici
         aggiungiDatiClimatici = new JButton("Aggiungi Parametri Climatici");
         customizeButton(aggiungiDatiClimatici);
         gbc.gridx = 1;
-        gbc.gridy = 2;  // Cambiato la riga per farlo apparire dopo
+        gbc.gridy = 2;
         contentPanel.add(aggiungiDatiClimatici, gbc);
 
         container.add(contentPanel, BorderLayout.CENTER);
 
         // Pannello inferiore per i bottoni di azione
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        actionPanel.setBackground(Color.WHITE);  // Sfondo bianco per il pannello inferiore
+        actionPanel.setBackground(Color.WHITE);
         salvaDatiButton = new JButton("Salva Dati");
         indietroButton = new JButton("Indietro");
         customizeButton(salvaDatiButton);
@@ -94,32 +102,85 @@ public class LayoutOperatore extends LayoutStandard {
         creaCentroButton.addActionListener(gestore);
 
         setVisible(true);
-
-        // Recupera i centri associati all'operatore e aggiorna la lista
-        aggiornaCentriAssociati();
+        titleLable = null;
     }
 
-    // Metodo per recuperare i centri associati all'operatore
-    private List<String> recuperaCentriAssociati(String username) {
-        QueryExecutorImpl queryExecutor = new QueryExecutorImpl();
+    private void caricaCentri() {
+        listaCentriModel.clear(); // Svuota la lista esistente
         try {
-            return queryExecutor.getCentriPerOperatore(username);  // Recupera i centri associati all'operatore
+            QueryExecutorImpl queryExecutor = new QueryExecutorImpl();
+            List<String> centri = queryExecutor.getCentriPerOperatore(username); // Carica i centri dal database
+            if (centri.isEmpty()) {
+                listaCentriModel.addElement("Nessun centro disponibile");
+            } else {
+                for (String centro : centri) {
+                    listaCentriModel.addElement(centro); // Aggiungi ogni centro al modello della lista
+                }
+            }
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Errore durante il recupero dei centri: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
-            return List.of();  // Restituisce una lista vuota in caso di errore
+            JOptionPane.showMessageDialog(this,
+                    "Errore durante il caricamento dei centri: " + ex.getMessage(),
+                    "Errore", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    // Metodo per aggiornare la lista dei centri associati
-    private void aggiornaCentriAssociati() {
-        List<String> centriAssociati = recuperaCentriAssociati(username);
-        listaCentriModel.clear();  // Pulisce la lista precedente
-        for (String centro : centriAssociati) {
-            listaCentriModel.addElement(centro);  // Aggiunge i centri associati alla lista
-        }
+    private void apriFinestraCreaCentro() {
+        JFrame createCenterFrame = new JFrame("Crea Centro Monitoraggio");
+        createCenterFrame.setSize(400, 300);
+        createCenterFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        createCenterFrame.setLocationRelativeTo(this);
+
+        // Layout della finestra per creare il centro
+        Container container = createCenterFrame.getContentPane();
+        container.setLayout(new GridLayout(5, 2));
+        container.setBackground(new Color(245, 245, 245));
+
+        container.add(new JLabel("id:"));
+        JTextField idField = new JTextField();
+        container.add(idField);
+
+        container.add(new JLabel("Nome Centro:"));
+        JTextField nomeCentroField = new JTextField();
+        container.add(nomeCentroField);
+
+        container.add(new JLabel("Descrizione:"));
+        JTextField descrizioneField = new JTextField();
+        container.add(descrizioneField);
+
+        JButton salvaCentroButton = new JButton("Salva Centro");
+        salvaCentroButton.addActionListener(e -> {
+            String id = idField.getText();
+            String nomeCentro = nomeCentroField.getText();
+            String descrizione = descrizioneField.getText();
+
+            if (id.isEmpty() || nomeCentro.isEmpty() || descrizione.isEmpty()) {
+                JOptionPane.showMessageDialog(createCenterFrame, "Tutti i campi sono obbligatori", "Errore", JOptionPane.ERROR_MESSAGE);
+            } else {
+                QueryExecutorImpl queryExecutor = new QueryExecutorImpl();
+                boolean success = false;
+
+                try {
+                    success = queryExecutor.salvaCentroMonitoraggio(id, nomeCentro, descrizione);
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(createCenterFrame, "Errore nel database: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
+                }
+
+                if (success) {
+                    JOptionPane.showMessageDialog(createCenterFrame, "Centro monitoraggio creato con successo.");
+                    caricaCentri(); // Ricarica la lista dei centri
+                    createCenterFrame.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(createCenterFrame, "Errore durante il salvataggio del centro.", "Errore", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        container.add(new JLabel());
+        container.add(salvaCentroButton);
+
+        createCenterFrame.setVisible(true);
     }
 
-    // Metodo per personalizzare i bottoni
     private void customizeButton(JButton button) {
         button.setPreferredSize(new Dimension(220, 45));
         button.setBackground(new Color(34, 139, 34));  // Verde
@@ -131,207 +192,23 @@ public class LayoutOperatore extends LayoutStandard {
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }
 
-    private void apriFinestraDatiClimatici() {
-        JFrame datiClimaticiFrame = new JFrame("Dati Climatici");
-        datiClimaticiFrame.setSize(600, 600); // Aumentata la dimensione per dare più spazio
-        datiClimaticiFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        datiClimaticiFrame.setLocationRelativeTo(this);
-
-        // Layout e componenti della finestra
-        Container container = datiClimaticiFrame.getContentPane();
-        container.setLayout(new BorderLayout());
-
-        JLabel label = new JLabel("Inserisci Parametri Climatici", SwingConstants.CENTER);
-        label.setFont(new Font("Arial", Font.BOLD, 18));
-        container.add(label, BorderLayout.NORTH);
-
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        // Dropdown per selezionare il centro
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        panel.add(new JLabel("Seleziona Centro:"), gbc);
-
-        JComboBox<String> centriDropdown = new JComboBox<>();
-        for (int i = 0; i < listaCentriModel.size(); i++) {
-            centriDropdown.addItem(listaCentriModel.getElementAt(i));
-        }
-        if (listaCentriModel.isEmpty()) {
-            centriDropdown.addItem("Nessun centro disponibile");
-        }
-        gbc.gridx = 1;
-        panel.add(centriDropdown, gbc);
-
-
-
-        // Parametri climatici con score e area di testo per severità
-        String[] parametri = {"Velocità Vento", "Temperatura", "Umidità", "Precipitazioni"};
-        JComboBox<Integer>[] scoreDropdowns = new JComboBox[parametri.length]; // Array per i dropdown di score
-        JTextArea[] severitaTextAreas = new JTextArea[parametri.length]; // Array per le JTextArea
-
-// Campo per l'inserimento del valore della chiave primaria "key"
-        gbc.gridy++;
-        gbc.gridx = 0;
-        panel.add(new JLabel("Key (ID univoco):"), gbc);
-
-        JTextField keyField = new JTextField(20);
-        gbc.gridx = 1;
-        panel.add(keyField, gbc);
-
-// Loop per aggiungere i parametri climatici
-        for (int i = 0; i < parametri.length; i++) {
-            gbc.gridy++;
-            gbc.gridx = 0;
-            panel.add(new JLabel(parametri[i] + " (Score 1-5):"), gbc);
-
-            // Dropdown per il punteggio (Score 1-5)
-            scoreDropdowns[i] = new JComboBox<>(new Integer[]{1, 2, 3, 4, 5});
-            gbc.gridx = 1;
-            panel.add(scoreDropdowns[i], gbc);
-
-            // Area di testo per inserire la severità
-            gbc.gridx = 0;
-            gbc.gridy++;
-            panel.add(new JLabel("Note (max 256 caratteri) " + parametri[i] + ":"), gbc);
-
-            severitaTextAreas[i] = new JTextArea(3, 20); // 3 righe e 20 colonne
-            severitaTextAreas[i].setLineWrap(true); // Abilita il wrapping del testo
-            severitaTextAreas[i].setWrapStyleWord(true); // Parola intera a capo
-            severitaTextAreas[i].setDocument(new javax.swing.text.PlainDocument() {
-                @Override
-                public void insertString(int offs, String str, javax.swing.text.AttributeSet a) {
-                    if (getLength() + str.length() <= 256) {  // Limita a 256 caratteri
-                        try {
-                            super.insertString(offs, str, a);
-                        } catch (BadLocationException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                }
-            });
-            JScrollPane scrollPane = new JScrollPane(severitaTextAreas[i]);
-            scrollPane.setPreferredSize(new Dimension(200, 60)); // Ridimensionato per una visualizzazione ottimale
-            gbc.gridx = 1;
-            panel.add(scrollPane, gbc);
-        }
-
-// Bottone per salvare i parametri
-        JButton salvaButton = new JButton("Salva Parametri");
-        salvaButton.setPreferredSize(new Dimension(150, 40));
-        salvaButton.setBackground(new Color(34, 139, 34));
-        salvaButton.setForeground(Color.WHITE);
-        salvaButton.setFont(new Font("Arial", Font.BOLD, 14));
-        salvaButton.addActionListener(e -> {
-            if (centriDropdown.getSelectedItem() == null || centriDropdown.getSelectedItem().equals("Nessun centro disponibile")) {
-                JOptionPane.showMessageDialog(datiClimaticiFrame, "Seleziona un centro prima di salvare!", "Errore", JOptionPane.ERROR_MESSAGE);
-            } else if (keyField.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(datiClimaticiFrame, "Inserisci un valore per la Key!", "Errore", JOptionPane.ERROR_MESSAGE);
-            } else {
-                String key = keyField.getText().trim(); // Valore della chiave primaria
-                String centroID = (String) centriDropdown.getSelectedItem();
-
-                // Salva i dati nel database
-                QueryExecutorImpl Q = new QueryExecutorImpl();
-                Q.salvaDatiClimatici( key ,centroID, scoreDropdowns, severitaTextAreas);
-            }
-        });
-        gbc.gridy++;
-        gbc.gridx = 0;
-        panel.add(salvaButton, gbc);
-
-// Aggiungi il pannello al contenitore
-        container.add(panel, BorderLayout.CENTER);
-        container.add(salvaButton, BorderLayout.SOUTH);
-        datiClimaticiFrame.setVisible(true);
-
-    }
-
-
-    // Metodo per aggiornare lo username (se necessario)
-    public void aggiornaUsername(String nuovoUsername) {
-        titleLable.setText("Benvenuto " + nuovoUsername.toUpperCase(Locale.ROOT));
-    }
-
-
-    // Metodo per aprire la finestra di creazione del centro
-    private void apriFinestraCreaCentro() {
-        JFrame createCenterFrame = new JFrame("Crea Centro Monitoraggio");
-        createCenterFrame.setSize(400, 300);
-        createCenterFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        createCenterFrame.setLocationRelativeTo(this);
-
-        // Layout della finestra per creare il centro
-        Container container = createCenterFrame.getContentPane();
-        container.setLayout(new GridLayout(5, 2));
-        container.setBackground(new Color(245, 245, 245)); // Colore chiaro per lo sfondo
-
-
-        // Aggiungi i campi per creare il centro di monitoraggio
-        container.add(new JLabel("id:"));
-        JTextField nomeCentroField = new JTextField();
-        container.add(nomeCentroField);
-
-        container.add(new JLabel("nomeCentro"));
-        JTextField descrizioneField = new JTextField();
-        container.add(descrizioneField);
-
-        container.add(new JLabel("descrizione"));
-        JTextField posizioneField = new JTextField();
-        container.add(posizioneField);
-
-        // Bottone per salvare il centro
-        JButton salvaCentroButton = new JButton("Salva Centro");
-        salvaCentroButton.addActionListener(e -> {
-            String nomeCentro = nomeCentroField.getText();
-            String descrizione = descrizioneField.getText();
-            String id = posizioneField.getText();
-
-            if (nomeCentro.isEmpty() || descrizione.isEmpty() || id.isEmpty()) {
-                JOptionPane.showMessageDialog(createCenterFrame, "Tutti i campi sono obbligatori", "Errore", JOptionPane.ERROR_MESSAGE);
-            } else {
-                QueryExecutorImpl queryExecutor = new QueryExecutorImpl();
-                boolean success = false;
-
-                try {
-                    success = queryExecutor.salvaCentroMonitoraggio(id, nomeCentro, descrizione, username);
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(createCenterFrame, "Errore nel database: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
-                }
-
-                if (success) {
-                    listaCentriModel.addElement(nomeCentro);
-                    JOptionPane.showMessageDialog(createCenterFrame, "Centro monitoraggio creato con successo.");
-                    createCenterFrame.dispose();
-                } else {
-                    JOptionPane.showMessageDialog(createCenterFrame, "Errore durante il salvataggio del centro.", "Errore", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
-
-
-        container.add(new JLabel()); // Spazio vuoto per il layout
-        container.add(salvaCentroButton);
-
-        createCenterFrame.setVisible(true);
-    }
-
-
-    // Classe per la gestione degli eventi
     private class Gestore implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == aggiungiDatiClimatici) {
-                apriFinestraDatiClimatici(); // Apri la finestra dei dati climatici
+                // Apre la finestra dei dati climatici
             } else if (e.getSource() == salvaDatiButton) {
                 JOptionPane.showMessageDialog(null, "Dati salvati.");
             } else if (e.getSource() == indietroButton) {
                 dispose();
             } else if (e.getSource() == creaCentroButton) {
-                apriFinestraCreaCentro(); // Apri la finestra per creare un centro
+                apriFinestraCreaCentro();
             }
         }
+    }
+
+    public static void main(String[] args) {
+        String usernameRegistrato = "nomeOperatore"; // Sostituisci con il nome dell'operatore
+        new LayoutOperatore(usernameRegistrato);
     }
 }

@@ -1,14 +1,14 @@
 -- Elimina il database esistente, se presente
-DROP DATABASE IF EXISTS "climate_monitoring";
+DROP DATABASE IF EXISTS "ClimateMonitoring";
 
-COMMENT ON DATABASE "climate_monitoring"
+COMMENT ON DATABASE "ClimateMonitoring"
     IS 'DB per LAB B';
 
-GRANT TEMPORARY, CONNECT ON DATABASE "climate_monitoring" TO PUBLIC;
+GRANT TEMPORARY, CONNECT ON DATABASE "ClimateMonitoring" TO PUBLIC;
 
-GRANT ALL ON DATABASE "climate_monitoring" TO agent1;
+GRANT ALL ON DATABASE "ClimateMonitoring" TO agent1;
 
-GRANT ALL ON DATABASE "climate_monitoring" TO postgres;
+GRANT ALL ON DATABASE "ClimateMonitoring" TO postgres;
 
 -- Tabella Citta
 CREATE TABLE Citta (
@@ -36,9 +36,10 @@ CREATE TABLE operatori (
 CREATE TABLE centrimonitoraggio (
                                     id VARCHAR(50) PRIMARY KEY,
                                     nomeCentro VARCHAR(100) NOT NULL,
-                                    descrizione TEXT NOT NULL,
-                                    username_operatore varchar not null
+                                    descrizione TEXT NOT NULL
 );
+
+
 
 -- Tabella Parametro
 CREATE TABLE Parametro (
@@ -95,18 +96,10 @@ CREATE TABLE Osservano (
                            PRIMARY KEY (CentriMonitoraggio_ID, Geoname_ID)
 );
 
-
-
-
 -- Assicurati che la colonna CF sia una chiave primaria (già definita nello script precedente)
 ALTER TABLE lavora
     ADD CONSTRAINT lavora_lavora_fk
         FOREIGN KEY (centrimonitoraggio_id) REFERENCES lavora(cf);
-
-DELETE FROM centrimonitoraggio
-WHERE username_operatore = null;
-
-
 
 
 -- Tabella Lavora
@@ -120,16 +113,14 @@ CREATE TABLE Lavora (
                         PRIMARY KEY (CF, CentriMonitoraggio_ID)
 );
 
-CREATE TABLE dati_climatici (
-                                key varchar(255) PRIMARY KEY,
-                                centro_id VARCHAR(255) NOT NULL,
-                                velocita_vento_score INT NOT NULL,
-                                velocita_vento_note VARCHAR(256),
-                                temperatura_score INT NOT NULL,
-                                temperatura_note VARCHAR(256),
-                                umidita_score INT NOT NULL,
-                                umidita_note VARCHAR(256),
-                                precipitazioni_score INT NOT NULL,
-                                precipitazioni_note VARCHAR(256),
-                                data_inserimento TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+-- Aggiungere una colonna operatore_username alla tabella centrimonitoraggio
+ALTER TABLE centrimonitoraggio
+    ADD COLUMN username_operatore VARCHAR(12) NOT NULL;
+
+-- Creare un vincolo di chiave esterna per collegare operatore_username a operatori.username
+ALTER TABLE centrimonitoraggio
+    ADD CONSTRAINT fk_operatore_username
+        FOREIGN KEY (username_operatore)
+            REFERENCES operatori(username)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE;

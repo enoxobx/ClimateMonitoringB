@@ -29,6 +29,27 @@ public class QueryExecutorImpl {
         }
     }
 
+    public List<String> getCentriPerOperatore(String id) throws SQLException {
+        ensureConnection(); // Assicura che la connessione al database sia attiva
+
+        String query = "SELECT nomeCentro " +
+                "FROM centrimonitoraggio  " +
+                "JOIN operatori ON username_operatore = username " +
+                "WHERE username = ?";
+        List<String> centri = new ArrayList<>();
+
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, id); // Associa il parametro username
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    centri.add(rs.getString("nomecentro")); // Aggiungi il nome del centro alla lista
+                }
+            }
+        }
+        return centri;
+    }
+
+
 
 
     public boolean salvaCentroMonitoraggio(String id, String nomeCentro, String descrizione, String currentUsername) throws SQLException {
