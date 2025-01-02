@@ -298,5 +298,6 @@ public class LayoutOperatore extends LayoutStandard {
             }
         }
     }
+}
 
 
