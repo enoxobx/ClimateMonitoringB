@@ -145,7 +145,7 @@ public class Login extends LayoutStandard {
                     showErrorMessage("Troppi tentativi falliti. Contatta l'amministratore.");
                     loginButton.setEnabled(false);
                 } else {
-                    showErrorMessage("Username, codice fiscale o password errati!");
+                    showErrorMessage("Username o password errati!");
                 }
             }
         } catch (Exception ex) {

@@ -31,17 +31,16 @@ public class QueryExecutorImpl {
 
 
     // Metodo di login
-    public boolean login(String usernameOrCodiceFiscale, String password) {
+    public boolean login(String username, String password) {
         boolean loginSuccess = false;
 
         try {
             ensureConnection(); // Verifica che la connessione sia attiva
 
-            String query = "SELECT * FROM operatori WHERE (username = ? OR codice_fiscale = ?) AND password = ?";
+            String query = "SELECT * FROM operatori WHERE username = ? AND password = ?";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.setString(1, usernameOrCodiceFiscale);
-                stmt.setString(2, usernameOrCodiceFiscale);
-                stmt.setString(3, password);
+                stmt.setString(1, username);
+                stmt.setString(2, password);
 
                 try (ResultSet resultSet = stmt.executeQuery()) {
                     if (resultSet.next()) {

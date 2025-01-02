@@ -16,8 +16,6 @@ public class LayoutOperatore extends LayoutStandard {
 
     private final String username;
     private final JButton aggiungiDatiClimatici;
-    private final JButton salvaDatiButton;
-    private final JButton indietroButton;
     private final JButton creaCentroButton;
     private final JList<String> centriList;
     private final DefaultListModel<String> listaCentriModel;
@@ -84,21 +82,15 @@ public class LayoutOperatore extends LayoutStandard {
         // Pannello inferiore per i bottoni di azione
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         actionPanel.setBackground(Color.WHITE);
-        salvaDatiButton = new JButton("Salva Dati");
-        indietroButton = new JButton("Indietro");
-        customizeButton(salvaDatiButton);
-        customizeButton(indietroButton);
+        // Aggiungi il bottone "Home" che è già stato creato in LayoutStandard
+        container.add(home, BorderLayout.WEST);
 
-        actionPanel.add(indietroButton);
-        actionPanel.add(salvaDatiButton);
 
         container.add(actionPanel, BorderLayout.SOUTH);
 
         // Aggiungi action listeners
         Gestore gestore = new Gestore();
         aggiungiDatiClimatici.addActionListener(gestore);
-        salvaDatiButton.addActionListener(gestore);
-        indietroButton.addActionListener(gestore);
         creaCentroButton.addActionListener(gestore);
 
         setVisible(true);
@@ -335,11 +327,6 @@ public class LayoutOperatore extends LayoutStandard {
             if (e.getSource() == aggiungiDatiClimatici) {
                 apriFinestraDatiClimatici();
                 QueryExecutorImpl q = new QueryExecutorImpl();
-
-            } else if (e.getSource() == salvaDatiButton) {
-                JOptionPane.showMessageDialog(null, "Dati salvati.");
-            } else if (e.getSource() == indietroButton) {
-                dispose();
             } else if (e.getSource() == creaCentroButton) {
                 apriFinestraCreaCentro();
             }
