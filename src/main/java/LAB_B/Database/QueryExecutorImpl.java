@@ -29,27 +29,6 @@ public class QueryExecutorImpl {
         }
     }
 
-    public List<String> getCentriPerOperatore(String id) throws SQLException {
-        ensureConnection(); // Assicura che la connessione al database sia attiva
-
-        String query = "SELECT nomeCentro " +
-                "FROM centrimonitoraggio  " +
-                "JOIN operatori ON username_operatore = username " +
-                "WHERE username = ?";
-        List<String> centri = new ArrayList<>();
-
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, id); // Associa il parametro username
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    centri.add(rs.getString("nomecentro")); // Aggiungi il nome del centro alla lista
-                }
-            }
-        }
-        return centri;
-    }
-
-
 
 
     public boolean salvaCentroMonitoraggio(String id, String nomeCentro, String descrizione, String currentUsername) throws SQLException {
@@ -59,9 +38,9 @@ public class QueryExecutorImpl {
         String query = "INSERT INTO centrimonitoraggio (id, nomeCentro, descrizione, username_operatore) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(3, id);
-            stmt.setString(1, nomeCentro);
-            stmt.setString(2, descrizione);
+            stmt.setString(1, id);
+            stmt.setString(2, nomeCentro);
+            stmt.setString(3, descrizione);
             stmt.setString(4, currentUsername);  // Aggiungi l'operatore corrente
 
             int rowsAffected = stmt.executeUpdate();
@@ -74,24 +53,32 @@ public class QueryExecutorImpl {
     }
 
 
-    public void salvaDatiClimatici(String key, String centroID, JComboBox<Integer>[] scoreDropdowns, JTextArea[] severitaTextAreas) {
+    public void salvaDatiClimatici(String centroID, JComboBox<Integer>[] scoreDropdowns, JTextArea[] severitaTextAreas) {
         String query = "INSERT INTO dati_climatici (" +
-                "key, centro_id, velocita_vento_score, velocita_vento_note, " +
-                "temperatura_score, temperatura_note, umidita_score, umidita_note, " +
-                "precipitazioni_score, precipitazioni_note) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, key); // Chiave primaria
-            stmt.setString(2, centroID); // ID del centro
-            stmt.setInt(3, (Integer) scoreDropdowns[0].getSelectedItem()); // velocita_vento_score
-            stmt.setString(4, severitaTextAreas[0].getText()); // velocita_vento_note
-            stmt.setInt(5, (Integer) scoreDropdowns[1].getSelectedItem()); // temperatura_score
-            stmt.setString(6, severitaTextAreas[1].getText()); // temperatura_note
-            stmt.setInt(7, (Integer) scoreDropdowns[2].getSelectedItem()); // umidita_score
-            stmt.setString(8, severitaTextAreas[2].getText()); // umidita_note
-            stmt.setInt(9, (Integer) scoreDropdowns[3].getSelectedItem()); // precipitazioni_score
-            stmt.setString(10, severitaTextAreas[3].getText()); // precipitazioni_note
 
+                "centro_id, velocita_vento_score, velocita_vento_note, " +
+                "temperatura_score, temperatura_note, " +
+                "umidita_score, umidita_note, " +
+                "precipitazioni_score, precipitazioni_note) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, centroID); // ID del centro
+
+            // Parametri climatici e relativi punteggi e note
+            stmt.setInt(2, (Integer) scoreDropdowns[0].getSelectedItem()); // velocita_vento_score
+            stmt.setString(3, severitaTextAreas[0].getText()); // velocita_vento_note
+
+            stmt.setInt(4, (Integer) scoreDropdowns[1].getSelectedItem()); // temperatura_score
+            stmt.setString(5, severitaTextAreas[1].getText()); // temperatura_note
+
+            stmt.setInt(6, (Integer) scoreDropdowns[2].getSelectedItem()); // umidita_score
+            stmt.setString(7, severitaTextAreas[2].getText()); // umidita_note
+
+            stmt.setInt(8, (Integer) scoreDropdowns[3].getSelectedItem()); // precipitazioni_score
+            stmt.setString(9, severitaTextAreas[3].getText()); // precipitazioni_note
+
+            // Esegui la query
             stmt.executeUpdate();
             JOptionPane.showMessageDialog(null, "Dati climatici salvati con successo.");
         } catch (SQLException e) {

@@ -105,6 +105,8 @@ public class LayoutOperatore extends LayoutStandard {
         titleLable = null;
     }
 
+
+
     private void caricaCentri() {
         listaCentriModel.clear(); // Svuota la lista esistente
         try {
@@ -122,6 +124,107 @@ public class LayoutOperatore extends LayoutStandard {
                     "Errore durante il caricamento dei centri: " + ex.getMessage(),
                     "Errore", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void apriFinestraDatiClimatici() {
+        JFrame datiClimaticiFrame = new JFrame("Dati Climatici");
+        datiClimaticiFrame.setSize(600, 600); // Aumentata la dimensione per dare più spazio
+        datiClimaticiFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        datiClimaticiFrame.setLocationRelativeTo(this);
+
+        // Layout e componenti della finestra
+        Container container = datiClimaticiFrame.getContentPane();
+        container.setLayout(new BorderLayout());
+
+        JLabel label = new JLabel("Inserisci Parametri Climatici", SwingConstants.CENTER);
+        label.setFont(new Font("Arial", Font.BOLD, 18));
+        container.add(label, BorderLayout.NORTH);
+
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // Dropdown per selezionare il centro
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panel.add(new JLabel("Seleziona Centro:"), gbc);
+
+        JComboBox<String> centriDropdown = new JComboBox<>();
+        for (int i = 0; i < listaCentriModel.size(); i++) {
+            centriDropdown.addItem(listaCentriModel.getElementAt(i));
+        }
+        if (listaCentriModel.isEmpty()) {
+            centriDropdown.addItem("Nessun centro disponibile");
+        }
+        gbc.gridx = 1;
+        panel.add(centriDropdown, gbc);
+
+        // Parametri climatici con score e area di testo per severità
+        String[] parametri = {"Velocità Vento", "Temperatura", "Umidità", "Precipitazioni"};
+        JComboBox<Integer>[] scoreDropdowns = new JComboBox[parametri.length]; // Array per i dropdown di score
+        JTextArea[] severitaTextAreas = new JTextArea[parametri.length]; // Array per le JTextArea
+
+        for (int i = 0; i < parametri.length; i++) {
+            gbc.gridy++;
+            gbc.gridx = 0;
+            panel.add(new JLabel(parametri[i] + " (Score 1-5):"), gbc);
+
+            // Dropdown per il punteggio (Score 1-5)
+            scoreDropdowns[i] = new JComboBox<>(new Integer[]{1, 2, 3, 4, 5});
+            gbc.gridx = 1;
+            panel.add(scoreDropdowns[i], gbc);
+
+            // Area di testo per inserire la severità
+            gbc.gridx = 0;
+            gbc.gridy++;
+            panel.add(new JLabel("Note (max 256 caratteri) " + parametri[i] + ":"), gbc);
+
+            severitaTextAreas[i] = new JTextArea(3, 20); // 3 righe e 20 colonne
+            severitaTextAreas[i].setLineWrap(true); // Abilita il wrapping del testo
+            severitaTextAreas[i].setWrapStyleWord(true); // Parola intera a capo
+            severitaTextAreas[i].setDocument(new javax.swing.text.PlainDocument() {
+                @Override
+                public void insertString(int offs, String str, javax.swing.text.AttributeSet a) {
+                    if (getLength() + str.length() <= 256) {  // Limita a 256 caratteri
+                        try {
+                            super.insertString(offs, str, a);
+                        } catch (BadLocationException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+            });
+            JScrollPane scrollPane = new JScrollPane(severitaTextAreas[i]);
+            scrollPane.setPreferredSize(new Dimension(200, 60)); // Ridimensionato per una visualizzazione ottimale
+            gbc.gridx = 1;
+            panel.add(scrollPane, gbc);
+        }
+
+        container.add(panel, BorderLayout.CENTER);
+
+        // Bottone per salvare i parametri
+        JButton salvaButton = new JButton("Salva Parametri");
+        salvaButton.setPreferredSize(new Dimension(150, 40));
+        salvaButton.setBackground(new Color(34, 139, 34));
+        salvaButton.setForeground(Color.WHITE);
+        salvaButton.setFont(new Font("Arial", Font.BOLD, 14));
+        salvaButton.addActionListener(e -> {
+            if (centriDropdown.getSelectedItem() == null || centriDropdown.getSelectedItem().equals("Nessun centro disponibile")) {
+                JOptionPane.showMessageDialog(datiClimaticiFrame, "Seleziona un centro prima di salvare!", "Errore", JOptionPane.ERROR_MESSAGE);
+            } else {
+                String centroID = (String) centriDropdown.getSelectedItem();
+
+                // Salva i dati nel database
+                QueryExecutorImpl q = new QueryExecutorImpl();
+                q.salvaDatiClimatici(centroID, scoreDropdowns, severitaTextAreas);
+            }
+        });
+        container.add(salvaButton, BorderLayout.SOUTH);
+
+        datiClimaticiFrame.setVisible(true);
+        container.add(salvaButton, BorderLayout.SOUTH);
+
     }
 
     private void apriFinestraCreaCentro() {
@@ -160,7 +263,7 @@ public class LayoutOperatore extends LayoutStandard {
                 boolean success = false;
 
                 try {
-                    success = queryExecutor.salvaCentroMonitoraggio(id, nomeCentro, descrizione);
+                    success = queryExecutor.salvaCentroMonitoraggio(id, nomeCentro, descrizione,username);
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(createCenterFrame, "Errore nel database: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
                 }
@@ -180,6 +283,9 @@ public class LayoutOperatore extends LayoutStandard {
 
         createCenterFrame.setVisible(true);
     }
+
+
+
 
     private void customizeButton(JButton button) {
         button.setPreferredSize(new Dimension(220, 45));
@@ -205,11 +311,5 @@ public class LayoutOperatore extends LayoutStandard {
                 apriFinestraCreaCentro();
             }
         }
-    }
-}
-
-    public static void main(String[] args) {
-        String usernameRegistrato = "nomeOperatore"; // Sostituisci con il nome dell'operatore
-        new LayoutOperatore(usernameRegistrato);
     }
 }
