@@ -127,6 +127,7 @@ public class LayoutOperatore extends LayoutStandard {
     }
 
     private void apriFinestraDatiClimatici() {
+
         JFrame datiClimaticiFrame = new JFrame("Dati Climatici");
         datiClimaticiFrame.setSize(600, 600); // Aumentata la dimensione per dare più spazio
         datiClimaticiFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -165,6 +166,16 @@ public class LayoutOperatore extends LayoutStandard {
         JComboBox<Integer>[] scoreDropdowns = new JComboBox[parametri.length]; // Array per i dropdown di score
         JTextArea[] severitaTextAreas = new JTextArea[parametri.length]; // Array per le JTextArea
 
+// Campo per l'inserimento del valore della chiave primaria "key"
+        gbc.gridy++;
+        gbc.gridx = 0;
+        panel.add(new JLabel("Key (ID univoco):"), gbc);
+
+        JTextField keyField = new JTextField(20);
+        gbc.gridx = 1;
+        panel.add(keyField, gbc);
+
+// Loop per aggiungere i parametri climatici
         for (int i = 0; i < parametri.length; i++) {
             gbc.gridy++;
             gbc.gridx = 0;
@@ -201,31 +212,47 @@ public class LayoutOperatore extends LayoutStandard {
             panel.add(scrollPane, gbc);
         }
 
-        container.add(panel, BorderLayout.CENTER);
 
-        // Bottone per salvare i parametri
-        JButton salvaButton = new JButton("Salva Parametri");
-        salvaButton.setPreferredSize(new Dimension(150, 40));
-        salvaButton.setBackground(new Color(34, 139, 34));
-        salvaButton.setForeground(Color.WHITE);
-        salvaButton.setFont(new Font("Arial", Font.BOLD, 14));
-        salvaButton.addActionListener(e -> {
-            if (centriDropdown.getSelectedItem() == null || centriDropdown.getSelectedItem().equals("Nessun centro disponibile")) {
-                JOptionPane.showMessageDialog(datiClimaticiFrame, "Seleziona un centro prima di salvare!", "Errore", JOptionPane.ERROR_MESSAGE);
-            } else {
-                String centroID = (String) centriDropdown.getSelectedItem();
 
-                // Salva i dati nel database
-                QueryExecutorImpl q = new QueryExecutorImpl();
-                q.salvaDatiClimatici(centroID, scoreDropdowns, severitaTextAreas);
+        // Pulsante "Salva Parametri"
+        gbc.gridy++;
+        gbc.gridx = 0;
+        gbc.gridwidth = 2;
+        JButton salvaParametriButton = new JButton("Salva Parametri");
+        panel.add(salvaParametriButton, gbc);
+
+        salvaParametriButton.addActionListener(e -> {
+            // Validazione dei dati
+            String key = keyField.getText();
+            String centro = (String) centriDropdown.getSelectedItem();
+            if (key.isEmpty() || centro == null || centro.equals("Nessun centro disponibile")) {
+                JOptionPane.showMessageDialog(datiClimaticiFrame, "Compila tutti i campi obbligatori.", "Errore", JOptionPane.ERROR_MESSAGE);
+                return;
             }
+
+            // Raccolta dei dati inseriti
+            StringBuilder datiInseriti = new StringBuilder("Key: " + key + "\nCentro: " + centro + "\n");
+            for (int i = 0; i < parametri.length; i++) {
+                datiInseriti.append(parametri[i])
+                        .append(" - Score: ")
+                        .append(scoreDropdowns[i].getSelectedItem())
+                        .append(", Note: ")
+                        .append(severitaTextAreas[i].getText())
+                        .append("\n");
+            }
+
+            QueryExecutorImpl q = new QueryExecutorImpl();
+            q.salvaDatiClimatici(key,centro,scoreDropdowns,severitaTextAreas);
+
+            // Mostra un messaggio di conferma
+            JOptionPane.showMessageDialog(datiClimaticiFrame, "Dati salvati localmente:\n" + datiInseriti, "Successo", JOptionPane.INFORMATION_MESSAGE);
+            datiClimaticiFrame.dispose();
         });
-        container.add(salvaButton, BorderLayout.SOUTH);
 
+        container.add(panel, BorderLayout.CENTER);
         datiClimaticiFrame.setVisible(true);
-        container.add(salvaButton, BorderLayout.SOUTH);
-
     }
+
 
     private void apriFinestraCreaCentro() {
         JFrame createCenterFrame = new JFrame("Crea Centro Monitoraggio");
@@ -280,7 +307,7 @@ public class LayoutOperatore extends LayoutStandard {
 
         container.add(new JLabel());
         container.add(salvaCentroButton);
-
+        QueryExecutorImpl q = new QueryExecutorImpl();
         createCenterFrame.setVisible(true);
     }
 
@@ -302,7 +329,9 @@ public class LayoutOperatore extends LayoutStandard {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == aggiungiDatiClimatici) {
-                // Apre la finestra dei dati climatici
+                apriFinestraDatiClimatici();
+                QueryExecutorImpl q = new QueryExecutorImpl();
+
             } else if (e.getSource() == salvaDatiButton) {
                 JOptionPane.showMessageDialog(null, "Dati salvati.");
             } else if (e.getSource() == indietroButton) {

@@ -27,4 +27,5 @@ public interface Database extends Remote{
     List<Coordinate> getCoordinaResultSet()throws RemoteException ;
     public List<Coordinate> getCoordinaResultSet(String name) throws RemoteException;
     List<Coordinate> getCoordinaResultSet(double latitude, double longitude, double tollerance )throws RemoteException ;
+
 }

@@ -1,14 +1,14 @@
 -- Elimina il database esistente, se presente
-DROP DATABASE IF EXISTS "ClimateMonitoring";
+DROP DATABASE IF EXISTS "climate_monitoring";
 
-COMMENT ON DATABASE "ClimateMonitoring"
+COMMENT ON DATABASE "climate_monitoring"
     IS 'DB per LAB B';
 
-GRANT TEMPORARY, CONNECT ON DATABASE "ClimateMonitoring" TO PUBLIC;
+GRANT TEMPORARY, CONNECT ON DATABASE "climate_monitoring" TO PUBLIC;
 
-GRANT ALL ON DATABASE "ClimateMonitoring" TO agent1;
+GRANT ALL ON DATABASE "climate_monitoring" TO agent1;
 
-GRANT ALL ON DATABASE "ClimateMonitoring" TO postgres;
+GRANT ALL ON DATABASE "climate_monitoring" TO postgres;
 
 -- Tabella Citta
 CREATE TABLE Citta (
@@ -20,6 +20,21 @@ CREATE TABLE Citta (
                        longitude FLOAT8 NOT NULL,
                        latitude FLOAT8 NOT NULL
 );
+
+CREATE TABLE dati_climatici (
+                                key varchar(255) PRIMARY KEY,
+                                centro_id VARCHAR(255) NOT NULL,
+                                velocita_vento_score INT NOT NULL,
+                                velocita_vento_note VARCHAR(256),
+                                temperatura_score INT NOT NULL,
+                                temperatura_note VARCHAR(256),
+                                umidita_score INT NOT NULL,
+                                umidita_note VARCHAR(256),
+                                precipitazioni_score INT NOT NULL,
+                                precipitazioni_note VARCHAR(256),
+                                data_inserimento TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 
 -- Tabella operatori
 CREATE TABLE operatori (

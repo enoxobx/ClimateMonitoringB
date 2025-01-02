@@ -2,6 +2,7 @@ package LAB_B.Database;
 
 import LAB_B.Common.Interface.*;
 
+import javax.swing.*;
 import java.util.List;
 import java.util.Properties;
 import java.rmi.RemoteException;
@@ -88,8 +89,6 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
         }
     }
 
-    // Implementazione dei metodi dell'interfaccia Database
-
     @Override
     public ResultSet executeQuery(String query, Object... params) throws RemoteException, SQLException {
         // Implementazione di executeQuery, se necessario
@@ -157,6 +156,7 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
             return null;
         }
     }
+
 
 
 }
