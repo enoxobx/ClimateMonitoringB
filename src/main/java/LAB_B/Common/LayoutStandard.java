@@ -21,6 +21,17 @@ abstract public class LayoutStandard extends JFrame {
     // Costruttore della classe LayoutStandard
     public LayoutStandard() {
         super("Climate Monitoring");  // Titolo della finestra
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            // Handle exception if Nimbus is not available
+            e.printStackTrace();
+        }
 
         // Ottiene il contenitore della finestra (il pannello principale)
         body = getContentPane();
@@ -48,7 +59,7 @@ abstract public class LayoutStandard extends JFrame {
     // In particolare, imposta le dimensioni fisse, la chiusura dell'applicazione
     // al termine della finestra e la posizione centrata.
     protected void setDefaultProperties() {
-        setSize(600, 400); // Imposta la dimensione della finestra
+        setSize(800, 800); // Imposta la dimensione della finestra
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Chiude l'applicazione quando la finestra viene chiusa
         setLocationRelativeTo(null); // Centra la finestra sullo schermo
         setResizable(false); // Disabilita la possibilità di ridimensionare la finestra

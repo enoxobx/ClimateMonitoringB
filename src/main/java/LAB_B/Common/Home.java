@@ -45,7 +45,8 @@ public class Home extends JFrame {
         bottoneCittadino = new JButton("Cittadino");
         bottoneCittadino.setPreferredSize(new Dimension(200, 50)); // Imposta le dimensioni preferite del bottone
         bottoneCittadino.setFont(new Font("Arial", Font.PLAIN, 16)); // Imposta il font del testo nel bottone
-        bottoneCittadino.setBackground(new Color(100, 200, 255)); // Imposta il colore di sfondo del bottone
+        bottoneCittadino.setBackground(new Color(103, 187, 246)); // Imposta il colore di sfondo del bottone
+        bottoneCittadino.setOpaque(true);
         bottoneCittadino.setForeground(Color.WHITE); // Imposta il colore del testo nel bottone
         bottoneCittadino.setBorder(BorderFactory.createLineBorder(Color.BLUE, 2)); // Imposta il bordo del bottone
         bottoneCittadino.setFocusPainted(false); // Rimuove l'effetto del bordo quando il bottone è selezionato
@@ -66,7 +67,7 @@ public class Home extends JFrame {
         bottoneOperatore = new JButton("Operatore");
         bottoneOperatore.setPreferredSize(new Dimension(200, 50)); // Imposta le dimensioni preferite del bottone
         bottoneOperatore.setFont(new Font("Arial", Font.PLAIN, 16)); // Imposta il font del testo nel bottone
-        bottoneOperatore.setBackground(new Color(100, 200, 255)); // Imposta il colore di sfondo del bottone
+        bottoneOperatore.setBackground(new Color(103, 187, 246)); // Imposta il colore di sfondo del bottone
         bottoneOperatore.setForeground(Color.WHITE); // Imposta il colore del testo nel bottone
         bottoneOperatore.setBorder(BorderFactory.createLineBorder(Color.BLUE, 2)); // Imposta il bordo del bottone
         bottoneOperatore.setFocusPainted(false); // Rimuove l'effetto del bordo quando il bottone è selezionato
@@ -76,7 +77,7 @@ public class Home extends JFrame {
         ImageIcon operatoreIcon = new ImageIcon("path_to_icon/operatore_icon.png");
         bottoneOperatore.setIcon(operatoreIcon); // Imposta l'icona nel bottone
         bottoneOperatore.setHorizontalTextPosition(SwingConstants.CENTER); // Posiziona il testo sotto l'icona
-
+        bottoneOperatore.setOpaque(true);
         // Aggiungi il bottone "Operatore" al layout
         gbc.gridx = 0; // Imposta la colonna
         gbc.gridy = 2; // Imposta la riga

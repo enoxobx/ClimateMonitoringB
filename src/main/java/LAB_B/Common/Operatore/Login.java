@@ -27,14 +27,11 @@ public class Login extends LayoutStandard {
 
     private int loginAttempts = 0;
 
-    private String dbUrl;
-    private String dbUsername;
-    private String dbPassword;
+
 
     public Login() {
         super(); // Richiama il costruttore di LayoutStandard
 
-        loadDatabaseConfig();
         setTitle("Login");
 
         setupUI();
@@ -43,18 +40,7 @@ public class Login extends LayoutStandard {
         setVisible(true);
     }
 
-    private void loadDatabaseConfig() {
-        Properties properties = new Properties();
-        try {
-            properties.load(getClass().getClassLoader().getResourceAsStream("config.properties"));
-            dbUrl = properties.getProperty("db.url");
-            dbUsername = properties.getProperty("db.username");
-            dbPassword = properties.getProperty("db.password");
-        } catch (IOException e) {
-            System.err.println("Errore nel caricamento del file di configurazione: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
+
 
     private void setupUI() {
         // Pannello centrale per input e bottoni
@@ -100,6 +86,8 @@ public class Login extends LayoutStandard {
 
         buttonPanel.add(loginButton);
         buttonPanel.add(registerButton);
+        loginButton.repaint();
+
         return buttonPanel;
     }
 
