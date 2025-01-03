@@ -7,15 +7,15 @@ import java.util.regex.Pattern;
 
 public class Operatore {
 
-    private String nome;
-    private String cognome;
-    private String codFiscale;
-    private String email;
-    private String password;
-    private String confermaPassword;  // Aggiunto campo per conferma password
-    private String centroMonitoraggio;
+    private final String nome;
+    private final String cognome;
+    private final String codFiscale;
+    private final String email;
+    private final String password;
+    private final String confermaPassword;  // Aggiunto campo per conferma password
+    private final String centroMonitoraggio;
     private String username;
-    private StringBuilder err = new StringBuilder();
+    private final StringBuilder err = new StringBuilder();
 
     // Costruttore completo con tutti i parametri
     public Operatore(String nome, String cognome, String codFiscale, String email, String password, String confermaPassword, String centroMonitoraggio, String username) {

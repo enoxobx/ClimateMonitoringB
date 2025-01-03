@@ -5,6 +5,7 @@ import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Locale;
@@ -102,8 +103,7 @@ public class LayoutOperatore extends LayoutStandard {
     private void caricaCentri() {
         listaCentriModel.clear(); // Svuota la lista esistente
         try {
-            QueryExecutorImpl queryExecutor = new QueryExecutorImpl();
-            List<String> centri = queryExecutor.getCentriPerOperatore(username); // Carica i centri dal database
+            List<String> centri = db.getCentriPerOperatore(username); // Carica i centri dal database
             if (centri.isEmpty()) {
                 listaCentriModel.addElement("Nessun centro disponibile");
             } else {
@@ -111,7 +111,7 @@ public class LayoutOperatore extends LayoutStandard {
                     listaCentriModel.addElement(centro); // Aggiungi ogni centro al modello della lista
                 }
             }
-        } catch (SQLException ex) {
+        } catch (RemoteException ex) {
             JOptionPane.showMessageDialog(this,
                     "Errore durante il caricamento dei centri: " + ex.getMessage(),
                     "Errore", JOptionPane.ERROR_MESSAGE);
@@ -300,12 +300,12 @@ public class LayoutOperatore extends LayoutStandard {
             if (id.isEmpty() || nomeCentro.isEmpty() || descrizione.isEmpty()) {
                 JOptionPane.showMessageDialog(createCenterFrame, "Tutti i campi sono obbligatori", "Errore", JOptionPane.ERROR_MESSAGE);
             } else {
-                QueryExecutorImpl queryExecutor = new QueryExecutorImpl();
                 boolean success = false;
 
                 try {
-                    success = queryExecutor.salvaCentroMonitoraggio(id, nomeCentro, descrizione,username);
-                } catch (SQLException ex) {
+
+                    success = db.salvaCentroMonitoraggio(nomeCentro, descrizione,username);
+                } catch (RemoteException ex) {
                     JOptionPane.showMessageDialog(createCenterFrame, "Errore nel database: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
                 }
 
@@ -344,7 +344,6 @@ public class LayoutOperatore extends LayoutStandard {
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == aggiungiDatiClimatici) {
                 apriFinestraDatiClimatici();
-                QueryExecutorImpl q = new QueryExecutorImpl();
             } else if (e.getSource() == creaCentroButton) {
                 apriFinestraCreaCentro();
             }

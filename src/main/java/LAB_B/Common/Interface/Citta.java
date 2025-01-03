@@ -1,13 +1,13 @@
 package LAB_B.Common.Interface;
 
 public class Citta {
-    private String geoname_id;
-    private String name;
-    private String ascii_name;
-    private String country_code;
-    private String country_name;
-    private double longitude;
-    private double latitude;
+    private final String geoname_id;
+    private final String name;
+    private final String ascii_name;
+    private final String country_code;
+    private final String country_name;
+    private final double longitude;
+    private final double latitude;
 
     public Citta(String geoname, String name, String ascii_name,String country_code,String country_name, double longitude,double latitude ){
         this.geoname_id=geoname;

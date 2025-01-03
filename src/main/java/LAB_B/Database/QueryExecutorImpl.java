@@ -58,28 +58,78 @@ public class QueryExecutorImpl {
         return loginSuccess;
     }
 
+    private List<String> getIDCentri(){
 
-
-
-    public boolean salvaCentroMonitoraggio(String id, String nomeCentro, String descrizione, String currentUsername) throws SQLException {
-        ensureConnection();
-
-        // La query aggiornata ora include la colonna 'username_operatore'
-        String query = "INSERT INTO centrimonitoraggio (id, nomeCentro, descrizione, username_operatore) VALUES (?, ?, ?, ?)";
-
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, id);
-            stmt.setString(2, nomeCentro);
-            stmt.setString(3, descrizione);
-            stmt.setString(4, currentUsername);  // Aggiungi l'operatore corrente
-
-            int rowsAffected = stmt.executeUpdate();
-            conn.commit(); // Forza il salvataggio nel database
-            return rowsAffected > 0;
+        List<String> ids = new ArrayList<String>();
+        try {
+            ensureConnection();
+            String query = "select id from centrimonitoraggio;";
+            try(PreparedStatement stmt = conn.prepareStatement(query)){
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()){
+                    ids.add(rs.getString("id"));
+                }
+            }
         } catch (SQLException e) {
-            conn.rollback(); // Annulla la transazione in caso di errore
-            throw e;
+            //TODO
         }
+
+        return ids;
+
+    }
+
+    private String getCF(String username){
+        String res ="";
+        try {
+            ensureConnection();
+            String query = "select codice_fiscale from operatori where username = ?;";
+            try(PreparedStatement stmt = conn.prepareStatement(query)){
+                stmt.setString(1,username);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) { // Verifica se sono presenti risultati
+                    res = rs.getString("codice_fiscale");
+                }
+            }
+        } catch (SQLException e) {
+            //TODO: gestire l'eccezione (ad esempio, log, rilancio)
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+
+
+    public boolean salvaCentroMonitoraggio(String nomeCentro, String descrizione, String currentUsername)  {
+        try {
+            ensureConnection();
+
+            List<String> idsCentri = getIDCentri();
+            int i =0;
+            String id =String.format(idsCentri.getLast()+"%03d",i);
+            while(idsCentri.contains(id)) {
+                id = String.format(idsCentri.getLast()+"%03d", ++i);
+            }
+            String query = "INSERT INTO centrimonitoraggio (id, nomeCentro, indirizzo) VALUES (?, ?, ?);"+
+                    "INSERT INTO lavora(cf,centrimonitoraggio_id) values (?,?);";
+
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, id);
+                stmt.setString(2, nomeCentro);
+                stmt.setString(3, descrizione);  // Aggiungi l'operatore corrente
+                String cf = getCF(currentUsername);
+                stmt.setString(4, cf);
+                stmt.setString(5,id);
+                int rowsAffected = stmt.executeUpdate();
+                conn.commit(); // Forza il salvataggio nel database
+                return rowsAffected > 0;
+            } catch (SQLException e) {
+                conn.rollback(); // Annulla la transazione in caso di errore
+                throw e;
+            }
+        } catch (SQLException e) {
+            //TODO
+        }
+        return false;
     }
 
 
@@ -348,53 +398,27 @@ public class QueryExecutorImpl {
         return coordinates;
     }
 
-    public List<String> getCentriPerOperatore(String username) throws SQLException {
+    public List<String> getCentriPerOperatore(String username)  {
         List<String> centrimonitoraggio = new ArrayList<>();
-        String query = "SELECT id FROM centrimonitoraggio " +
-                "JOIN operatori ON username = username_operatore " +
-                "WHERE username = ?";
-
-        ensureConnection(); // Assicurati che la connessione sia attiva
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, username);  // Imposta il parametro correttamente
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    centrimonitoraggio.add(rs.getString("id"));
+        String query = "SELECT nomecentro\n" +
+                "FROM lavora,operatori,centrimonitoraggio\n" +
+                "WHERE cf = username AND id = centrimonitoraggio_id " +
+                "AND username = ?";
+        try {
+            ensureConnection(); // Assicurati che la connessione sia attiva
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, username);  // Imposta il parametro correttamente
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        centrimonitoraggio.add(rs.getString("nomecentro"));
+                    }
                 }
             }
-        }
-        return centrimonitoraggio;
-    }
-
-
-
-
-    private List<String> recuperaCentriAssociati(String username) {
-        List<String> centri = new ArrayList<>();
-
-        // Esegui la query sul database per recuperare i centri associati
-        // Usa una classe QueryExecutorImpl o un'altra classe di accesso al database
-        QueryExecutorImpl queryExecutor = new QueryExecutorImpl();
-
-        try {
-            // Verifica che lo username non sia nullo o vuoto
-            if (username == null || username.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Nome utente non valido.", "Errore", JOptionPane.ERROR_MESSAGE);
-                return centri;
-            }
-
-            // Recupera i centri dal database
-            centri = queryExecutor.getCentriPerOperatore(username);
-            if (centri.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Nessun centro trovato per l'operatore: " + username, "Nessun dato", JOptionPane.INFORMATION_MESSAGE);
-            }
         } catch (SQLException e) {
-            // Stampa l'errore completo per un debug più dettagliato
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Errore durante il recupero dei centri: " + e.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
+            throw new RuntimeException(e);
         }
 
-        return centri;
+        return centrimonitoraggio;
     }
 
 

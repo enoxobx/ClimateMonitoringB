@@ -25,7 +25,9 @@ public interface Database extends Remote{
     boolean registrazione(Operatore operatore) throws RemoteException;
 
     List<Coordinate> getCoordinaResultSet()throws RemoteException ;
-    public List<Coordinate> getCoordinaResultSet(String name) throws RemoteException;
+    List<Coordinate> getCoordinaResultSet(String name) throws RemoteException;
     List<Coordinate> getCoordinaResultSet(double latitude, double longitude, double tollerance )throws RemoteException ;
 
+    List<String> getCentriPerOperatore(String username)throws RemoteException;
+    boolean salvaCentroMonitoraggio(String nomeCentro,String descrizione,String username) throws RemoteException;
 }

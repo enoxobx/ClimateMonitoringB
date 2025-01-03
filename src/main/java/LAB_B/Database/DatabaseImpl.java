@@ -140,6 +140,19 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
         }
 
     }
+
+    @Override
+    public List<String> getCentriPerOperatore(String username) throws RemoteException {
+        if(queryExecutorImpl == null) queryExecutorImpl = new QueryExecutorImpl();
+        return queryExecutorImpl.getCentriPerOperatore(username);
+    }
+
+    @Override
+    public boolean salvaCentroMonitoraggio(String nomeCentro, String descrizione, String username) throws RemoteException {
+        if(queryExecutorImpl == null)queryExecutorImpl = new QueryExecutorImpl();
+        return queryExecutorImpl.salvaCentroMonitoraggio(nomeCentro,descrizione,username );
+    }
+
     @Override
     public List<Coordinate> getCoordinaResultSet(String name) throws RemoteException {
 
