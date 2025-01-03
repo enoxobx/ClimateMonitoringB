@@ -101,11 +101,19 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
         return 0; // Placeholder
     }
 
+
     @Override
     public boolean login(String codiceFiscale, String password) throws RemoteException, SQLException {
-        // Implementazione di login, se necessario
-        return false; // Placeholder
+        try {
+            if (queryExecutorImpl == null) queryExecutorImpl = new QueryExecutorImpl();
+            return queryExecutorImpl.login(codiceFiscale, password);
+        } catch (Exception e) {
+            // Gestione di altre eccezioni generiche
+            e.printStackTrace();
+            return false;
+        }
     }
+
 
     // Metodo per la registrazione di un operatore
     @Override

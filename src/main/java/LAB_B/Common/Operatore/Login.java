@@ -3,6 +3,7 @@ package LAB_B.Common.Operatore;
 import LAB_B.Client.Client;
 import LAB_B.Common.LayoutStandard;
 import LAB_B.Common.Home;
+import LAB_B.Database.DatabaseImpl;
 import LAB_B.Database.QueryExecutorImpl;
 
 import javax.swing.*;
@@ -132,8 +133,8 @@ public class Login extends LayoutStandard {
 
     private void performLogin(String username, String password) {
         try {
-            QueryExecutorImpl queryExecutor = new QueryExecutorImpl();
-            boolean success = queryExecutor.login(username, password);
+             db = new DatabaseImpl();
+            boolean success = db.login(username, password);
 
             if (success) {
                 showSuccessMessage("Login effettuato con successo!");

@@ -49,7 +49,10 @@ public class QueryExecutorImpl {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();  // Per il debug, è possibile loggare l'errore
+            // Gestione dell'eccezione SQL
+            System.err.println("Errore durante l'esecuzione del login: " + e.getMessage());
+            e.printStackTrace(); // Facoltativo: per debugging dettagliato
+            // Puoi usare un logger per salvare il messaggio di errore in un file di log
         }
 
         return loginSuccess;

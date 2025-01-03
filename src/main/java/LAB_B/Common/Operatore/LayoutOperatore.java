@@ -206,6 +206,7 @@ public class LayoutOperatore extends LayoutStandard {
 
 
 
+
         // Pulsante "Salva Parametri"
         gbc.gridy++;
         gbc.gridx = 0;
@@ -221,6 +222,8 @@ public class LayoutOperatore extends LayoutStandard {
                 JOptionPane.showMessageDialog(datiClimaticiFrame, "Compila tutti i campi obbligatori.", "Errore", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+
+
 
             // Raccolta dei dati inseriti
             StringBuilder datiInseriti = new StringBuilder("Key: " + key + "\nCentro: " + centro + "\n");
@@ -244,6 +247,21 @@ public class LayoutOperatore extends LayoutStandard {
             JOptionPane.showMessageDialog(datiClimaticiFrame, "Dati salvati localmente:\n" + datiInseriti, "Successo", JOptionPane.INFORMATION_MESSAGE);
             datiClimaticiFrame.dispose();
         });
+
+        // Pulsante "Indietro"
+        gbc.gridy++;
+        gbc.gridx = 0;
+        gbc.gridwidth = 2;
+        JButton indietroButton = new JButton("Indietro");
+        panel.add(indietroButton, gbc);
+
+        indietroButton.addActionListener(e -> {
+            // Torna alla pagina precedente
+            datiClimaticiFrame.dispose(); // Chiude il frame corrente
+            // Aggiungi qui il codice per mostrare il frame precedente, ad esempio:
+            // paginaPrecedenteFrame.setVisible(true);
+        });
+
 
         container.add(panel, BorderLayout.CENTER);
         datiClimaticiFrame.setVisible(true);
