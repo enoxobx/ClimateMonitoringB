@@ -16,9 +16,12 @@
             </node>
             <node kind="database">
               <name qname="ClimateMonitoring" />
-              <name qname="climate_monitoring" />
               <name qname="postgres" />
+              <name qname="climate_monitoring" />
               <node kind="schema" qname="public" />
+            </node>
+            <node kind="database" qname="climateMonitoring">
+              <node kind="schema" negative="1" />
             </node>
           </node>
         </introspection-scope>

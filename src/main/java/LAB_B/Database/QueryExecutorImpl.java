@@ -1,8 +1,10 @@
 package LAB_B.Database;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import LAB_B.Common.Interface.*;
 
@@ -99,35 +101,42 @@ public class QueryExecutorImpl {
 
 
 
-    public boolean salvaCentroMonitoraggio(String nomeCentro, String descrizione, String currentUsername)  {
-        try {
-            ensureConnection();
 
-            List<String> idsCentri = getIDCentri();
-            int i =0;
-            String id =String.format(idsCentri.getLast()+"%03d",i);
-            while(idsCentri.contains(id)) {
-                id = String.format(idsCentri.getLast()+"%03d", ++i);
-            }
-            String query = "INSERT INTO centrimonitoraggio (id, nomeCentro, indirizzo) VALUES (?, ?, ?);"+
-                    "INSERT INTO lavora(cf,centrimonitoraggio_id) values (?,?);";
+    public boolean salvaCentroMonitoraggio(String nomeCentro, String indirizzo, String username) {
+        // Generazione di un ID univoco usando UUID
+        String idCentro = UUID.randomUUID().toString();  // Genera un ID univoco
 
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.setString(1, id);
-                stmt.setString(2, nomeCentro);
-                stmt.setString(3, descrizione);  // Aggiungi l'operatore corrente
-                String cf = getCF(currentUsername);
-                stmt.setString(4, cf);
-                stmt.setString(5,id);
-                int rowsAffected = stmt.executeUpdate();
-                conn.commit(); // Forza il salvataggio nel database
-                return rowsAffected > 0;
-            } catch (SQLException e) {
-                conn.rollback(); // Annulla la transazione in caso di errore
-                throw e;
+        // Assicurati che il nomeCentro e l'indirizzo non siano vuoti
+        if (nomeCentro.isEmpty() || indirizzo.isEmpty()) {
+            throw new IllegalArgumentException("Nome centro e indirizzo sono obbligatori.");
+        }
+
+        // Logica per popolare la lista dei centri
+        List<String> centri = new ArrayList<>();
+        // Supponiamo che tu stia popolando la lista 'centri' con i dati provenienti da un database o altre fonti.
+
+        // Ad esempio, ora potresti salvare il nuovo centro nel database
+        // (supponendo che ci sia una query per inserire nel database)
+        String query = "INSERT INTO centrimonitoraggio (id, nomecentro, indirizzo, username) VALUES (?, ?, ?, ?)";
+
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            // Imposta il parametro dell'ID univoco
+            stmt.setString(1, idCentro);
+            stmt.setString(2, nomeCentro);
+            stmt.setString(3, indirizzo);
+            stmt.setString(4, username);
+
+            // Esegui l'operazione
+            int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                System.out.println("Centro monitoraggio salvato con successo.");
+            } else {
+                throw new SQLException("Errore durante il salvataggio del centro monitoraggio.");
             }
         } catch (SQLException e) {
-            //TODO
+            e.printStackTrace();
+            throw new RuntimeException("Errore nel salvataggio del centro monitoraggio.", e);
         }
         return false;
     }
@@ -139,22 +148,39 @@ public class QueryExecutorImpl {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        String query = "INSERT INTO dati_climatici (" +
-                "key, centro_id, velocita_vento_score, velocita_vento_note, " +
-                "temperatura_score, temperatura_note, umidita_score, umidita_note, " +
-                "precipitazioni_score, precipitazioni_note) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        String query = "INSERT INTO Parametro (" +
+                "ID, wind, humidity, pressure, temperature, precipitation, " +
+                "glacier_altitude, glacier_mass, wind_comment, humidity_comment, " +
+                "pressure_comment, temperature_comment, precipitation_comment, " +
+                "glacier_altitude_comment, glacier_mass_comment, wind_score, " +
+                "humidity_score, pressure_score, temperature_score, precipitation_score, " +
+                "glacier_altitude_score, glacier_mass_score) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, key); // Chiave primaria
-            stmt.setString(2, centroID); // ID del centro
-            stmt.setInt(3, (Integer) scoreDropdowns[0].getSelectedItem()); // velocita_vento_score
-            stmt.setString(4, severitaTextAreas[0].getText()); // velocita_vento_note
-            stmt.setInt(5, (Integer) scoreDropdowns[1].getSelectedItem()); // temperatura_score
-            stmt.setString(6, severitaTextAreas[1].getText()); // temperatura_note
-            stmt.setInt(7, (Integer) scoreDropdowns[2].getSelectedItem()); // umidita_score
-            stmt.setString(8, severitaTextAreas[2].getText()); // umidita_note
-            stmt.setInt(9, (Integer) scoreDropdowns[3].getSelectedItem()); // precipitazioni_score
-            stmt.setString(10, severitaTextAreas[3].getText()); // precipitazioni_note
+            stmt.setString(2, "N/A"); // wind (da definire)
+            stmt.setString(3, "N/A"); // humidity (da definire)
+            stmt.setString(4, "N/A"); // pressure (da definire)
+            stmt.setString(5, "N/A"); // temperature (da definire)
+            stmt.setString(6, "N/A"); // precipitation (da definire)
+            stmt.setString(7, "N/A"); // glacier_altitude (da definire)
+            stmt.setString(8, "N/A"); // glacier_mass (da definire)
+            stmt.setString(9, severitaTextAreas[0].getText()); // wind_comment
+            stmt.setString(10, severitaTextAreas[1].getText()); // humidity_comment
+            stmt.setString(11, "N/A"); // pressure_comment (da definire)
+            stmt.setString(12, severitaTextAreas[2].getText()); // temperature_comment
+            stmt.setString(13, severitaTextAreas[3].getText()); // precipitation_comment
+            stmt.setString(14, "N/A"); // glacier_altitude_comment (da definire)
+            stmt.setString(15, "N/A"); // glacier_mass_comment (da definire)
+            stmt.setBigDecimal(16, new BigDecimal(scoreDropdowns[0].getSelectedItem().toString())); // wind_score
+            stmt.setBigDecimal(17, new BigDecimal(scoreDropdowns[1].getSelectedItem().toString())); // humidity_score
+            stmt.setBigDecimal(18, new BigDecimal("0")); // pressure_score (da definire)
+            stmt.setBigDecimal(19, new BigDecimal(scoreDropdowns[2].getSelectedItem().toString())); // temperature_score
+            stmt.setBigDecimal(20, new BigDecimal(scoreDropdowns[3].getSelectedItem().toString())); // precipitation_score
+            stmt.setBigDecimal(21, new BigDecimal("0")); // glacier_altitude_score (da definire)
+            stmt.setBigDecimal(22, new BigDecimal("0")); // glacier_mass_score (da definire)
 
             stmt.executeUpdate();
             connection.commit(); // Conferma le modifiche
@@ -165,6 +191,7 @@ public class QueryExecutorImpl {
             JOptionPane.showMessageDialog(null, "Errore durante il salvataggio dei dati climatici: " + e.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
         }
     }
+
 
 
 
@@ -400,10 +427,10 @@ public class QueryExecutorImpl {
         return coordinates;
     }
 
-    public List<String> getCentriPerOperatore(String username)  {
+    public List<String> getCentriPerOperatore(String username) {
         List<String> centrimonitoraggio = new ArrayList<>();
         String query = "SELECT nomecentro " +
-                "FROM lavora,operatori,centrimonitoraggio " +
+                "FROM lavora, operatori, centrimonitoraggio " +
                 "WHERE cf = codice_fiscale AND id = centrimonitoraggio_id " +
                 "AND username = ? ";
         try {
@@ -417,22 +444,15 @@ public class QueryExecutorImpl {
                 }
             }
         } catch (SQLException e) {
-            try {
-                conn.rollback();
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex);
-            }
+            // Rimozione del rollback manuale
             throw new RuntimeException(e);
-        } finally {
-            try {
-                conn.commit();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
         }
+
+        // Rimozione del commit manuale nel blocco finally
 
         return centrimonitoraggio;
     }
+
 
 
     // Metodo per verificare se lo username esiste nel database

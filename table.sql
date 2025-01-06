@@ -23,7 +23,7 @@ GRANT ALL ON DATABASE "ClimateMonitoring" TO agent1;
 GRANT ALL ON DATABASE "ClimateMonitoring" TO postgres;
 
 CREATE TABLE Citta (
-                       Geoname_ID BIGINT() PRIMARY KEY,
+                       Geoname_ID BIGINT PRIMARY KEY,
                        Name VARCHAR(30) NOT NULL,
                        ASCII_Name VARCHAR(30) NOT NULL,
                        Country_Code VARCHAR(3) NOT NULL,
@@ -81,7 +81,7 @@ CREATE TABLE Rilevazione (
                              CentriMonitoraggio_ID VARCHAR(30) REFERENCES CentriMonitoraggio(id)
                                  ON UPDATE CASCADE
                                  ON DELETE NO ACTION,
-                             Geoname_ID BIGINT() REFERENCES Citta(Geoname_ID)
+                             Geoname_ID BIGINT REFERENCES Citta(Geoname_ID)
                                  ON UPDATE CASCADE
                                  ON DELETE NO ACTION,
                              Par_ID VARCHAR(30) REFERENCES Parametro(ID)
@@ -93,7 +93,7 @@ CREATE TABLE Osservano (
                            CentriMonitoraggio_ID VARCHAR(30) REFERENCES CentriMonitoraggio(id)
                                ON UPDATE CASCADE
                                ON DELETE NO ACTION,
-                           Geoname_ID BIGINT() REFERENCES Citta(Geoname_ID)
+                           Geoname_ID BIGINT REFERENCES Citta(Geoname_ID)
                                ON UPDATE CASCADE
                                ON DELETE NO ACTION,
                            PRIMARY KEY(CentriMonitoraggio_ID,Geoname_ID)

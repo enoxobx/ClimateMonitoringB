@@ -279,32 +279,30 @@ public class LayoutOperatore extends LayoutStandard {
         container.setLayout(new GridLayout(5, 2));
         container.setBackground(new Color(245, 245, 245));
 
-        container.add(new JLabel("id:"));
+        /*container.add(new JLabel("id:"));
         JTextField idField = new JTextField();
-        container.add(idField);
+        container.add(idField);*/
 
         container.add(new JLabel("Nome Centro:"));
         JTextField nomeCentroField = new JTextField();
         container.add(nomeCentroField);
 
-        container.add(new JLabel("Descrizione:"));
+        container.add(new JLabel("indirizzo:"));
         JTextField indirizzoField = new JTextField();
         container.add(indirizzoField);
 
         JButton salvaCentroButton = new JButton("Salva Centro");
         salvaCentroButton.addActionListener(e -> {
-            String id = idField.getText();
             String nomeCentro = nomeCentroField.getText();
             String indirizzo = indirizzoField.getText();
 
-            if (id.isEmpty() || nomeCentro.isEmpty() || indirizzo.isEmpty()) {
+            if (nomeCentro.isEmpty() || indirizzo.isEmpty()) {
                 JOptionPane.showMessageDialog(createCenterFrame, "Tutti i campi sono obbligatori", "Errore", JOptionPane.ERROR_MESSAGE);
             } else {
                 boolean success = false;
 
                 try {
-
-                    success = db.salvaCentroMonitoraggio(nomeCentro, indirizzo,username);
+                    success = db.salvaCentroMonitoraggio(nomeCentro, indirizzo, username);
                 } catch (RemoteException ex) {
                     JOptionPane.showMessageDialog(createCenterFrame, "Errore nel database: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
                 }
@@ -323,6 +321,7 @@ public class LayoutOperatore extends LayoutStandard {
         container.add(salvaCentroButton);
         QueryExecutorImpl q = new QueryExecutorImpl();
         createCenterFrame.setVisible(true);
+
     }
 
 
