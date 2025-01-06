@@ -134,6 +134,49 @@ public class QueryExecutorImpl {
     }
 
 
+    public boolean salvaRilevazione(String currentUsername, String centroMonitoraggioID, long geonameID, String parametroID) {
+        Connection conn = null;
+        try {
+            conn = DatabaseImpl.getConnection(); // Ottieni la connessione al database
+            conn.setAutoCommit(false); // Disabilita il commit automatico per la transazione
+
+            // Recupera il codice fiscale dell'utente
+            String cf = getCF(currentUsername);
+
+            String query = "INSERT INTO Rilevazione (CF, CentriMonitoraggio_ID, Geoname_ID, Par_ID, date_r) " +
+                    "VALUES (?, ?, ?, ?, ?)";
+
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, cf); // Imposta il codice fiscale
+                stmt.setString(2, centroMonitoraggioID); // Imposta l'ID del centro di monitoraggio
+                stmt.setLong(3, geonameID); // Imposta il Geoname_ID
+                stmt.setString(4, parametroID); // Imposta l'ID del parametro
+                stmt.setDate(5, new java.sql.Date(System.currentTimeMillis())); // Imposta la data corrente
+
+                int rowsAffected = stmt.executeUpdate();
+                conn.commit(); // Conferma le modifiche
+
+                return rowsAffected > 0; // Restituisce true se l'inserimento è stato effettuato con successo
+            } catch (SQLException e) {
+                conn.rollback(); // Annulla la transazione in caso di errore
+                throw e;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Errore nel salvataggio della rilevazione.", e);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true); // Ripristina il commit automatico
+                    conn.close(); // Chiude la connessione
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
     public void salvaDatiClimatici(String key, String centroID, JComboBox<Integer>[] scoreDropdowns, JTextArea[] severitaTextAreas) throws SQLException {
         try {
             ensureConnection();

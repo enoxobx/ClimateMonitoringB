@@ -153,6 +153,11 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
     }
 
     @Override
+    public boolean SalvaRilevazione(String currentUsername, String centroMonitoraggioID, long geonameID, String parametroID) throws RemoteException {
+        return false;
+    }
+
+    @Override
     public List<Coordinate> getCoordinaResultSet(String name) throws RemoteException {
 
         try {

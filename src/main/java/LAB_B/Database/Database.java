@@ -30,4 +30,5 @@ public interface Database extends Remote{
 
     List<String> getCentriPerOperatore(String username)throws RemoteException;
     boolean salvaCentroMonitoraggio(String nomeCentro,String descrizione,String username) throws RemoteException;
+    boolean SalvaRilevazione(String currentUsername, String centroMonitoraggioID, long geonameID, String parametroID) throws RemoteException;
 }
