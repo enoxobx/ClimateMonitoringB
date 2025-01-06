@@ -2,6 +2,7 @@ package LAB_B.Database;
 
 import LAB_B.Common.Interface.*;
 
+import javax.swing.*;
 import java.util.List;
 import java.util.Properties;
 import java.rmi.RemoteException;
@@ -126,12 +127,13 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
             return false;
         }
     }
+
     @Override
     public List<Coordinate> getCoordinaResultSet(double latitude, double longitude, double tollerance) throws RemoteException {
 
         try {
-            if(queryExecutorImpl == null)queryExecutorImpl = new QueryExecutorImpl();
-            return queryExecutorImpl.getCoordinate(latitude,longitude,tollerance);
+            if (queryExecutorImpl == null) queryExecutorImpl = new QueryExecutorImpl();
+            return queryExecutorImpl.getCoordinate(latitude, longitude, tollerance);
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -142,26 +144,31 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
 
     @Override
     public List<String> getCentriPerOperatore(String username) throws RemoteException {
-        if(queryExecutorImpl == null) queryExecutorImpl = new QueryExecutorImpl();
+        if (queryExecutorImpl == null) queryExecutorImpl = new QueryExecutorImpl();
         return queryExecutorImpl.getCentriPerOperatore(username);
     }
 
     @Override
-    public boolean salvaCentroMonitoraggio(String nomeCentro, String descrizione, String username) throws RemoteException {
-        if(queryExecutorImpl == null)queryExecutorImpl = new QueryExecutorImpl();
-        return queryExecutorImpl.salvaCentroMonitoraggio(nomeCentro,descrizione,username );
+    public boolean salvaCentroMonitoraggio(String nomeCentro, String descrizione, String username) throws Exception {
+        if (queryExecutorImpl == null) queryExecutorImpl = new QueryExecutorImpl();
+        return queryExecutorImpl.salvaCentroMonitoraggio(nomeCentro, descrizione, username);
     }
 
     @Override
-    public boolean SalvaRilevazione(String currentUsername, String centroMonitoraggioID, long geonameID, String parametroID) throws RemoteException {
-        return false;
+    public boolean salvaRilevazione(String key, String centroID, JComboBox<Integer>[] scoreDropdowns, JTextArea[] severitaTextAreas, String username, String geo_id) throws RemoteException {
+        if (queryExecutorImpl == null) queryExecutorImpl = new QueryExecutorImpl();
+        try {
+            return queryExecutorImpl.salvaDatiClimatici(key, centroID, scoreDropdowns, severitaTextAreas, username, geo_id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public List<Coordinate> getCoordinaResultSet(String name) throws RemoteException {
 
         try {
-            if(queryExecutorImpl == null)queryExecutorImpl = new QueryExecutorImpl();
+            if (queryExecutorImpl == null) queryExecutorImpl = new QueryExecutorImpl();
             return queryExecutorImpl.getCoordinate(name);
         } catch (SQLException e) {
             // TODO Auto-generated catch block
@@ -181,7 +188,6 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
             return null;
         }
     }
-
 
 
 }

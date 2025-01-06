@@ -6,7 +6,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Locale;
 
@@ -235,11 +234,9 @@ public class LayoutOperatore extends LayoutStandard {
                         .append(severitaTextAreas[i].getText())
                         .append("\n");
             }
-
-            QueryExecutorImpl q = new QueryExecutorImpl();
             try {
-                q.salvaDatiClimatici(key,centro,scoreDropdowns,severitaTextAreas);
-            } catch (SQLException ex) {
+                db.salvaRilevazione(key,centro,scoreDropdowns,severitaTextAreas,/* aggiungere parametri mancanti per completare metodo (username e geoname_ID)*/);
+            } catch (RemoteException ex) {
                 throw new RuntimeException(ex);
             }
 
@@ -300,7 +297,7 @@ public class LayoutOperatore extends LayoutStandard {
                 try {
 
                     success = db.salvaCentroMonitoraggio(nomeCentro, indirizzo,username);
-                } catch (RemoteException ex) {
+                } catch (Exception ex) {
                     JOptionPane.showMessageDialog(createCenterFrame, "Errore nel database: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
                 }
 

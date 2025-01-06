@@ -9,7 +9,6 @@ import LAB_B.Common.Interface.*;
 
 import javax.swing.*;
 
-import static LAB_B.Database.DatabaseImpl.connection;
 
 public class QueryExecutorImpl {
     private static final String SELECT_OPERATORI_QUERY = "SELECT 1 FROM operatori WHERE %s = ? LIMIT 1";
@@ -59,15 +58,15 @@ public class QueryExecutorImpl {
         return loginSuccess;
     }
 
-    private List<String> getIDCentri(){
+    private List<String> getIDCentri() {
 
         List<String> ids = new ArrayList<String>();
         try {
             ensureConnection();
             String query = "select id from centrimonitoraggio;";
-            try(PreparedStatement stmt = conn.prepareStatement(query)){
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 ResultSet rs = stmt.executeQuery();
-                while (rs.next()){
+                while (rs.next()) {
                     ids.add(rs.getString("id"));
                 }
             }
@@ -79,13 +78,13 @@ public class QueryExecutorImpl {
 
     }
 
-    private String getCF(String username){
-        String res ="";
+    private String getCF(String username) {
+        String res = "";
         try {
             ensureConnection();
             String query = "select codice_fiscale from operatori where username = ?;";
-            try(PreparedStatement stmt = conn.prepareStatement(query)){
-                stmt.setString(1,username);
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, username);
                 ResultSet rs = stmt.executeQuery();
                 if (rs.next()) { // Verifica se sono presenti risultati
                     res = rs.getString("codice_fiscale");
@@ -99,33 +98,32 @@ public class QueryExecutorImpl {
     }
 
 
-
-    public boolean salvaCentroMonitoraggio(String nomeCentro, String descrizione, String currentUsername)  {
+    public boolean salvaCentroMonitoraggio(String nomeCentro, String indirizzo, String currentUsername) throws Exception {
         try {
             ensureConnection();
 
             List<String> idsCentri = getIDCentri();
-            int i =0;
-            String id =String.format(idsCentri.getLast()+"%03d",i);
-            while(idsCentri.contains(id)) {
-                id = String.format(idsCentri.getLast()+"%03d", ++i);
+            int i = 0;
+            String id = String.format(idsCentri.getLast() + "%03d", i);
+            while (idsCentri.contains(id)) {
+                id = String.format(idsCentri.getLast() + "%03d", ++i);
             }
-            String query = "INSERT INTO centrimonitoraggio (id, nomeCentro, indirizzo) VALUES (?, ?, ?);"+
-                    "INSERT INTO lavora(cf,centrimonitoraggio_id) values (?,?);";
+            String query = "INSERT INTO centrimonitoraggio (id, nomeCentro, indirizzo) VALUES (gen_random_uuid(), ?, ?);" +
+                    "INSERT INTO lavora(cf,centrimonitoraggio_id) values (?, (select id from centrimonitoraggio where nomecentro = ? and indirizzo = ?));";
 
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.setString(1, id);
-                stmt.setString(2, nomeCentro);
-                stmt.setString(3, descrizione);  // Aggiungi l'operatore corrente
+                stmt.setString(1, nomeCentro);
+                stmt.setString(2, indirizzo);
                 String cf = getCF(currentUsername);
-                stmt.setString(4, cf);
-                stmt.setString(5,id);
+                stmt.setString(3, cf);
+                stmt.setString(4, nomeCentro);
+                stmt.setString(5, indirizzo);
                 int rowsAffected = stmt.executeUpdate();
                 conn.commit(); // Forza il salvataggio nel database
                 return rowsAffected > 0;
             } catch (SQLException e) {
                 conn.rollback(); // Annulla la transazione in caso di errore
-                throw e;
+                throw new Exception(e.getMessage());
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -134,11 +132,9 @@ public class QueryExecutorImpl {
     }
 
 
-    public boolean salvaRilevazione(String currentUsername, String centroMonitoraggioID, long geonameID, String parametroID) {
-        Connection conn = null;
+    private boolean salvaRilevazione(String currentUsername, String centroMonitoraggioID, String geonameID, String parametroID) {
         try {
-            conn = DatabaseImpl.getConnection(); // Ottieni la connessione al database
-            conn.setAutoCommit(false); // Disabilita il commit automatico per la transazione
+            ensureConnection();
 
             // Recupera il codice fiscale dell'utente
             String cf = getCF(currentUsername);
@@ -149,7 +145,7 @@ public class QueryExecutorImpl {
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 stmt.setString(1, cf); // Imposta il codice fiscale
                 stmt.setString(2, centroMonitoraggioID); // Imposta l'ID del centro di monitoraggio
-                stmt.setLong(3, geonameID); // Imposta il Geoname_ID
+                stmt.setString(3, geonameID); // Imposta il Geoname_ID
                 stmt.setString(4, parametroID); // Imposta l'ID del parametro
                 stmt.setDate(5, new java.sql.Date(System.currentTimeMillis())); // Imposta la data corrente
 
@@ -164,20 +160,11 @@ public class QueryExecutorImpl {
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException("Errore nel salvataggio della rilevazione.", e);
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true); // Ripristina il commit automatico
-                    conn.close(); // Chiude la connessione
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
 
-    public void salvaDatiClimatici(String key, String centroID, JComboBox<Integer>[] scoreDropdowns, JTextArea[] severitaTextAreas) throws SQLException {
+    public boolean salvaDatiClimatici(String key, String centroID, JComboBox<Integer>[] scoreDropdowns, JTextArea[] severitaTextAreas, String username, String geo_id) throws SQLException {
         try {
             ensureConnection();
         } catch (SQLException e) {
@@ -193,7 +180,8 @@ public class QueryExecutorImpl {
                 "glacier_altitude_score, glacier_mass_score) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, key); // Chiave primaria
             stmt.setString(2, "N/A"); // wind (da definire)
             stmt.setString(3, "N/A"); // humidity (da definire)
@@ -218,16 +206,20 @@ public class QueryExecutorImpl {
             stmt.setBigDecimal(22, new BigDecimal("0")); // glacier_mass_score (da definire)
 
             stmt.executeUpdate();
-            connection.commit(); // Conferma le modifiche
+
+            salvaRilevazione(username, centroID, geo_id, key);
+
+            conn.commit(); // Conferma le modifiche
             JOptionPane.showMessageDialog(null, "Dati climatici salvati con successo.");
+            return stmt.executeUpdate()>0;
+
         } catch (SQLException e) {
-            connection.rollback(); // Annulla le modifiche in caso di errore
+            conn.rollback(); // Annulla le modifiche in caso di errore
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Errore durante il salvataggio dei dati climatici: " + e.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
         }
+        return false;
     }
-
-
 
 
     // Verifica se un campo è vuoto o nullo
@@ -293,8 +285,6 @@ public class QueryExecutorImpl {
         }
 
 
-
-
         // Query per inserire l'operatore nel database
         String query = "INSERT INTO operatori (nome, cognome, codice_fiscale, email, password, centro_monitoraggio, username) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -358,8 +348,6 @@ public class QueryExecutorImpl {
     }
 
 
-
-
     // Metodo per ottenere coordinate senza filtri
     public List<Coordinate> getCoordinate() throws SQLException {
         ensureConnection();
@@ -381,7 +369,6 @@ public class QueryExecutorImpl {
         }
         return coordinates;
     }
-
 
 
     // Validazione email
@@ -418,8 +405,8 @@ public class QueryExecutorImpl {
         List<Coordinate> coordinates = new ArrayList<>();
         String query = "select geoname_id,name,ascii_name,country_code,country_name,latitude,longitude from citta where name like ? ";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            text = "%"+text+"%";
-            stmt.setString(1,text);
+            text = "%" + text + "%";
+            stmt.setString(1, text);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 String geoname_id = rs.getString("geoname_id");
@@ -462,7 +449,7 @@ public class QueryExecutorImpl {
         return coordinates;
     }
 
-    public List<String> getCentriPerOperatore(String username)  {
+    public List<String> getCentriPerOperatore(String username) {
         List<String> centrimonitoraggio = new ArrayList<>();
         String query = "SELECT nomecentro " +
                 "FROM lavora, operatori, centrimonitoraggio " +
@@ -550,7 +537,6 @@ public class QueryExecutorImpl {
         // Restituisci lo username unico
         return username;
     }
-
 
 
 }
