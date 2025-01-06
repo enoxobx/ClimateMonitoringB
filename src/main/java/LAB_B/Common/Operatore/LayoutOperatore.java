@@ -288,23 +288,23 @@ public class LayoutOperatore extends LayoutStandard {
         container.add(nomeCentroField);
 
         container.add(new JLabel("Descrizione:"));
-        JTextField descrizioneField = new JTextField();
-        container.add(descrizioneField);
+        JTextField indirizzoField = new JTextField();
+        container.add(indirizzoField);
 
         JButton salvaCentroButton = new JButton("Salva Centro");
         salvaCentroButton.addActionListener(e -> {
             String id = idField.getText();
             String nomeCentro = nomeCentroField.getText();
-            String descrizione = descrizioneField.getText();
+            String indirizzo = indirizzoField.getText();
 
-            if (id.isEmpty() || nomeCentro.isEmpty() || descrizione.isEmpty()) {
+            if (id.isEmpty() || nomeCentro.isEmpty() || indirizzo.isEmpty()) {
                 JOptionPane.showMessageDialog(createCenterFrame, "Tutti i campi sono obbligatori", "Errore", JOptionPane.ERROR_MESSAGE);
             } else {
                 boolean success = false;
 
                 try {
 
-                    success = db.salvaCentroMonitoraggio(nomeCentro, descrizione,username);
+                    success = db.salvaCentroMonitoraggio(nomeCentro, indirizzo,username);
                 } catch (RemoteException ex) {
                     JOptionPane.showMessageDialog(createCenterFrame, "Errore nel database: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
                 }

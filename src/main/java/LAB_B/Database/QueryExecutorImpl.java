@@ -279,7 +279,9 @@ public class QueryExecutorImpl {
                 return rs.next();
             }
         }
-    } public List<String> getCentriMonitoraggio() throws SQLException {
+    }
+
+    public List<String> getCentriMonitoraggio() throws SQLException {
         ensureConnection();
         List<String> centri = new ArrayList<>();
         String query = "SELECT nomeCentro FROM centrimonitoraggio";
@@ -400,10 +402,10 @@ public class QueryExecutorImpl {
 
     public List<String> getCentriPerOperatore(String username)  {
         List<String> centrimonitoraggio = new ArrayList<>();
-        String query = "SELECT nomecentro\n" +
-                "FROM lavora,operatori,centrimonitoraggio\n" +
-                "WHERE cf = username AND id = centrimonitoraggio_id " +
-                "AND username = ?";
+        String query = "SELECT nomecentro " +
+                "FROM lavora,operatori,centrimonitoraggio " +
+                "WHERE cf = codice_fiscale AND id = centrimonitoraggio_id " +
+                "AND username = ? ";
         try {
             ensureConnection(); // Assicurati che la connessione sia attiva
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -415,7 +417,18 @@ public class QueryExecutorImpl {
                 }
             }
         } catch (SQLException e) {
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
             throw new RuntimeException(e);
+        } finally {
+            try {
+                conn.commit();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         return centrimonitoraggio;
