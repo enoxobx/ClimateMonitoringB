@@ -279,10 +279,6 @@ public class LayoutOperatore extends LayoutStandard {
         container.setLayout(new GridLayout(5, 2));
         container.setBackground(new Color(245, 245, 245));
 
-        /*container.add(new JLabel("id:"));
-        JTextField idField = new JTextField();
-        container.add(idField);*/
-
         container.add(new JLabel("Nome Centro:"));
         JTextField nomeCentroField = new JTextField();
         container.add(nomeCentroField);
@@ -302,7 +298,8 @@ public class LayoutOperatore extends LayoutStandard {
                 boolean success = false;
 
                 try {
-                    success = db.salvaCentroMonitoraggio(nomeCentro, indirizzo, username);
+
+                    success = db.salvaCentroMonitoraggio(nomeCentro, indirizzo,username);
                 } catch (RemoteException ex) {
                     JOptionPane.showMessageDialog(createCenterFrame, "Errore nel database: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
                 }

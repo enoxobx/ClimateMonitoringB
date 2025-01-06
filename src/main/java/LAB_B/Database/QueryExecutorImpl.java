@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import LAB_B.Common.Interface.*;
 
@@ -101,44 +100,37 @@ public class QueryExecutorImpl {
 
 
 
+    public boolean salvaCentroMonitoraggio(String nomeCentro, String descrizione, String currentUsername)  {
+        try {
+            ensureConnection();
 
-    public boolean salvaCentroMonitoraggio(String nomeCentro, String indirizzo, String username) {
-        // Generazione di un ID univoco usando UUID
-        String idCentro = UUID.randomUUID().toString();  // Genera un ID univoco
+            List<String> idsCentri = getIDCentri();
+            int i =0;
+            String id =String.format(idsCentri.getLast()+"%03d",i);
+            while(idsCentri.contains(id)) {
+                id = String.format(idsCentri.getLast()+"%03d", ++i);
+            }
+            String query = "INSERT INTO centrimonitoraggio (id, nomeCentro, indirizzo) VALUES (?, ?, ?);"+
+                    "INSERT INTO lavora(cf,centrimonitoraggio_id) values (?,?);";
 
-        // Assicurati che il nomeCentro e l'indirizzo non siano vuoti
-        if (nomeCentro.isEmpty() || indirizzo.isEmpty()) {
-            throw new IllegalArgumentException("Nome centro e indirizzo sono obbligatori.");
-        }
-
-        // Logica per popolare la lista dei centri
-        List<String> centri = new ArrayList<>();
-        // Supponiamo che tu stia popolando la lista 'centri' con i dati provenienti da un database o altre fonti.
-
-        // Ad esempio, ora potresti salvare il nuovo centro nel database
-        // (supponendo che ci sia una query per inserire nel database)
-        String query = "INSERT INTO centrimonitoraggio (id, nomecentro, indirizzo, username) VALUES (?, ?, ?, ?)";
-
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            // Imposta il parametro dell'ID univoco
-            stmt.setString(1, idCentro);
-            stmt.setString(2, nomeCentro);
-            stmt.setString(3, indirizzo);
-            stmt.setString(4, username);
-
-            // Esegui l'operazione
-            int rowsAffected = stmt.executeUpdate();
-
-            if (rowsAffected > 0) {
-                System.out.println("Centro monitoraggio salvato con successo.");
-            } else {
-                throw new SQLException("Errore durante il salvataggio del centro monitoraggio.");
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, id);
+                stmt.setString(2, nomeCentro);
+                stmt.setString(3, descrizione);  // Aggiungi l'operatore corrente
+                String cf = getCF(currentUsername);
+                stmt.setString(4, cf);
+                stmt.setString(5,id);
+                int rowsAffected = stmt.executeUpdate();
+                conn.commit(); // Forza il salvataggio nel database
+                return rowsAffected > 0;
+            } catch (SQLException e) {
+                conn.rollback(); // Annulla la transazione in caso di errore
+                throw e;
             }
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException("Errore nel salvataggio del centro monitoraggio.", e);
         }
-        return false;
     }
 
 
@@ -427,7 +419,7 @@ public class QueryExecutorImpl {
         return coordinates;
     }
 
-    public List<String> getCentriPerOperatore(String username) {
+    public List<String> getCentriPerOperatore(String username)  {
         List<String> centrimonitoraggio = new ArrayList<>();
         String query = "SELECT nomecentro " +
                 "FROM lavora, operatori, centrimonitoraggio " +
@@ -444,15 +436,22 @@ public class QueryExecutorImpl {
                 }
             }
         } catch (SQLException e) {
-            // Rimozione del rollback manuale
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
             throw new RuntimeException(e);
+        } finally {
+            try {
+                conn.commit();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
-
-        // Rimozione del commit manuale nel blocco finally
 
         return centrimonitoraggio;
     }
-
 
 
     // Metodo per verificare se lo username esiste nel database

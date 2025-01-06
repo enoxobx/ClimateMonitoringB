@@ -2,7 +2,6 @@ package LAB_B.Database;
 
 import LAB_B.Common.Interface.*;
 
-import javax.swing.*;
 import java.util.List;
 import java.util.Properties;
 import java.rmi.RemoteException;
