@@ -186,7 +186,13 @@ public class LayoutOperatore extends LayoutStandard {
         gbc.gridx = 0;
         panel.add(new JLabel("Username:"), gbc);
 
+// Definisci l'username di default
+        String usernameDefault = username;  // Puoi sostituirlo con qualsiasi altro valore di default
+
+// Crea il JTextField e imposta il valore di default
         JTextField usernameField = new JTextField(20);
+        usernameField.setText(usernameDefault);  // Imposta il testo predefinito
+
         gbc.gridx = 1;
         panel.add(usernameField, gbc);
 
@@ -290,7 +296,7 @@ public class LayoutOperatore extends LayoutStandard {
 
 
                     // Chiamata al metodo di salvataggio con tutti i parametri richiesti
-                    boolean success = db.salvaRilevazione(key, centro, scoreDropdowns, severitaTextAreas, username, geo_id);
+                    boolean success = db.salvaRilevazione(key, centro, scoreDropdowns, severitaTextAreas, this.username, geo_id);
                     if (success) {
                         System.out.println("Rilevazione salvata con successo.");
                     } else {
