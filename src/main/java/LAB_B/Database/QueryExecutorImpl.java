@@ -78,6 +78,31 @@ public class QueryExecutorImpl {
 
     }
 
+    public String getGeonameIdByName(String cittaSelezionata) {
+        String geonameID = null; // Valore di ritorno se non trovato
+        try {
+            ensureConnection(); // Verifica che la connessione sia attiva
+
+            String query = "SELECT Geoname_ID FROM Citta WHERE Nome = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, cittaSelezionata); // Imposta il nome della città
+
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        geonameID = rs.getString("Geoname_ID"); // Recupera il Geoname_ID
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            // Gestione dell'errore
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Errore durante il recupero dell'ID Geoname.", "Errore", JOptionPane.ERROR_MESSAGE);
+        }
+
+        return geonameID;
+    }
+
+
     private String getCF(String username) {
         String res = "";
         try {
@@ -222,6 +247,7 @@ public class QueryExecutorImpl {
     }
 
 
+
     // Verifica se un campo è vuoto o nullo
     public boolean isNullOrEmpty(String... fields) {
         for (String field : fields) {
@@ -333,6 +359,8 @@ public class QueryExecutorImpl {
         }
     }
 
+
+
     public List<String> getCentriMonitoraggio() throws SQLException {
         ensureConnection();
         List<String> centri = new ArrayList<>();
@@ -369,6 +397,8 @@ public class QueryExecutorImpl {
         }
         return coordinates;
     }
+
+
 
 
     // Validazione email
@@ -488,6 +518,8 @@ public class QueryExecutorImpl {
     private boolean isUsernameExist(String username) throws SQLException {
         return existsInDatabase("username", username);
     }
+
+
 
     public String generateUsername(String nome, String cognome, String codFiscale) throws SQLException {
         // Verifica la validità dei parametri

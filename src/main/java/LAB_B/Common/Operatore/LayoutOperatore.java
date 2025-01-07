@@ -21,6 +21,8 @@ public class LayoutOperatore extends LayoutStandard {
     private final DefaultListModel<String> listaCentriModel;
     private final JLabel titleLable;
     private final ScrollPane centriScrollPane;
+    private final JComboBox<String> cittaDropdown = new JComboBox<>();
+    private final   JComboBox<String> centriDropdown = new JComboBox<>();
 
     public LayoutOperatore(String username) {
         super(); // Chiamata al costruttore della classe padre LayoutStandard
@@ -137,10 +139,6 @@ public class LayoutOperatore extends LayoutStandard {
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Dropdown per selezionare il centro
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        panel.add(new JLabel("Seleziona Centro:"), gbc);
 
         JComboBox<String> centriDropdown = new JComboBox<>();
         for (int i = 0; i < listaCentriModel.size(); i++) {
@@ -156,7 +154,8 @@ public class LayoutOperatore extends LayoutStandard {
         String[] parametri = {"Velocità Vento", "Temperatura", "Umidità", "Precipitazioni"};
         JComboBox<Integer>[] scoreDropdowns = new JComboBox[parametri.length]; // Array per i dropdown di score
         JTextArea[] severitaTextAreas = new JTextArea[parametri.length]; // Array per le JTextArea
-
+        JComboBox<Integer>[] usernamescore = new JComboBox[parametri.length];
+        JComboBox<Integer>[] geonemascore = new JComboBox[parametri.length];
 // Campo per l'inserimento del valore della chiave primaria "key"
         gbc.gridy++;
         gbc.gridx = 0;
@@ -165,6 +164,43 @@ public class LayoutOperatore extends LayoutStandard {
         JTextField keyField = new JTextField(20);
         gbc.gridx = 1;
         panel.add(keyField, gbc);
+
+// Dropdown per selezionare il centro
+        gbc.gridy++;
+        gbc.gridx = 0;
+        panel.add(new JLabel("Seleziona Centro:"), gbc);
+
+
+
+        for (int i = 0; i < listaCentriModel.size(); i++) {
+            centriDropdown.addItem(listaCentriModel.getElementAt(i));
+        }
+        if (listaCentriModel.isEmpty()) {
+            centriDropdown.addItem("Nessun centro disponibile");
+        }
+        gbc.gridx = 1;
+        panel.add(centriDropdown, gbc);
+
+// Campo per l'inserimento dell'username
+        gbc.gridy++;
+        gbc.gridx = 0;
+        panel.add(new JLabel("Username:"), gbc);
+
+        JTextField usernameField = new JTextField(20);
+        gbc.gridx = 1;
+        panel.add(usernameField, gbc);
+
+// Dropdown per selezionare la città (geo_id)
+        gbc.gridy++;
+        gbc.gridx = 0;
+        panel.add(new JLabel("Seleziona Città (Geo ID):"), gbc);
+
+        JComboBox<String> cittaDropdown = new JComboBox<>();
+// Aggiungi qui le città o geonameID
+        gbc.gridx = 1;
+        panel.add(cittaDropdown, gbc);
+
+
 
 // Loop per aggiungere i parametri climatici
         for (int i = 0; i < parametri.length; i++) {
@@ -222,10 +258,18 @@ public class LayoutOperatore extends LayoutStandard {
                 return;
             }
 
+            String geo_id = (String) cittaDropdown.getSelectedItem();
+
+// Verifica se geo_id è valido
+            if (geo_id == null || geo_id.isEmpty()) {
+                JOptionPane.showMessageDialog(datiClimaticiFrame, "Seleziona una città valida.", "Errore", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
 
-            // Raccolta dei dati inseriti
-            StringBuilder datiInseriti = new StringBuilder("Key: " + key + "\nCentro: " + centro + "\n");
+
+// Costruzione del log dei dati inseriti per il debug o conferma
+            StringBuilder datiInseriti = new StringBuilder("Key: " + key + "\nCentro: " + centro + "\nGeo ID: " + geo_id + "\n");
             for (int i = 0; i < parametri.length; i++) {
                 datiInseriti.append(parametri[i])
                         .append(" - Score: ")
@@ -234,10 +278,31 @@ public class LayoutOperatore extends LayoutStandard {
                         .append(severitaTextAreas[i].getText())
                         .append("\n");
             }
+
             try {
-                db.salvaRilevazione(key,centro,scoreDropdowns,severitaTextAreas,/* aggiungere parametri mancanti per completare metodo (username e geoname_ID)*/);
+                // Salvataggio delle rilevazioni
+                for (int i = 0; i < parametri.length; i++) {
+                    String score = scoreDropdowns[i].getSelectedItem().toString();  // Converti score in stringa
+                    String note = severitaTextAreas[i].getText(); // Note inserite per il parametro
+
+                    // Converti geo_id in un tipo numerico (long)
+                    long geo_id_long = Long.parseLong(geo_id);
+
+
+                    // Chiamata al metodo di salvataggio con tutti i parametri richiesti
+                    boolean success = db.salvaRilevazione(key, centro, scoreDropdowns, severitaTextAreas, username, geo_id);
+                    if (success) {
+                        System.out.println("Rilevazione salvata con successo.");
+                    } else {
+                        System.out.println("Errore nel salvataggio.");
+                    }
+                }
+
+                // Mostra un messaggio di conferma all'utente
+                JOptionPane.showMessageDialog(null, "Dati salvati con successo:\n" + datiInseriti, "Successo", JOptionPane.INFORMATION_MESSAGE);
+
             } catch (RemoteException ex) {
-                throw new RuntimeException(ex);
+                throw new RuntimeException("Errore durante il salvataggio della rilevazione.", ex);
             }
 
             // Mostra un messaggio di conferma
