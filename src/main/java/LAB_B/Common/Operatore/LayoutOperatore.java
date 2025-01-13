@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 
 import LAB_B.Common.*;
+import LAB_B.Common.Interface.*;
 import LAB_B.Database.*;
 
 public class LayoutOperatore extends LayoutStandard {
@@ -201,8 +202,18 @@ public class LayoutOperatore extends LayoutStandard {
         gbc.gridx = 0;
         panel.add(new JLabel("Seleziona Città (Geo ID):"), gbc);
 
-        JComboBox<String> cittaDropdown = new JComboBox<>();
+        JComboBox<Citta> cittaDropdown = new JComboBox<>();
 // Aggiungi qui le città o geonameID
+
+        try {
+            List<Coordinate> listaC = db.getCoordinaResultSet();
+            for(var citta : listaC){
+                cittaDropdown.addItem(citta.getCitta());
+            }
+        } catch (RemoteException e) {
+            JOptionPane.showMessageDialog(this.getComponent(0), e.getMessage());
+            e.printStackTrace();
+        }
         gbc.gridx = 1;
         panel.add(cittaDropdown, gbc);
 
@@ -259,12 +270,12 @@ public class LayoutOperatore extends LayoutStandard {
             // Validazione dei dati
             String key = keyField.getText();
             String centro = (String) centriDropdown.getSelectedItem();
-            if (key.isEmpty() || centro == null || centro.equals("Nessun centro disponibile")) {
+            if (centro == null || centro.equals("Nessun centro disponibile")) {
                 JOptionPane.showMessageDialog(datiClimaticiFrame, "Compila tutti i campi obbligatori.", "Errore", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
-            String geo_id = (String) cittaDropdown.getSelectedItem();
+            Citta selected = (Citta)cittaDropdown.getSelectedItem();
+            String geo_id =  selected.getGeoname();
 
 // Verifica se geo_id è valido
             if (geo_id == null || geo_id.isEmpty()) {
@@ -291,12 +302,9 @@ public class LayoutOperatore extends LayoutStandard {
                     String score = scoreDropdowns[i].getSelectedItem().toString();  // Converti score in stringa
                     String note = severitaTextAreas[i].getText(); // Note inserite per il parametro
 
-                    // Converti geo_id in un tipo numerico (long)
-                    long geo_id_long = Long.parseLong(geo_id);
-
-
+                    long geoname = Long.parseLong(geo_id);
                     // Chiamata al metodo di salvataggio con tutti i parametri richiesti
-                    boolean success = db.salvaRilevazione(key, centro, scoreDropdowns, severitaTextAreas, this.username, geo_id);
+                    boolean success = db.salvaRilevazione(key, centro, scoreDropdowns, severitaTextAreas, this.username, geoname);
                     if (success) {
                         System.out.println("Rilevazione salvata con successo.");
                     } else {

@@ -9,9 +9,8 @@ import LAB_B.Common.Interface.*;
 
 import javax.swing.*;
 
-
 public class QueryExecutorImpl {
-    private static final String SELECT_OPERATORI_QUERY = "SELECT 1 FROM operatori WHERE %s = ? LIMIT 1";
+
     private Connection conn;
 
     public QueryExecutorImpl() {
@@ -22,13 +21,12 @@ public class QueryExecutorImpl {
     public void ensureConnection() throws SQLException {
         if (conn == null || conn.isClosed()) {
             System.out.println("Riconnessione al database...");
-            conn = DatabaseImpl.getConnection();  // Riconnessione solo se necessario
+            conn = DatabaseImpl.getConnection(); // Riconnessione solo se necessario
             if (conn == null || conn.isClosed()) {
                 throw new SQLException("Impossibile stabilire la connessione al database.");
             }
         }
     }
-
 
     // Metodo di login
     public boolean login(String username, String password) {
@@ -39,10 +37,7 @@ public class QueryExecutorImpl {
 
             String query = "SELECT * FROM operatori WHERE username = ? AND password = ?";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.setString(1, username);
-                stmt.setString(2, password);
-
-                try (ResultSet resultSet = stmt.executeQuery()) {
+                try (ResultSet resultSet = Tools.setParametri(stmt, username, password).executeQuery()) {
                     if (resultSet.next()) {
                         loginSuccess = true; // Se il risultato esiste, login riuscito
                     }
@@ -71,7 +66,28 @@ public class QueryExecutorImpl {
                 }
             }
         } catch (SQLException e) {
-            //TODO
+            // TODO
+        }
+
+        return ids;
+
+    }
+
+    // restituisce l'id dei centri sapendo il loro nome
+    private List<String> getIDCentri(String name) {
+
+        List<String> ids = new ArrayList<String>();
+        try {
+            ensureConnection();
+            String query = "select id from centrimonitoraggio where nomeCentro like ? ";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                ResultSet rs = Tools.setParametri(stmt, name).executeQuery();
+                while (rs.next()) {
+                    ids.add(rs.getString("id"));
+                }
+            }
+        } catch (SQLException e) {
+            // TODO
         }
 
         return ids;
@@ -85,9 +101,8 @@ public class QueryExecutorImpl {
 
             String query = "SELECT Geoname_ID FROM Citta WHERE Nome = ?";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.setString(1, cittaSelezionata); // Imposta il nome della città
 
-                try (ResultSet rs = stmt.executeQuery()) {
+                try (ResultSet rs = Tools.setParametri(stmt, cittaSelezionata).executeQuery()) {
                     if (rs.next()) {
                         geonameID = rs.getString("Geoname_ID"); // Recupera il Geoname_ID
                     }
@@ -96,12 +111,12 @@ public class QueryExecutorImpl {
         } catch (SQLException e) {
             // Gestione dell'errore
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Errore durante il recupero dell'ID Geoname.", "Errore", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Errore durante il recupero dell'ID Geoname.", "Errore",
+                    JOptionPane.ERROR_MESSAGE);
         }
 
         return geonameID;
     }
-
 
     private String getCF(String username) {
         String res = "";
@@ -109,41 +124,33 @@ public class QueryExecutorImpl {
             ensureConnection();
             String query = "select codice_fiscale from operatori where username = ?;";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.setString(1, username);
-                ResultSet rs = stmt.executeQuery();
+                ResultSet rs = Tools.setParametri(stmt, username).executeQuery();
                 if (rs.next()) { // Verifica se sono presenti risultati
                     res = rs.getString("codice_fiscale");
                 }
             }
         } catch (SQLException e) {
-            //TODO: gestire l'eccezione (ad esempio, log, rilancio)
+            // TODO: gestire l'eccezione (ad esempio, log, rilancio)
             e.printStackTrace();
         }
         return res;
     }
 
-
-    public boolean salvaCentroMonitoraggio(String nomeCentro, String indirizzo, String currentUsername) throws Exception {
+    public boolean salvaCentroMonitoraggio(String nomeCentro, String indirizzo, String currentUsername)
+            throws Exception {
         try {
             ensureConnection();
+            String query = "INSERT INTO centrimonitoraggio (id, nomeCentro, indirizzo) VALUES (gen_random_uuid(), ?, ?) RETURNING id;";
 
-            List<String> idsCentri = getIDCentri();
-            int i = 0;
-            String id = String.format(idsCentri.getLast() + "%03d", i);
-            while (idsCentri.contains(id)) {
-                id = String.format(idsCentri.getLast() + "%03d", ++i);
-            }
-            String query = "INSERT INTO centrimonitoraggio (id, nomeCentro, indirizzo) VALUES (gen_random_uuid(), ?, ?);" +
-                    "INSERT INTO lavora(cf,centrimonitoraggio_id) values (?, (select id from centrimonitoraggio where nomecentro = ? and indirizzo = ?));";
+            String query2 = "INSERT INTO lavora(cf,centrimonitoraggio_id) values (?, ?);";
 
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.setString(1, nomeCentro);
-                stmt.setString(2, indirizzo);
+            try (PreparedStatement stmt = conn.prepareStatement(query);
+                    PreparedStatement stmt2 = conn.prepareStatement(query2)) {
                 String cf = getCF(currentUsername);
-                stmt.setString(3, cf);
-                stmt.setString(4, nomeCentro);
-                stmt.setString(5, indirizzo);
-                int rowsAffected = stmt.executeUpdate();
+                ResultSet rs = Tools.setParametri(stmt, nomeCentro, indirizzo).executeQuery();
+                rs.next();
+                String id = rs.getString("id");
+                int rowsAffected = Tools.setParametri(stmt2, cf, id).executeUpdate();
                 conn.commit(); // Forza il salvataggio nel database
                 return rowsAffected > 0;
             } catch (SQLException e) {
@@ -156,25 +163,22 @@ public class QueryExecutorImpl {
         }
     }
 
-
-    private boolean salvaRilevazione(String currentUsername, String centroMonitoraggioID, String geonameID, String parametroID) {
+    private boolean salvaRilevazione(String currentUsername, String centroMonitoraggio, long geonameID,
+            String parametroID) {
         try {
             ensureConnection();
 
             // Recupera il codice fiscale dell'utente
             String cf = getCF(currentUsername);
+            List<String> centroMonitoraggioID = getIDCentri(centroMonitoraggio);
 
             String query = "INSERT INTO Rilevazione (CF, CentriMonitoraggio_ID, Geoname_ID, Par_ID, date_r) " +
                     "VALUES (?, ?, ?, ?, ?)";
 
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.setString(1, cf); // Imposta il codice fiscale
-                stmt.setString(2, centroMonitoraggioID); // Imposta l'ID del centro di monitoraggio
-                stmt.setString(3, geonameID); // Imposta il Geoname_ID
-                stmt.setString(4, parametroID); // Imposta l'ID del parametro
-                stmt.setDate(5, new java.sql.Date(System.currentTimeMillis())); // Imposta la data corrente
 
-                int rowsAffected = stmt.executeUpdate();
+                int rowsAffected = Tools.setParametri(stmt, cf, centroMonitoraggioID.getFirst(), geonameID, parametroID,
+                        new java.sql.Date(System.currentTimeMillis())).executeUpdate();
                 conn.commit(); // Conferma le modifiche
 
                 return rowsAffected > 0; // Restituisce true se l'inserimento è stato effettuato con successo
@@ -188,8 +192,8 @@ public class QueryExecutorImpl {
         }
     }
 
-
-    public boolean salvaDatiClimatici(String key, String centroID, JComboBox<Integer>[] scoreDropdowns, JTextArea[] severitaTextAreas, String username, String geo_id) throws SQLException {
+    public boolean salvaDatiClimatici(String key, String centroID, JComboBox<Integer>[] scoreDropdowns,
+            JTextArea[] severitaTextAreas, String username, long geo_id) throws SQLException {
         try {
             ensureConnection();
         } catch (SQLException e) {
@@ -205,48 +209,47 @@ public class QueryExecutorImpl {
                 "glacier_altitude_score, glacier_mass_score) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, key); // Chiave primaria
-            stmt.setString(2, "N/A"); // wind (da definire)
-            stmt.setString(3, "N/A"); // humidity (da definire)
-            stmt.setString(4, "N/A"); // pressure (da definire)
-            stmt.setString(5, "N/A"); // temperature (da definire)
-            stmt.setString(6, "N/A"); // precipitation (da definire)
-            stmt.setString(7, "N/A"); // glacier_altitude (da definire)
-            stmt.setString(8, "N/A"); // glacier_mass (da definire)
-            stmt.setString(9, severitaTextAreas[0].getText()); // wind_comment
-            stmt.setString(10, severitaTextAreas[1].getText()); // humidity_comment
-            stmt.setString(11, "N/A"); // pressure_comment (da definire)
-            stmt.setString(12, severitaTextAreas[2].getText()); // temperature_comment
-            stmt.setString(13, severitaTextAreas[3].getText()); // precipitation_comment
-            stmt.setString(14, "N/A"); // glacier_altitude_comment (da definire)
-            stmt.setString(15, "N/A"); // glacier_mass_comment (da definire)
-            stmt.setBigDecimal(16, new BigDecimal(scoreDropdowns[0].getSelectedItem().toString())); // wind_score
-            stmt.setBigDecimal(17, new BigDecimal(scoreDropdowns[1].getSelectedItem().toString())); // humidity_score
-            stmt.setBigDecimal(18, new BigDecimal("0")); // pressure_score (da definire)
-            stmt.setBigDecimal(19, new BigDecimal(scoreDropdowns[2].getSelectedItem().toString())); // temperature_score
-            stmt.setBigDecimal(20, new BigDecimal(scoreDropdowns[3].getSelectedItem().toString())); // precipitation_score
-            stmt.setBigDecimal(21, new BigDecimal("0")); // glacier_altitude_score (da definire)
-            stmt.setBigDecimal(22, new BigDecimal("0")); // glacier_mass_score (da definire)
 
-            stmt.executeUpdate();
+            Tools.setParametri(stmt,
+                    key, // Chiave primaria
+                    "N/A", // wind (da definire)
+                    "N/A", // humidity (da definire)
+                    "N/A", // pressure (da definire)
+                    "N/A", // temperature (da definire)
+                    "N/A", // precipitation (da definire)
+                    "N/A", // glacier_altitude (da definire)
+                    "N/A", // glacier_mass (da definire)
+                    severitaTextAreas[0].getText(), // wind_comment
+                    severitaTextAreas[1].getText(), // humidity_comment
+                    "N/A", // pressure_comment (da definire)
+                    severitaTextAreas[2].getText(), // temperature_comment
+                    severitaTextAreas[3].getText(), // precipitation_comment
+                    "N/A", // glacier_altitude_comment (da definire)
+                    "N/A", // glacier_mass_comment (da definire)
+                    new BigDecimal(scoreDropdowns[0].getSelectedItem().toString()), // wind_score
+                    new BigDecimal(scoreDropdowns[1].getSelectedItem().toString()), // humidity_score
+                    0, // pressure_score (da definire)
+                    new BigDecimal(scoreDropdowns[2].getSelectedItem().toString()), // temperature_score
+                    new BigDecimal(scoreDropdowns[3].getSelectedItem().toString()), // precipitation_score
+                    0, // glacier_altitude_score (da definire)
+                    0) // glacier_mass_score (da definire)
+                    .executeUpdate();
 
             salvaRilevazione(username, centroID, geo_id, key);
 
             conn.commit(); // Conferma le modifiche
             JOptionPane.showMessageDialog(null, "Dati climatici salvati con successo.");
-            return stmt.executeUpdate()>0;
+            return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
             conn.rollback(); // Annulla le modifiche in caso di errore
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Errore durante il salvataggio dei dati climatici: " + e.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Errore durante il salvataggio dei dati climatici: " + e.getMessage(),
+                    "Errore", JOptionPane.ERROR_MESSAGE);
         }
         return false;
     }
-
-
 
     // Verifica se un campo è vuoto o nullo
     public boolean isNullOrEmpty(String... fields) {
@@ -261,10 +264,10 @@ public class QueryExecutorImpl {
     // Verifica se un valore esiste nel database
     private boolean existsInDatabase(String field, String value) throws SQLException {
         ensureConnection();
+        String SELECT_OPERATORI_QUERY = "SELECT 1 FROM operatori WHERE %s = ? LIMIT 1";
         String query = String.format(SELECT_OPERATORI_QUERY, field);
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, value);
-            try (ResultSet rs = stmt.executeQuery()) {
+            try (ResultSet rs = Tools.setParametri(stmt, value).executeQuery()) {
                 return rs.next();
             }
         }
@@ -293,14 +296,14 @@ public class QueryExecutorImpl {
         if (emailEsistente(operatore.getEmail())) {
             // Mostra un messaggio di errore con un pop-up
             JOptionPane.showMessageDialog(null, "L'email è già in uso.", "Errore", JOptionPane.ERROR_MESSAGE);
-            return false;  // Ferma l'esecuzione se l'email esiste già
+            return false; // Ferma l'esecuzione se l'email esiste già
         }
 
         // Verifica se il codice fiscale esiste già
         if (codiceFiscaleEsistente(operatore.getCodFiscale())) {
             // Mostra un messaggio di errore con un pop-up
             JOptionPane.showMessageDialog(null, "Il codice fiscale è già in uso.", "Errore", JOptionPane.ERROR_MESSAGE);
-            return false;  // Ferma l'esecuzione se il codice fiscale esiste già
+            return false; // Ferma l'esecuzione se il codice fiscale esiste già
         }
 
         // Genera lo username solo dopo aver validato tutti i dati
@@ -310,23 +313,20 @@ public class QueryExecutorImpl {
             return false;
         }
 
-
         // Query per inserire l'operatore nel database
-        String query = "INSERT INTO operatori (nome, cognome, codice_fiscale, email, password, centro_monitoraggio, username) " +
+        String query = "INSERT INTO operatori (nome, cognome, codice_fiscale, email, password, centro_monitoraggio, username) "
+                +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            conn.setAutoCommit(false); // Inizia transazione
-
-            stmt.setString(1, operatore.getNome());
-            stmt.setString(2, operatore.getCognome());
-            stmt.setString(3, operatore.getCodFiscale());
-            stmt.setString(4, operatore.getEmail());
-            stmt.setString(5, operatore.getPassword());
-            stmt.setString(6, operatore.getCentroMonitoraggio());
-            stmt.setString(7, username);
-
-            int rowsAffected = stmt.executeUpdate();
+            int rowsAffected = Tools.setParametri(stmt,
+                    operatore.getNome(),
+                    operatore.getCognome(),
+                    operatore.getCodFiscale(),
+                    operatore.getEmail(),
+                    operatore.getPassword(),
+                    operatore.getCentroMonitoraggio(),
+                    username).executeUpdate();
             if (rowsAffected > 0) {
                 conn.commit();
                 return true;
@@ -336,11 +336,8 @@ public class QueryExecutorImpl {
         } catch (SQLException e) {
             conn.rollback();
             throw new SQLException("Errore durante il salvataggio dell'operatore.", e);
-        } finally {
-            conn.setAutoCommit(true); // Ripristina auto commit
         }
     }
-
 
     public boolean isIdExist(String id) throws SQLException {
 
@@ -348,18 +345,14 @@ public class QueryExecutorImpl {
             throw new IllegalArgumentException("ID già esistente: " + id);
         }
 
-
         ensureConnection();
         String query = "SELECT 1 FROM centrimonitoraggio WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
+            try (ResultSet rs = Tools.setParametri(stmt, id).executeQuery()) {
                 return rs.next();
             }
         }
     }
-
-
 
     public List<String> getCentriMonitoraggio() throws SQLException {
         ensureConnection();
@@ -375,12 +368,11 @@ public class QueryExecutorImpl {
         return centri;
     }
 
-
     // Metodo per ottenere coordinate senza filtri
     public List<Coordinate> getCoordinate() throws SQLException {
         ensureConnection();
         List<Coordinate> coordinates = new ArrayList<>();
-        String query = "SELECT * FROM citta";
+        String query = "SELECT * FROM citta ORDER BY name ASC ";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -397,9 +389,6 @@ public class QueryExecutorImpl {
         }
         return coordinates;
     }
-
-
-
 
     // Validazione email
     private boolean isValidEmail(String email) {
@@ -420,24 +409,22 @@ public class QueryExecutorImpl {
     public boolean codiceFiscaleEsistente(String codiceFiscale) throws SQLException {
         String query = "SELECT COUNT(*) FROM operatori WHERE codice_fiscale = ?";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, codiceFiscale);
-            try (ResultSet rs = stmt.executeQuery()) {
+            try (ResultSet rs = Tools.setParametri(stmt, codiceFiscale).executeQuery()) {
                 if (rs.next()) {
-                    return rs.getInt(1) > 0;  // Restituisce true se il codice fiscale esiste
+                    return rs.getInt(1) > 0; // Restituisce true se il codice fiscale esiste
                 }
             }
         }
-        return false;  // Restituisce false se il codice fiscale non esiste
+        return false; // Restituisce false se il codice fiscale non esiste
     }
 
     public List<Coordinate> getCoordinate(String text) throws SQLException {
         ensureConnection();
         List<Coordinate> coordinates = new ArrayList<>();
-        String query = "select geoname_id,name,ascii_name,country_code,country_name,latitude,longitude from citta where name like ? ";
+        String query = "select geoname_id,name,ascii_name,country_code,country_name,latitude,longitude from citta where name like ?  ORDER BY name ASC ";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             text = "%" + text + "%";
-            stmt.setString(1, text);
-            ResultSet rs = stmt.executeQuery();
+            ResultSet rs = Tools.setParametri(stmt, text).executeQuery();
             while (rs.next()) {
                 String geoname_id = rs.getString("geoname_id");
                 String nam = rs.getString("name");
@@ -459,11 +446,8 @@ public class QueryExecutorImpl {
         List<Coordinate> coordinates = new ArrayList<>();
         String query = "SELECT * FROM citta WHERE latitude BETWEEN ? AND ? AND longitude BETWEEN ? AND ?";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setDouble(1, latitude - tolerance);
-            stmt.setDouble(2, latitude + tolerance);
-            stmt.setDouble(3, longitude - tolerance);
-            stmt.setDouble(4, longitude + tolerance);
-            ResultSet rs = stmt.executeQuery();
+            ResultSet rs = Tools.setParametri(stmt, latitude - tolerance, latitude + tolerance, longitude - tolerance,
+                    longitude + tolerance).executeQuery();
             while (rs.next()) {
                 String geoname_id = rs.getString("geoname_id");
                 String nam = rs.getString("name");
@@ -488,8 +472,7 @@ public class QueryExecutorImpl {
         try {
             ensureConnection(); // Assicurati che la connessione sia attiva
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.setString(1, username);  // Imposta il parametro correttamente
-                try (ResultSet rs = stmt.executeQuery()) {
+                try (ResultSet rs = Tools.setParametri(stmt, username).executeQuery()) {
                     while (rs.next()) {
                         centrimonitoraggio.add(rs.getString("nomecentro"));
                     }
@@ -513,13 +496,10 @@ public class QueryExecutorImpl {
         return centrimonitoraggio;
     }
 
-
     // Metodo per verificare se lo username esiste nel database
     private boolean isUsernameExist(String username) throws SQLException {
         return existsInDatabase("username", username);
     }
-
-
 
     public String generateUsername(String nome, String cognome, String codFiscale) throws SQLException {
         // Verifica la validità dei parametri
@@ -532,10 +512,12 @@ public class QueryExecutorImpl {
             throw new IllegalArgumentException("Il codice fiscale deve avere esattamente 16 caratteri.");
         }
 
-        // Estrai la parte del nome (primi 4 caratteri) e rendi la prima lettera maiuscola
+        // Estrai la parte del nome (primi 4 caratteri) e rendi la prima lettera
+        // maiuscola
         String nomeParte = nome.length() >= 4 ? nome.substring(0, 4).toUpperCase() : nome.toUpperCase();
 
-        // Estrai la parte del cognome (primi 4 caratteri) e rendi la prima lettera maiuscola
+        // Estrai la parte del cognome (primi 4 caratteri) e rendi la prima lettera
+        // maiuscola
         String cognomeParte = cognome.length() >= 4 ? cognome.substring(0, 4).toUpperCase() : cognome.toUpperCase();
 
         // Estrai i caratteri dal 6° al 9° del codice fiscale
@@ -545,7 +527,7 @@ public class QueryExecutorImpl {
         String baseUsername = nomeParte + cognomeParte + codFiscaleParte;
 
         // Assicurati che il nome utente generato non superi una lunghezza massima
-        int maxLength = 20;  // Limite di lunghezza per lo username
+        int maxLength = 20; // Limite di lunghezza per lo username
         if (baseUsername.length() > maxLength) {
             baseUsername = baseUsername.substring(0, maxLength);
         }
@@ -569,6 +551,5 @@ public class QueryExecutorImpl {
         // Restituisci lo username unico
         return username;
     }
-
 
 }

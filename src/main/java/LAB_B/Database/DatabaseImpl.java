@@ -19,7 +19,8 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
     // Oggetto per l'esecuzione delle query
     private QueryExecutorImpl queryExecutorImpl;
 
-    // Blocco statico per inizializzare la connessione al database al momento del caricamento della classe
+    // Blocco statico per inizializzare la connessione al database al momento del
+    // caricamento della classe
     static {
         try {
             initializeConnection();
@@ -33,11 +34,10 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
     public DatabaseImpl() throws IOException, SQLException {
         super();
         if (connection == null || connection.isClosed()) {
-            initializeConnection();  // Solo al primo utilizzo
+            initializeConnection(); // Solo al primo utilizzo
         }
         this.queryExecutorImpl = new QueryExecutorImpl();
     }
-
 
     // Metodo per inizializzare la connessione al database
     private static void initializeConnection() throws SQLException, IOException {
@@ -76,7 +76,8 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
         return connection;
     }
 
-    // Metodo per chiudere la connessione (richiamato solo alla fine, quando l'applicazione termina)
+    // Metodo per chiudere la connessione (richiamato solo alla fine, quando
+    // l'applicazione termina)
     public static void closeConnection() {
         try {
             if (connection != null && !connection.isClosed()) {
@@ -90,22 +91,10 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
     }
 
     @Override
-    public ResultSet executeQuery(String query, Object... params) throws RemoteException, SQLException {
-        // Implementazione di executeQuery, se necessario
-        return null; // Placeholder
-    }
-
-    @Override
-    public int executeUpdate(String query, Object... params) throws RemoteException, SQLException {
-        // Implementazione di executeUpdate, se necessario
-        return 0; // Placeholder
-    }
-
-
-    @Override
     public boolean login(String codiceFiscale, String password) throws RemoteException, SQLException {
         try {
-            if (queryExecutorImpl == null) queryExecutorImpl = new QueryExecutorImpl();
+            if (queryExecutorImpl == null)
+                queryExecutorImpl = new QueryExecutorImpl();
             return queryExecutorImpl.login(codiceFiscale, password);
         } catch (Exception e) {
             // Gestione di altre eccezioni generiche
@@ -114,12 +103,12 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
         }
     }
 
-
     // Metodo per la registrazione di un operatore
     @Override
     public boolean registrazione(Operatore operatore) throws RemoteException {
         try {
-            // Usa il metodo salvaOperatore del QueryExecutorImpl per registrare l'operatore nel database
+            // Usa il metodo salvaOperatore del QueryExecutorImpl per registrare l'operatore
+            // nel database
             return queryExecutorImpl.salvaOperatore(operatore);
         } catch (SQLException e) {
             System.err.println("Errore durante la registrazione dell'operatore: " + e.getMessage());
@@ -129,10 +118,12 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
     }
 
     @Override
-    public List<Coordinate> getCoordinaResultSet(double latitude, double longitude, double tollerance) throws RemoteException {
+    public List<Coordinate> getCoordinaResultSet(double latitude, double longitude, double tollerance)
+            throws RemoteException {
 
         try {
-            if (queryExecutorImpl == null) queryExecutorImpl = new QueryExecutorImpl();
+            if (queryExecutorImpl == null)
+                queryExecutorImpl = new QueryExecutorImpl();
             return queryExecutorImpl.getCoordinate(latitude, longitude, tollerance);
         } catch (SQLException e) {
             // TODO Auto-generated catch block
@@ -144,21 +135,26 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
 
     @Override
     public List<String> getCentriPerOperatore(String username) throws RemoteException {
-        if (queryExecutorImpl == null) queryExecutorImpl = new QueryExecutorImpl();
+        if (queryExecutorImpl == null)
+            queryExecutorImpl = new QueryExecutorImpl();
         return queryExecutorImpl.getCentriPerOperatore(username);
     }
 
     @Override
     public boolean salvaCentroMonitoraggio(String nomeCentro, String descrizione, String username) throws Exception {
-        if (queryExecutorImpl == null) queryExecutorImpl = new QueryExecutorImpl();
+        if (queryExecutorImpl == null)
+            queryExecutorImpl = new QueryExecutorImpl();
         return queryExecutorImpl.salvaCentroMonitoraggio(nomeCentro, descrizione, username);
     }
 
     @Override
-    public boolean salvaRilevazione(String key, String centroID, JComboBox<Integer>[] scoreDropdowns, JTextArea[] severitaTextAreas, String username, String geo_id) throws RemoteException {
-        if (queryExecutorImpl == null) queryExecutorImpl = new QueryExecutorImpl();
+    public boolean salvaRilevazione(String key, String centroID, JComboBox<Integer>[] scoreDropdowns,
+            JTextArea[] severitaTextAreas, String username, long geo_id) throws RemoteException {
+        if (queryExecutorImpl == null)
+            queryExecutorImpl = new QueryExecutorImpl();
         try {
-            return queryExecutorImpl.salvaDatiClimatici(key, centroID, scoreDropdowns, severitaTextAreas, username, geo_id);
+            return queryExecutorImpl.salvaDatiClimatici(key, centroID, scoreDropdowns, severitaTextAreas, username,
+                    geo_id);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -168,7 +164,8 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
     public List<Coordinate> getCoordinaResultSet(String name) throws RemoteException {
 
         try {
-            if (queryExecutorImpl == null) queryExecutorImpl = new QueryExecutorImpl();
+            if (queryExecutorImpl == null)
+                queryExecutorImpl = new QueryExecutorImpl();
             return queryExecutorImpl.getCoordinate(name);
         } catch (SQLException e) {
             // TODO Auto-generated catch block
@@ -188,6 +185,5 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
             return null;
         }
     }
-
 
 }

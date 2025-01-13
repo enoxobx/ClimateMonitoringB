@@ -37,9 +37,9 @@ public class LayoutCittadino extends LayoutStandard {
         caricaCitta = new JButton("Carica città vicine");
         posiziona = new JButton("Mostra nella mappa");
         search = new JButton("Cerca");
-        Citta pari = new Citta("pari", "pari", "pari", "fr", "Francia", 2.2943506, 48.8588443);
-        Coordinate parigi = new Coordinate(pari);
-        mapViewer.setDisplayPosition(parigi, 6);
+        Citta varese = new Citta("Varese", "Varese", "Varese", "it", "italia", 8.825058, 45.820599);
+        Coordinate Vare = new Coordinate(varese);
+        mapViewer.setDisplayPosition(Vare, 12);
 
         body.add(mapViewer, BorderLayout.NORTH);
         body.add(centerP, BorderLayout.CENTER);

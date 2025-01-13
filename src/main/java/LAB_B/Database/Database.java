@@ -11,12 +11,6 @@ import java.sql.SQLException;
 import java.util.List;
 public interface Database extends Remote{
 
-    // Esegui una query generica con parametri variabili
-    ResultSet executeQuery(String query, Object... params) throws RemoteException, SQLException;
-
-    // Esegui un'operazione di aggiornamento (INSERT, UPDATE, DELETE) con parametri variabili
-    int executeUpdate(String query, Object... params) throws RemoteException, SQLException;
-
     // Metodo per il login dell'operatore, dato il codice fiscale e la password
     boolean login(String codiceFiscale, String password) throws RemoteException, SQLException;
 
@@ -25,7 +19,7 @@ public interface Database extends Remote{
 
     List<Coordinate> getCoordinaResultSet()throws RemoteException ;
 
-    boolean salvaRilevazione(String key, String centroID, JComboBox<Integer>[] scoreDropdowns, JTextArea[] severitaTextAreas, String username, String geo_id) throws RemoteException;
+    boolean salvaRilevazione(String key, String centroID, JComboBox<Integer>[] scoreDropdowns, JTextArea[] severitaTextAreas, String username, long geo_id) throws RemoteException;
 
     List<Coordinate> getCoordinaResultSet(String name) throws RemoteException;
     List<Coordinate> getCoordinaResultSet(double latitude, double longitude, double tollerance )throws RemoteException ;
