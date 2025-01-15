@@ -38,8 +38,8 @@ CREATE TABLE operatori (
                            cognome VARCHAR(100) NOT NULL,
                            username VARCHAR(12) NOT NULL UNIQUE,
                            email VARCHAR(100) NOT NULL UNIQUE,
-                           password VARCHAR(100) NOT NULL,
-                           centro_monitoraggio VARCHAR(100) NOT NULL
+                           password VARCHAR(100) NOT NULL
+
 );
 
 

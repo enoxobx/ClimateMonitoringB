@@ -52,6 +52,158 @@ public class QueryExecutorImpl {
 
         return loginSuccess;
     }
+    // Validazione email
+    private boolean isValidEmail(String email) {
+        return email != null && email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+    }
+
+    // Validazione codice fiscale
+    private boolean isValidCodiceFiscale(String codiceFiscale) {
+        return codiceFiscale != null && codiceFiscale.matches("[A-Z0-9]{16}");
+    }
+
+    // Verifica se un campo è vuoto o nullo
+    public boolean isNullOrEmpty(String... fields) {
+        for (String field : fields) {
+            if (field == null || field.trim().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Verifica se un valore esiste nel database
+    private boolean existsInDatabase(String field, String value) throws SQLException {
+        ensureConnection();
+        String SELECT_OPERATORI_QUERY = "SELECT 1 FROM operatori WHERE %s = ? LIMIT 1";
+        String query = String.format(SELECT_OPERATORI_QUERY, field);
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            try (ResultSet rs = Tools.setParametri(stmt, value).executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    // Metodo per verificare se lo username esiste nel database
+    private boolean isUsernameExist(String username) throws SQLException {
+        return existsInDatabase("username", username);
+    }
+
+    // Verifica se l'email esiste
+    public boolean emailEsistente(String email) throws SQLException {
+        return existsInDatabase("email", email);
+    }
+
+    // Verifica se il codice fiscale esiste nel database
+    public boolean codiceFiscaleEsistente(String codiceFiscale) throws SQLException {
+        String query = "SELECT COUNT(*) FROM operatori WHERE codice_fiscale = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            try (ResultSet rs = Tools.setParametri(stmt, codiceFiscale).executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    // Metodo per salvare l'operatore nel database
+    public boolean salvaOperatore(Operatore operatore) throws SQLException {
+        ensureConnection();
+
+        // Verifica che tutti i campi siano validi
+        if (isNullOrEmpty(operatore.getNome(), operatore.getCognome(), operatore.getCodFiscale(),
+                operatore.getEmail(), operatore.getPassword())) {
+            throw new IllegalArgumentException("Tutti i campi devono essere compilati.");
+        }
+
+        // Verifica la validità di email e codice fiscale
+        if (!isValidEmail(operatore.getEmail())) {
+            throw new IllegalArgumentException("Email non valida.");
+        }
+
+        if (!isValidCodiceFiscale(operatore.getCodFiscale())) {
+            throw new IllegalArgumentException("Codice Fiscale non valido.");
+        }
+
+        // Verifica se l'email esiste già
+        if (emailEsistente(operatore.getEmail())) {
+            JOptionPane.showMessageDialog(null, "L'email è già in uso.", "Errore", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        // Verifica se il codice fiscale esiste già
+        if (codiceFiscaleEsistente(operatore.getCodFiscale())) {
+            JOptionPane.showMessageDialog(null, "Il codice fiscale è già in uso.", "Errore", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        // Genera lo username solo dopo aver validato tutti i dati
+        String username = generateUsername(operatore.getNome(), operatore.getCognome(), operatore.getCodFiscale());
+        if (isUsernameExist(username)) {
+            JOptionPane.showMessageDialog(null, "Lo username è già in uso.", "Errore", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        // Query per inserire l'operatore nel database
+        String query = "INSERT INTO operatori (nome, cognome, codice_fiscale, email, password, username) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            int rowsAffected = Tools.setParametri(stmt,
+                    operatore.getNome(),
+                    operatore.getCognome(),
+                    operatore.getCodFiscale(),
+                    operatore.getEmail(),
+                    operatore.getPassword(),
+                    username).executeUpdate();
+            if (rowsAffected > 0) {
+                conn.commit();
+                return true;
+            } else {
+                throw new SQLException("Errore nell'inserimento dell'operatore nel database.");
+            }
+        } catch (SQLException e) {
+            conn.rollback();
+            throw new SQLException("Errore durante il salvataggio dell'operatore.", e);
+        }
+    }
+
+    // Metodo per generare uno username unico
+    public String generateUsername(String nome, String cognome, String codFiscale) throws SQLException {
+        if (nome == null || cognome == null || codFiscale == null) {
+            throw new IllegalArgumentException("Nome, cognome e codice fiscale non possono essere nulli.");
+        }
+
+        if (codFiscale.length() != 16) {
+            throw new IllegalArgumentException("Il codice fiscale deve avere esattamente 16 caratteri.");
+        }
+
+        String nomeParte = nome.length() >= 4 ? nome.substring(0, 4).toUpperCase() : nome.toUpperCase();
+        String cognomeParte = cognome.length() >= 4 ? cognome.substring(0, 4).toUpperCase() : cognome.toUpperCase();
+        String codFiscaleParte = codFiscale.substring(5, 9);
+
+        String baseUsername = nomeParte + cognomeParte + codFiscaleParte;
+
+        int maxLength = 20;
+        if (baseUsername.length() > maxLength) {
+            baseUsername = baseUsername.substring(0, maxLength);
+        }
+
+        String username = baseUsername;
+        int counter = 1;
+
+        while (isUsernameExist(username)) {
+            username = baseUsername + counter;
+            counter++;
+
+            if (username.length() > maxLength) {
+                throw new SQLException("Impossibile generare uno username unico con il formato richiesto.");
+            }
+        }
+
+        return username;
+    }
 
     private List<String> getIDCentri() {
 
@@ -251,93 +403,7 @@ public class QueryExecutorImpl {
         return false;
     }
 
-    // Verifica se un campo è vuoto o nullo
-    public boolean isNullOrEmpty(String... fields) {
-        for (String field : fields) {
-            if (field == null || field.trim().isEmpty()) {
-                return true;
-            }
-        }
-        return false;
-    }
 
-    // Verifica se un valore esiste nel database
-    private boolean existsInDatabase(String field, String value) throws SQLException {
-        ensureConnection();
-        String SELECT_OPERATORI_QUERY = "SELECT 1 FROM operatori WHERE %s = ? LIMIT 1";
-        String query = String.format(SELECT_OPERATORI_QUERY, field);
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            try (ResultSet rs = Tools.setParametri(stmt, value).executeQuery()) {
-                return rs.next();
-            }
-        }
-    }
-
-    // Metodo per salvare l'operatore nel database
-    public boolean salvaOperatore(Operatore operatore) throws SQLException {
-        ensureConnection();
-
-        // Verifica che tutti i campi siano validi
-        if (isNullOrEmpty(operatore.getNome(), operatore.getCognome(), operatore.getCodFiscale(),
-                operatore.getEmail(), operatore.getPassword(), operatore.getCentroMonitoraggio())) {
-            throw new IllegalArgumentException("Tutti i campi devono essere compilati.");
-        }
-
-        // Verifica la validità di email e codice fiscale
-        if (!isValidEmail(operatore.getEmail())) {
-            throw new IllegalArgumentException("Email non valida.");
-        }
-
-        if (!isValidCodiceFiscale(operatore.getCodFiscale())) {
-            throw new IllegalArgumentException("Codice Fiscale non valido.");
-        }
-
-        // Verifica se l'email esiste già
-        if (emailEsistente(operatore.getEmail())) {
-            // Mostra un messaggio di errore con un pop-up
-            JOptionPane.showMessageDialog(null, "L'email è già in uso.", "Errore", JOptionPane.ERROR_MESSAGE);
-            return false; // Ferma l'esecuzione se l'email esiste già
-        }
-
-        // Verifica se il codice fiscale esiste già
-        if (codiceFiscaleEsistente(operatore.getCodFiscale())) {
-            // Mostra un messaggio di errore con un pop-up
-            JOptionPane.showMessageDialog(null, "Il codice fiscale è già in uso.", "Errore", JOptionPane.ERROR_MESSAGE);
-            return false; // Ferma l'esecuzione se il codice fiscale esiste già
-        }
-
-        // Genera lo username solo dopo aver validato tutti i dati
-        String username = generateUsername(operatore.getNome(), operatore.getCognome(), operatore.getCodFiscale());
-        if (isUsernameExist(username)) {
-            JOptionPane.showMessageDialog(null, "Lo username è già in uso.", "Errore", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
-        // Query per inserire l'operatore nel database
-        String query = "INSERT INTO operatori (nome, cognome, codice_fiscale, email, password, centro_monitoraggio, username) "
-                +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            int rowsAffected = Tools.setParametri(stmt,
-                    operatore.getNome(),
-                    operatore.getCognome(),
-                    operatore.getCodFiscale(),
-                    operatore.getEmail(),
-                    operatore.getPassword(),
-                    operatore.getCentroMonitoraggio(),
-                    username).executeUpdate();
-            if (rowsAffected > 0) {
-                conn.commit();
-                return true;
-            } else {
-                throw new SQLException("Errore nell'inserimento dell'operatore nel database.");
-            }
-        } catch (SQLException e) {
-            conn.rollback();
-            throw new SQLException("Errore durante il salvataggio dell'operatore.", e);
-        }
-    }
 
     public boolean isIdExist(String id) throws SQLException {
 
@@ -390,33 +456,9 @@ public class QueryExecutorImpl {
         return coordinates;
     }
 
-    // Validazione email
-    private boolean isValidEmail(String email) {
-        return email != null && email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
-    }
 
-    // Validazione codice fiscale
-    private boolean isValidCodiceFiscale(String codiceFiscale) {
-        return codiceFiscale != null && codiceFiscale.matches("[A-Z0-9]{16}");
-    }
 
-    // Verifica se l'email esiste
-    public boolean emailEsistente(String email) throws SQLException {
-        return existsInDatabase("email", email);
-    }
 
-    // Verifica se il codice fiscale esiste nel database
-    public boolean codiceFiscaleEsistente(String codiceFiscale) throws SQLException {
-        String query = "SELECT COUNT(*) FROM operatori WHERE codice_fiscale = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            try (ResultSet rs = Tools.setParametri(stmt, codiceFiscale).executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0; // Restituisce true se il codice fiscale esiste
-                }
-            }
-        }
-        return false; // Restituisce false se il codice fiscale non esiste
-    }
 
     public List<Coordinate> getCoordinate(String text) throws SQLException {
         ensureConnection();
@@ -495,61 +537,6 @@ public class QueryExecutorImpl {
 
         return centrimonitoraggio;
     }
-
-    // Metodo per verificare se lo username esiste nel database
-    private boolean isUsernameExist(String username) throws SQLException {
-        return existsInDatabase("username", username);
-    }
-
-    public String generateUsername(String nome, String cognome, String codFiscale) throws SQLException {
-        // Verifica la validità dei parametri
-        if (nome == null || cognome == null || codFiscale == null) {
-            throw new IllegalArgumentException("Nome, cognome e codice fiscale non possono essere nulli.");
-        }
-
-        // Assicurati che il codice fiscale abbia almeno 16 caratteri
-        if (codFiscale.length() != 16) {
-            throw new IllegalArgumentException("Il codice fiscale deve avere esattamente 16 caratteri.");
-        }
-
-        // Estrai la parte del nome (primi 4 caratteri) e rendi la prima lettera
-        // maiuscola
-        String nomeParte = nome.length() >= 4 ? nome.substring(0, 4).toUpperCase() : nome.toUpperCase();
-
-        // Estrai la parte del cognome (primi 4 caratteri) e rendi la prima lettera
-        // maiuscola
-        String cognomeParte = cognome.length() >= 4 ? cognome.substring(0, 4).toUpperCase() : cognome.toUpperCase();
-
-        // Estrai i caratteri dal 6° al 9° del codice fiscale
-        String codFiscaleParte = codFiscale.substring(5, 9);
-
-        // Combina le parti per creare il baseUsername
-        String baseUsername = nomeParte + cognomeParte + codFiscaleParte;
-
-        // Assicurati che il nome utente generato non superi una lunghezza massima
-        int maxLength = 20; // Limite di lunghezza per lo username
-        if (baseUsername.length() > maxLength) {
-            baseUsername = baseUsername.substring(0, maxLength);
-        }
-
-        // Variabili per gestire il controllo dell'unicità
-        String username = baseUsername;
-        int counter = 1;
-
-        // Ciclo per verificare se lo username è unico
-        while (isUsernameExist(username)) {
-            // Se lo username esiste già, aggiungi un numero incrementato
-            username = baseUsername + counter;
-            counter++;
-
-            // Se lo username supera la lunghezza massima, interrompi
-            if (username.length() > maxLength) {
-                throw new SQLException("Impossibile generare uno username unico con il formato richiesto.");
-            }
-        }
-
-        // Restituisci lo username unico
-        return username;
-    }
-
 }
+
+

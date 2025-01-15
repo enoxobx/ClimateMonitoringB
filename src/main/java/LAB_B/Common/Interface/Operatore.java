@@ -13,19 +13,17 @@ public class Operatore {
     private final String email;
     private final String password;
     private final String confermaPassword;  // Aggiunto campo per conferma password
-    private final String centroMonitoraggio;
     private String username;
     private final StringBuilder err = new StringBuilder();
 
     // Costruttore completo con tutti i parametri
-    public Operatore(String nome, String cognome, String codFiscale, String email, String password, String confermaPassword, String centroMonitoraggio, String username) {
+    public Operatore(String nome, String cognome, String codFiscale, String email, String password, String confermaPassword,  String username) {
         this.nome = nome;
         this.cognome = cognome;
         this.codFiscale = codFiscale != null ? codFiscale.toUpperCase() : ""; // Assicurati che il codice fiscale sia in maiuscolo
         this.email = email;
         this.password = password;
         this.confermaPassword = confermaPassword;
-        this.centroMonitoraggio = centroMonitoraggio;
         this.username = username; // Username può essere null o vuoto
     }
 
@@ -48,10 +46,6 @@ public class Operatore {
 
     public String getPassword() {
         return password;
-    }
-
-    public String getCentroMonitoraggio() {
-        return centroMonitoraggio;
     }
 
     public String getUsername() {
@@ -92,10 +86,6 @@ public class Operatore {
             err.append("Le password non coincidono.\n");
         }
 
-        // Centro monitoraggio (non deve essere vuoto)
-        if (centroMonitoraggio == null || centroMonitoraggio.isEmpty()) {
-            err.append("Centro Monitoraggio non valido. Non può essere vuoto.\n");
-        }
 
         // Se non ci sono errori, generiamo lo username, se necessario
         if (err.length() == 0 && (username == null || username.isEmpty())) {

@@ -18,8 +18,6 @@ public class SignUp extends LayoutStandard {
     private final JTextField emailField = new JTextField(15);
     private final JPasswordField passwordField = new JPasswordField(15);
     private final JPasswordField confermaPasswordField = new JPasswordField(15);
-    private final JTextField centroField = new JTextField(15);
-
     private final JButton helpButton = new JButton("?");
 
     // Costruttore
@@ -56,7 +54,6 @@ public class SignUp extends LayoutStandard {
         addField(inputPanel, "Email:", emailField);
         addField(inputPanel, "Password:", passwordField);
         addField(inputPanel, "Conferma Password:", confermaPasswordField);
-        addField(inputPanel, "Centro di Monitoraggio:", centroField);
         body.add(inputPanel, BorderLayout.CENTER);
 
         // Aggiungi il bottone "Home" che è già stato creato in LayoutStandard
@@ -102,7 +99,6 @@ public class SignUp extends LayoutStandard {
                 "<li><strong>Codice Fiscale:</strong> Inserisci il tuo codice fiscale.</li>" +
                 "<li><strong>Email:</strong> Inserisci una email valida.</li>" +
                 "<li><strong>Password:</strong> La password deve contenere almeno una lettera maiuscola, una minuscola, un numero e un simbolo.</li>" +
-                "<li><strong>Centro di Monitoraggio:</strong> Inserisci il centro di monitoraggio assegnato.</li>" +
                 "</ul></html>";
         JOptionPane.showMessageDialog(this, helpMessage, "Guida", JOptionPane.INFORMATION_MESSAGE);
     }
@@ -117,10 +113,10 @@ public class SignUp extends LayoutStandard {
         String email = emailField.getText().trim();
         String password = new String(passwordField.getPassword());
         String confermaPassword = new String(confermaPasswordField.getPassword());
-        String centroMonitoraggio = centroField.getText().trim();
+
 
         // Crea un nuovo oggetto operatore
-        Operatore operatore = new Operatore(nome, cognome, codiceFiscale, email, password, confermaPassword, centroMonitoraggio, null);
+        Operatore operatore = new Operatore(nome, cognome, codiceFiscale, email, password, confermaPassword, null);
 
         // Verifica la validità dei dati
         if (!operatore.validate()) {
