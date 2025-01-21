@@ -23,7 +23,7 @@ public class LayoutOperatore extends LayoutStandard {
     private final JLabel titleLable;
     private final ScrollPane centriScrollPane;
     private final JComboBox<String> cittaDropdown = new JComboBox<>();
-    private final   JComboBox<String> centriDropdown = new JComboBox<>();
+    private final JComboBox<String> centriDropdown = new JComboBox<>();
 
     public LayoutOperatore(String username) {
         super(); // Chiamata al costruttore della classe padre LayoutStandard
@@ -38,13 +38,13 @@ public class LayoutOperatore extends LayoutStandard {
 
         JLabel titleLabel = new JLabel("Benvenuto " + username.toUpperCase(Locale.ROOT), SwingConstants.CENTER);
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 26));
-        titleLabel.setForeground(new Color(70, 130, 180));  // Colore blu
+        titleLabel.setForeground(new Color(70, 130, 180)); // Colore blu
         container.add(titleLabel, BorderLayout.NORTH);
 
         // Pannello centrale
         JPanel contentPanel = new JPanel(new GridBagLayout());
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));  // Aggiunto padding
-        contentPanel.setBackground(Color.WHITE);  // Colore di sfondo bianco
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30)); // Aggiunto padding
+        contentPanel.setBackground(Color.WHITE); // Colore di sfondo bianco
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -88,7 +88,6 @@ public class LayoutOperatore extends LayoutStandard {
         // Aggiungi il bottone "Home" che è già stato creato in LayoutStandard
         container.add(home, BorderLayout.WEST);
 
-
         container.add(actionPanel, BorderLayout.SOUTH);
 
         // Aggiungi action listeners
@@ -99,8 +98,6 @@ public class LayoutOperatore extends LayoutStandard {
         setVisible(true);
         titleLable = null;
     }
-
-
 
     private void caricaCentri() {
         listaCentriModel.clear(); // Svuota la lista esistente
@@ -140,7 +137,6 @@ public class LayoutOperatore extends LayoutStandard {
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-
         JComboBox<String> centriDropdown = new JComboBox<>();
         for (int i = 0; i < listaCentriModel.size(); i++) {
             centriDropdown.addItem(listaCentriModel.getElementAt(i));
@@ -152,12 +148,12 @@ public class LayoutOperatore extends LayoutStandard {
         panel.add(centriDropdown, gbc);
 
         // Parametri climatici con score e area di testo per severità
-        String[] parametri = {"Velocità Vento", "Temperatura", "Umidità", "Precipitazioni"};
+        String[] parametri = { "Velocità Vento", "Temperatura", "Umidità", "Precipitazioni" };
         JComboBox<Integer>[] scoreDropdowns = new JComboBox[parametri.length]; // Array per i dropdown di score
         JTextArea[] severitaTextAreas = new JTextArea[parametri.length]; // Array per le JTextArea
         JComboBox<Integer>[] usernamescore = new JComboBox[parametri.length];
         JComboBox<Integer>[] geonemascore = new JComboBox[parametri.length];
-// Campo per l'inserimento del valore della chiave primaria "key"
+        // Campo per l'inserimento del valore della chiave primaria "key"
         gbc.gridy++;
         gbc.gridx = 0;
         panel.add(new JLabel("Key (ID univoco):"), gbc);
@@ -166,12 +162,10 @@ public class LayoutOperatore extends LayoutStandard {
         gbc.gridx = 1;
         panel.add(keyField, gbc);
 
-// Dropdown per selezionare il centro
+        // Dropdown per selezionare il centro
         gbc.gridy++;
         gbc.gridx = 0;
         panel.add(new JLabel("Seleziona Centro:"), gbc);
-
-
 
         for (int i = 0; i < listaCentriModel.size(); i++) {
             centriDropdown.addItem(listaCentriModel.getElementAt(i));
@@ -182,32 +176,32 @@ public class LayoutOperatore extends LayoutStandard {
         gbc.gridx = 1;
         panel.add(centriDropdown, gbc);
 
-// Campo per l'inserimento dell'username
+        // Campo per l'inserimento dell'username
         gbc.gridy++;
         gbc.gridx = 0;
         panel.add(new JLabel("Username:"), gbc);
 
-// Definisci l'username di default
-        String usernameDefault = username;  // Puoi sostituirlo con qualsiasi altro valore di default
+        // Definisci l'username di default
+        String usernameDefault = username; // Puoi sostituirlo con qualsiasi altro valore di default
 
-// Crea il JTextField e imposta il valore di default
+        // Crea il JTextField e imposta il valore di default
         JTextField usernameField = new JTextField(20);
-        usernameField.setText(usernameDefault);  // Imposta il testo predefinito
+        usernameField.setText(usernameDefault); // Imposta il testo predefinito
 
         gbc.gridx = 1;
         panel.add(usernameField, gbc);
 
-// Dropdown per selezionare la città (geo_id)
+        // Dropdown per selezionare la città (geo_id)
         gbc.gridy++;
         gbc.gridx = 0;
         panel.add(new JLabel("Seleziona Città (Geo ID):"), gbc);
 
         JComboBox<Citta> cittaDropdown = new JComboBox<>();
-// Aggiungi qui le città o geonameID
+        // Aggiungi qui le città o geonameID
 
         try {
             List<Coordinate> listaC = db.getCoordinaResultSet();
-            for(var citta : listaC){
+            for (var citta : listaC) {
                 cittaDropdown.addItem(citta.getCitta());
             }
         } catch (RemoteException e) {
@@ -217,16 +211,14 @@ public class LayoutOperatore extends LayoutStandard {
         gbc.gridx = 1;
         panel.add(cittaDropdown, gbc);
 
-
-
-// Loop per aggiungere i parametri climatici
+        // Loop per aggiungere i parametri climatici
         for (int i = 0; i < parametri.length; i++) {
             gbc.gridy++;
             gbc.gridx = 0;
             panel.add(new JLabel(parametri[i] + " (Score 1-5):"), gbc);
 
             // Dropdown per il punteggio (Score 1-5)
-            scoreDropdowns[i] = new JComboBox<>(new Integer[]{1, 2, 3, 4, 5});
+            scoreDropdowns[i] = new JComboBox<>(new Integer[] { 1, 2, 3, 4, 5 });
             gbc.gridx = 1;
             panel.add(scoreDropdowns[i], gbc);
 
@@ -241,7 +233,7 @@ public class LayoutOperatore extends LayoutStandard {
             severitaTextAreas[i].setDocument(new javax.swing.text.PlainDocument() {
                 @Override
                 public void insertString(int offs, String str, javax.swing.text.AttributeSet a) {
-                    if (getLength() + str.length() <= 256) {  // Limita a 256 caratteri
+                    if (getLength() + str.length() <= 256) { // Limita a 256 caratteri
                         try {
                             super.insertString(offs, str, a);
                         } catch (BadLocationException e) {
@@ -256,9 +248,6 @@ public class LayoutOperatore extends LayoutStandard {
             panel.add(scrollPane, gbc);
         }
 
-
-
-
         // Pulsante "Salva Parametri"
         gbc.gridy++;
         gbc.gridx = 0;
@@ -271,22 +260,23 @@ public class LayoutOperatore extends LayoutStandard {
             String key = keyField.getText();
             String centro = (String) centriDropdown.getSelectedItem();
             if (centro == null || centro.equals("Nessun centro disponibile")) {
-                JOptionPane.showMessageDialog(datiClimaticiFrame, "Compila tutti i campi obbligatori.", "Errore", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(datiClimaticiFrame, "Compila tutti i campi obbligatori.", "Errore",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            Citta selected = (Citta)cittaDropdown.getSelectedItem();
-            String geo_id =  selected.getGeoname();
+            Citta selected = (Citta) cittaDropdown.getSelectedItem();
+            String geo_id = selected.getGeoname();
 
-// Verifica se geo_id è valido
+            // Verifica se geo_id è valido
             if (geo_id == null || geo_id.isEmpty()) {
-                JOptionPane.showMessageDialog(datiClimaticiFrame, "Seleziona una città valida.", "Errore", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(datiClimaticiFrame, "Seleziona una città valida.", "Errore",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-
-
-// Costruzione del log dei dati inseriti per il debug o conferma
-            StringBuilder datiInseriti = new StringBuilder("Key: " + key + "\nCentro: " + centro + "\nGeo ID: " + geo_id + "\n");
+            // Costruzione del log dei dati inseriti per il debug o conferma
+            StringBuilder datiInseriti = new StringBuilder(
+                    "Key: " + key + "\nCentro: " + centro + "\nGeo ID: " + geo_id + "\n");
             for (int i = 0; i < parametri.length; i++) {
                 datiInseriti.append(parametri[i])
                         .append(" - Score: ")
@@ -297,30 +287,28 @@ public class LayoutOperatore extends LayoutStandard {
             }
 
             try {
-                // Salvataggio delle rilevazioni
-                for (int i = 0; i < parametri.length; i++) {
-                    String score = scoreDropdowns[i].getSelectedItem().toString();  // Converti score in stringa
-                    String note = severitaTextAreas[i].getText(); // Note inserite per il parametro
 
-                    long geoname = Long.parseLong(geo_id);
-                    // Chiamata al metodo di salvataggio con tutti i parametri richiesti
-                    boolean success = db.salvaRilevazione(key, centro, scoreDropdowns, severitaTextAreas, this.username, geoname);
-                    if (success) {
-                        System.out.println("Rilevazione salvata con successo.");
-                    } else {
-                        System.out.println("Errore nel salvataggio.");
-                    }
+                long geoname = Long.parseLong(geo_id);
+                // Chiamata al metodo di salvataggio con tutti i parametri richiesti
+                boolean success = db.salvaRilevazione(key, centro, scoreDropdowns, severitaTextAreas, this.username,
+                        geoname);
+                if (success) {
+                    System.out.println("Rilevazione salvata con successo.");
+                } else {
+                    System.out.println("Errore nel salvataggio.");
                 }
 
                 // Mostra un messaggio di conferma all'utente
-                JOptionPane.showMessageDialog(null, "Dati salvati con successo:\n" + datiInseriti, "Successo", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Dati salvati con successo:\n" + datiInseriti, "Successo",
+                        JOptionPane.OK_OPTION);
 
             } catch (RemoteException ex) {
                 throw new RuntimeException("Errore durante il salvataggio della rilevazione.", ex);
             }
 
             // Mostra un messaggio di conferma
-            JOptionPane.showMessageDialog(datiClimaticiFrame, "Dati salvati localmente:\n" + datiInseriti, "Successo", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(datiClimaticiFrame, "Dati salvati localmente:\n" + datiInseriti, "Successo",
+                    JOptionPane.OK_OPTION);
             datiClimaticiFrame.dispose();
         });
 
@@ -338,11 +326,9 @@ public class LayoutOperatore extends LayoutStandard {
             // paginaPrecedenteFrame.setVisible(true);
         });
 
-
         container.add(panel, BorderLayout.CENTER);
         datiClimaticiFrame.setVisible(true);
     }
-
 
     private void apriFinestraCreaCentro() {
         JFrame createCenterFrame = new JFrame("Crea Centro Monitoraggio");
@@ -369,15 +355,17 @@ public class LayoutOperatore extends LayoutStandard {
             String indirizzo = indirizzoField.getText();
 
             if (nomeCentro.isEmpty() || indirizzo.isEmpty()) {
-                JOptionPane.showMessageDialog(createCenterFrame, "Tutti i campi sono obbligatori", "Errore", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(createCenterFrame, "Tutti i campi sono obbligatori", "Errore",
+                        JOptionPane.ERROR_MESSAGE);
             } else {
                 boolean success = false;
 
                 try {
 
-                    success = db.salvaCentroMonitoraggio(nomeCentro, indirizzo,username);
+                    success = db.salvaCentroMonitoraggio(nomeCentro, indirizzo, username);
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(createCenterFrame, "Errore nel database: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(createCenterFrame, "Errore nel database: " + ex.getMessage(),
+                            "Errore", JOptionPane.ERROR_MESSAGE);
                 }
 
                 if (success) {
@@ -385,24 +373,21 @@ public class LayoutOperatore extends LayoutStandard {
                     caricaCentri(); // Ricarica la lista dei centri
                     createCenterFrame.dispose();
                 } else {
-                    JOptionPane.showMessageDialog(createCenterFrame, "Errore durante il salvataggio del centro.", "Errore", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(createCenterFrame, "Errore durante il salvataggio del centro.",
+                            "Errore", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
 
         container.add(new JLabel());
         container.add(salvaCentroButton);
-        QueryExecutorImpl q = new QueryExecutorImpl();
         createCenterFrame.setVisible(true);
 
     }
 
-
-
-
     private void customizeButton(JButton button) {
         button.setPreferredSize(new Dimension(220, 45));
-        button.setBackground(new Color(34, 139, 34));  // Verde
+        button.setBackground(new Color(34, 139, 34)); // Verde
         button.setForeground(Color.WHITE);
         button.setFont(new Font("Segoe UI", Font.BOLD, 14));
         button.setFocusPainted(false);

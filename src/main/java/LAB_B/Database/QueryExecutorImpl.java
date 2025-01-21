@@ -204,7 +204,7 @@ public class QueryExecutorImpl {
 
         return username;
     }
-
+/* 
     private List<String> getIDCentri() {
 
         List<String> ids = new ArrayList<String>();
@@ -224,7 +224,7 @@ public class QueryExecutorImpl {
         return ids;
 
     }
-
+*/
     // restituisce l'id dei centri sapendo il loro nome
     private List<String> getIDCentri(String name) {
 
@@ -359,12 +359,11 @@ public class QueryExecutorImpl {
                 "glacier_altitude_comment, glacier_mass_comment, wind_score, " +
                 "humidity_score, pressure_score, temperature_score, precipitation_score, " +
                 "glacier_altitude_score, glacier_mass_score) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "VALUES (gen_random_uuid(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING ID";
 
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            Tools.setParametri(stmt,
-                    key, // Chiave primaria
+            ResultSet rs = Tools.setParametri(stmt,// Chiave primaria
                     "N/A", // wind (da definire)
                     "N/A", // humidity (da definire)
                     "N/A", // pressure (da definire)
@@ -386,13 +385,14 @@ public class QueryExecutorImpl {
                     new BigDecimal(scoreDropdowns[3].getSelectedItem().toString()), // precipitation_score
                     0, // glacier_altitude_score (da definire)
                     0) // glacier_mass_score (da definire)
-                    .executeUpdate();
+                    .executeQuery();
+                rs.next();
+                key = rs.getString("ID");
 
             salvaRilevazione(username, centroID, geo_id, key);
 
             conn.commit(); // Conferma le modifiche
-            JOptionPane.showMessageDialog(null, "Dati climatici salvati con successo.");
-            return stmt.executeUpdate() > 0;
+            return key != null;
 
         } catch (SQLException e) {
             conn.rollback(); // Annulla le modifiche in caso di errore

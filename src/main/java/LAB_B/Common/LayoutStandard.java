@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Serializable;
 import java.rmi.RemoteException;
 
 // Classe astratta che fornisce una finestra di layout standard con un bottone "Home".
@@ -72,7 +73,7 @@ abstract public class LayoutStandard extends JFrame {
     }
 
     // Gestore degli eventi per il bottone "Home"
-    public class Gestore implements ActionListener {
+    public class Gestore implements ActionListener, Serializable{
 
         // Metodo che gestisce l'evento quando il bottone viene cliccato
         @Override

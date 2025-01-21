@@ -5,11 +5,9 @@ import LAB_B.Common.Interface.*;
 
 import javax.swing.*;
 import java.util.List;
-import java.util.Properties;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.*;
-import java.io.InputStream;
 import java.io.IOException;
 
 public class DatabaseImpl extends UnicastRemoteObject implements Database {

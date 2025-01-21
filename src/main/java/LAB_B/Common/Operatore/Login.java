@@ -1,15 +1,12 @@
 package LAB_B.Common.Operatore;
 
-import LAB_B.Client.Client;
+
 import LAB_B.Common.LayoutStandard;
 import LAB_B.Common.Home;
 import LAB_B.Database.DatabaseImpl;
-import LAB_B.Database.QueryExecutorImpl;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
-import java.util.Properties;
 
 public class Login extends LayoutStandard {
 

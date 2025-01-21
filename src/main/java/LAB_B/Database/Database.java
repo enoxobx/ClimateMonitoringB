@@ -6,7 +6,6 @@ import LAB_B.Common.Interface.Operatore;
 import javax.swing.*;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 public interface Database extends Remote{

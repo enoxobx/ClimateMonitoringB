@@ -4,9 +4,6 @@ import LAB_B.Common.Interface.Operatore;
 import LAB_B.Common.LayoutStandard;
 import javax.swing.*;
 import java.awt.*;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.rmi.RemoteException;
 
 public class SignUp extends LayoutStandard {

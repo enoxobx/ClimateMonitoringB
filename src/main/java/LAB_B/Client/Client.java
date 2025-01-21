@@ -9,9 +9,6 @@ import LAB_B.Database.Database;
 
 public class Client {
     
-
-
-
     // private static Database db;
 
     public static Database getDb() throws RemoteException {
