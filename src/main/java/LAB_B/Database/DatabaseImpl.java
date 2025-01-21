@@ -1,5 +1,6 @@
 package LAB_B.Database;
 
+import LAB_B.Common.Config;
 import LAB_B.Common.Interface.*;
 
 import javax.swing.*;
@@ -43,24 +44,19 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
     private static void initializeConnection() throws SQLException, IOException {
         if (connection == null || connection.isClosed()) {
             System.out.println("Tentativo di connessione al database...");
-            try (InputStream input = DatabaseImpl.class.getClassLoader().getResourceAsStream("config.properties")) {
-                if (input == null) {
-                    System.err.println("Impossibile trovare il file di configurazione.");
-                } else {
-                    Properties config = new Properties();
-                    config.load(input);
 
-                    String dbUrl = config.getProperty("db.url");
-                    String dbUsername = config.getProperty("db.username");
-                    String dbPassword = config.getProperty("db.password");
+            Config config = new Config();
 
-                    if (connection == null || connection.isClosed()) {
-                        connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
-                        connection.setAutoCommit(false); // Disabilita autocommit per le transazioni
-                        System.out.println("Connessione al database riuscita!");
-                    }
-                }
+            String dbUrl = config.getUrlDb();
+            String dbUsername = config.getDbUsername();
+            String dbPassword = config.getDbPassword();
+
+            if (connection == null || connection.isClosed()) {
+                connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+                connection.setAutoCommit(false); // Disabilita autocommit per le transazioni
+                System.out.println("Connessione al database riuscita!");
             }
+
         }
     }
 

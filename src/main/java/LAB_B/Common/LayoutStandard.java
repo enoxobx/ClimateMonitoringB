@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.rmi.RemoteException;
 
 // Classe astratta che fornisce una finestra di layout standard con un bottone "Home".
 // Nota: la classe è dichiarata "abstract" per non essere utilizzata direttamente,
@@ -48,7 +49,12 @@ abstract public class LayoutStandard extends JFrame {
         home.addActionListener(gestore);
 
         //istanzia il db da usare;
-        db = Client.getDb();
+        try {
+            db = Client.getDb();
+        } catch (RemoteException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
 
         // Imposta le proprietà predefinite della finestra

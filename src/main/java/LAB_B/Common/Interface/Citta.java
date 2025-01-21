@@ -1,6 +1,8 @@
 package LAB_B.Common.Interface;
 
-public class Citta {
+import java.io.Serializable;
+
+public class Citta implements Serializable{
     private final String geoname_id;
     private final String name;
     private final String ascii_name;
