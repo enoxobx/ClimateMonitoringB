@@ -28,8 +28,10 @@ public class Home extends JFrame {
 
         // Layout principale per posizionare i componenti nella finestra
         Container corpo = getContentPane(); // Ottiene il contenitore della finestra
-        corpo.setLayout(new GridBagLayout()); // Imposta il layout GridBagLayout per una disposizione flessibile dei componenti
-        GridBagConstraints gbc = new GridBagConstraints(); // Crea un oggetto per gestire le posizioni e le restrizioni dei componenti nel layout
+        corpo.setLayout(new GridBagLayout()); // Imposta il layout GridBagLayout per una disposizione flessibile dei
+                                              // componenti
+        GridBagConstraints gbc = new GridBagConstraints(); // Crea un oggetto per gestire le posizioni e le restrizioni
+                                                           // dei componenti nel layout
         corpo.setBackground(new Color(240, 240, 240)); // Imposta il colore di sfondo della finestra
 
         // Aggiungi un titolo alla finestra
@@ -50,7 +52,8 @@ public class Home extends JFrame {
         bottoneCittadino.setForeground(Color.WHITE); // Imposta il colore del testo nel bottone
         bottoneCittadino.setBorder(BorderFactory.createLineBorder(Color.BLUE, 2)); // Imposta il bordo del bottone
         bottoneCittadino.setFocusPainted(false); // Rimuove l'effetto del bordo quando il bottone è selezionato
-        bottoneCittadino.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // Imposta il cursore della mano quando ci si passa sopra
+        bottoneCittadino.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // Imposta il cursore della mano
+                                                                                    // quando ci si passa sopra
 
         // Aggiungi un'icona al bottone "Cittadino" (da cambiare il path se necessario)
         ImageIcon cittadinoIcon = new ImageIcon("path_to_icon/cittadino_icon.png");
@@ -71,7 +74,8 @@ public class Home extends JFrame {
         bottoneOperatore.setForeground(Color.WHITE); // Imposta il colore del testo nel bottone
         bottoneOperatore.setBorder(BorderFactory.createLineBorder(Color.BLUE, 2)); // Imposta il bordo del bottone
         bottoneOperatore.setFocusPainted(false); // Rimuove l'effetto del bordo quando il bottone è selezionato
-        bottoneOperatore.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // Imposta il cursore della mano quando ci si passa sopra
+        bottoneOperatore.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // Imposta il cursore della mano
+                                                                                    // quando ci si passa sopra
 
         // Aggiungi un'icona al bottone "Operatore" (da cambiare il path se necessario)
         ImageIcon operatoreIcon = new ImageIcon("path_to_icon/operatore_icon.png");

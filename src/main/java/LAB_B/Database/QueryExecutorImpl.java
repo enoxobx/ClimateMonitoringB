@@ -52,6 +52,7 @@ public class QueryExecutorImpl {
 
         return loginSuccess;
     }
+
     // Validazione email
     private boolean isValidEmail(String email) {
         return email != null && email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
@@ -204,27 +205,28 @@ public class QueryExecutorImpl {
 
         return username;
     }
-/* 
-    private List<String> getIDCentri() {
 
-        List<String> ids = new ArrayList<String>();
-        try {
-            ensureConnection();
-            String query = "select id from centrimonitoraggio;";
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                ResultSet rs = stmt.executeQuery();
-                while (rs.next()) {
-                    ids.add(rs.getString("id"));
-                }
-            }
-        } catch (SQLException e) {
-            // TODO
-        }
-
-        return ids;
-
-    }
-*/
+    /*
+     * private List<String> getIDCentri() {
+     * 
+     * List<String> ids = new ArrayList<String>();
+     * try {
+     * ensureConnection();
+     * String query = "select id from centrimonitoraggio;";
+     * try (PreparedStatement stmt = conn.prepareStatement(query)) {
+     * ResultSet rs = stmt.executeQuery();
+     * while (rs.next()) {
+     * ids.add(rs.getString("id"));
+     * }
+     * }
+     * } catch (SQLException e) {
+     * // TODO
+     * }
+     * 
+     * return ids;
+     * 
+     * }
+     */
     // restituisce l'id dei centri sapendo il loro nome
     private List<String> getIDCentri(String name) {
 
@@ -363,7 +365,7 @@ public class QueryExecutorImpl {
 
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            ResultSet rs = Tools.setParametri(stmt,// Chiave primaria
+            ResultSet rs = Tools.setParametri(stmt, // Chiave primaria
                     "N/A", // wind (da definire)
                     "N/A", // humidity (da definire)
                     "N/A", // pressure (da definire)
@@ -386,8 +388,8 @@ public class QueryExecutorImpl {
                     0, // glacier_altitude_score (da definire)
                     0) // glacier_mass_score (da definire)
                     .executeQuery();
-                rs.next();
-                key = rs.getString("ID");
+            rs.next();
+            key = rs.getString("ID");
 
             salvaRilevazione(username, centroID, geo_id, key);
 
@@ -402,8 +404,6 @@ public class QueryExecutorImpl {
         }
         return false;
     }
-
-
 
     public boolean isIdExist(String id) throws SQLException {
 
@@ -455,10 +455,6 @@ public class QueryExecutorImpl {
         }
         return coordinates;
     }
-
-
-
-
 
     public List<Coordinate> getCoordinate(String text) throws SQLException {
         ensureConnection();
@@ -538,5 +534,3 @@ public class QueryExecutorImpl {
         return centrimonitoraggio;
     }
 }
-
-

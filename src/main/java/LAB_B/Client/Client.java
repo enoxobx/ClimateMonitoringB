@@ -8,7 +8,7 @@ import LAB_B.Common.Config;
 import LAB_B.Database.Database;
 
 public class Client {
-    
+
     // private static Database db;
 
     public static Database getDb() throws RemoteException {
@@ -20,7 +20,6 @@ public class Client {
             Registry registry = LocateRegistry.getRegistry(cf.getHost(), cf.getRmiPort());
             return (Database) registry.lookup(cf.getRmiDbName()); // Ottieni un nuovo stub ogni volta
 
-            
         } catch (java.rmi.NotBoundException nbe) {
             System.err.println("Errore: oggetto remoto non trovato nel registry: " + nbe.getMessage());
             throw new RemoteException("Oggetto remoto non trovato", nbe); // Rilancia un'eccezione RemoteException

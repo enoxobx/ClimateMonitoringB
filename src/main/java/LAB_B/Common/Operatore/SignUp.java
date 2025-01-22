@@ -95,12 +95,11 @@ public class SignUp extends LayoutStandard {
                 "<li><strong>Cognome:</strong> Inserisci il tuo cognome (max 30 caratteri).</li>" +
                 "<li><strong>Codice Fiscale:</strong> Inserisci il tuo codice fiscale.</li>" +
                 "<li><strong>Email:</strong> Inserisci una email valida.</li>" +
-                "<li><strong>Password:</strong> La password deve contenere almeno una lettera maiuscola, una minuscola, un numero e un simbolo.</li>" +
+                "<li><strong>Password:</strong> La password deve contenere almeno una lettera maiuscola, una minuscola, un numero e un simbolo.</li>"
+                +
                 "</ul></html>";
         JOptionPane.showMessageDialog(this, helpMessage, "Guida", JOptionPane.INFORMATION_MESSAGE);
     }
-
-
 
     // Gestisce la registrazione dell'operatore
     private void handleRegistration() {
@@ -111,7 +110,6 @@ public class SignUp extends LayoutStandard {
         String password = new String(passwordField.getPassword());
         String confermaPassword = new String(confermaPasswordField.getPassword());
 
-
         // Crea un nuovo oggetto operatore
         Operatore operatore = new Operatore(nome, cognome, codiceFiscale, email, password, confermaPassword, null);
 
@@ -120,9 +118,10 @@ public class SignUp extends LayoutStandard {
             // Verifica che ci siano errori e li mostri
             String errorMessages = operatore.getErrorMessages();
             if (!errorMessages.isEmpty()) {
-                JOptionPane.showMessageDialog(this, errorMessages, "Errore di Registrazione", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, errorMessages, "Errore di Registrazione",
+                        JOptionPane.ERROR_MESSAGE);
             }
-            return;  // Termina se ci sono errori
+            return; // Termina se ci sono errori
         }
 
         // Registrazione nel sistema
@@ -132,17 +131,20 @@ public class SignUp extends LayoutStandard {
                 // Mostra il messaggio di successo includendo l'email e lo username
                 String successMessage = "Operatore registrato con successo!\n";
                 successMessage += "Email: " + email + "\n";
-                successMessage += "Username: " + operatore.getUsername();  // Usa il metodo getUsername() per ottenere lo username generato
+                successMessage += "Username: " + operatore.getUsername(); // Usa il metodo getUsername() per ottenere lo
+                                                                          // username generato
 
                 JOptionPane.showMessageDialog(this, successMessage, "Successo", JOptionPane.INFORMATION_MESSAGE);
                 new Login().setVisible(true); // Vai alla schermata di login
                 dispose();
             } else {
-                JOptionPane.showMessageDialog(this, "Errore durante la registrazione. Riprovare.", "Errore", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Errore durante la registrazione. Riprovare.", "Errore",
+                        JOptionPane.ERROR_MESSAGE);
             }
         } catch (RemoteException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Errore nel contatto con il server.", "Errore", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Errore nel contatto con il server.", "Errore",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 

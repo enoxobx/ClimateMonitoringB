@@ -1,6 +1,5 @@
 package LAB_B.Common.Operatore;
 
-
 import LAB_B.Common.LayoutStandard;
 import LAB_B.Common.Home;
 import LAB_B.Database.DatabaseImpl;
@@ -24,8 +23,6 @@ public class Login extends LayoutStandard {
 
     private int loginAttempts = 0;
 
-
-
     public Login() {
         super(); // Richiama il costruttore di LayoutStandard
 
@@ -36,8 +33,6 @@ public class Login extends LayoutStandard {
 
         setVisible(true);
     }
-
-
 
     private void setupUI() {
         // Pannello centrale per input e bottoni
@@ -118,7 +113,7 @@ public class Login extends LayoutStandard {
 
     private void performLogin(String username, String password) {
         try {
-             db = new DatabaseImpl();
+            db = new DatabaseImpl();
             boolean success = db.login(username, password);
 
             if (success) {

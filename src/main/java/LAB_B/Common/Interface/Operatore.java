@@ -12,15 +12,17 @@ public class Operatore {
     private final String codFiscale;
     private final String email;
     private final String password;
-    private final String confermaPassword;  // Aggiunto campo per conferma password
+    private final String confermaPassword; // Aggiunto campo per conferma password
     private String username;
     private final StringBuilder err = new StringBuilder();
 
     // Costruttore completo con tutti i parametri
-    public Operatore(String nome, String cognome, String codFiscale, String email, String password, String confermaPassword,  String username) {
+    public Operatore(String nome, String cognome, String codFiscale, String email, String password,
+            String confermaPassword, String username) {
         this.nome = nome;
         this.cognome = cognome;
-        this.codFiscale = codFiscale != null ? codFiscale.toUpperCase() : ""; // Assicurati che il codice fiscale sia in maiuscolo
+        this.codFiscale = codFiscale != null ? codFiscale.toUpperCase() : ""; // Assicurati che il codice fiscale sia in
+                                                                              // maiuscolo
         this.email = email;
         this.password = password;
         this.confermaPassword = confermaPassword;
@@ -76,9 +78,11 @@ public class Operatore {
             err.append("Email non valida. Formato non corretto.\n");
         }
 
-        // Password (minimo 8 caratteri con almeno un numero, una lettera maiuscola, una minuscola e un simbolo)
+        // Password (minimo 8 caratteri con almeno un numero, una lettera maiuscola, una
+        // minuscola e un simbolo)
         if (password == null || password.length() < 8 || !isValidPassword(password)) {
-            err.append("Password non valida. Deve essere lunga almeno 8 caratteri e contenere almeno un numero, una lettera maiuscola, una minuscola e un simbolo.\n");
+            err.append(
+                    "Password non valida. Deve essere lunga almeno 8 caratteri e contenere almeno un numero, una lettera maiuscola, una minuscola e un simbolo.\n");
         }
 
         // Verifica che le password coincidano
@@ -86,13 +90,13 @@ public class Operatore {
             err.append("Le password non coincidono.\n");
         }
 
-
         // Se non ci sono errori, generiamo lo username, se necessario
         if (err.length() == 0 && (username == null || username.isEmpty())) {
             // Crea una nuova istanza di QueryExecutorImpl per generare lo username
             QueryExecutorImpl queryExecutor = new QueryExecutorImpl();
             try {
-                this.username = queryExecutor.generateUsername(nome, cognome, codFiscale); // Genera un username tramite QueryExecutorImpl
+                this.username = queryExecutor.generateUsername(nome, cognome, codFiscale); // Genera un username tramite
+                                                                                           // QueryExecutorImpl
             } catch (SQLException e) {
                 err.append("Errore nella generazione dello username: " + e.getMessage() + "\n");
             }
@@ -109,7 +113,7 @@ public class Operatore {
     // Verifica se la email è valida
     private boolean isValidEmail(String email) {
         if (email == null || email.trim().isEmpty()) {
-            return false;  // Email vuota
+            return false; // Email vuota
         }
         // Regex per validare email con almeno una lettera e simbolo '@' e '.'
         return email.matches("^[\\w-\\.]+@[\\w-]+\\.[a-zA-Z]{2,6}$");
@@ -120,7 +124,8 @@ public class Operatore {
         // Pattern per verificare la presenza di caratteri speciali
         Pattern specialCharPattern = Pattern.compile("[!@#\\$%^&*()_+\\-=\\[\\]{};':\",\\\\|,.<>\\/?]");
 
-        // Verifica che la password contenga almeno una lettera maiuscola, una minuscola, un numero e un simbolo
+        // Verifica che la password contenga almeno una lettera maiuscola, una
+        // minuscola, un numero e un simbolo
         return password.matches(".*[A-Z].*") && // almeno una lettera maiuscola
                 password.matches(".*[a-z].*") && // almeno una lettera minuscola
                 password.matches(".*[0-9].*") && // almeno un numero

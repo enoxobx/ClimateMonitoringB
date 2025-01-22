@@ -21,9 +21,11 @@ public interface Database extends Remote{
     boolean salvaRilevazione(String key, String centroID, JComboBox<Integer>[] scoreDropdowns, JTextArea[] severitaTextAreas, String username, long geo_id) throws RemoteException;
 
     List<Coordinate> getCoordinaResultSet(String name) throws RemoteException;
+    
     List<Coordinate> getCoordinaResultSet(double latitude, double longitude, double tollerance )throws RemoteException ;
 
     List<String> getCentriPerOperatore(String username)throws RemoteException;
+    
     boolean salvaCentroMonitoraggio(String nomeCentro,String descrizione,String username) throws Exception;
 
 }

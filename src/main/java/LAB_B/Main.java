@@ -14,37 +14,36 @@ public class Main {
         try {
             serverThread = new Server();
 
-
             try {
                 // Avvia la finestra principale Home
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        new Home();  // Crea e visualizza la finestra principale
+                        new Home(); // Crea e visualizza la finestra principale
                     }
                 });
-    
+
                 // Attendere che il thread del server finisca
                 serverThread.join();
-    
+
             } catch (Exception e) {
                 // Gestione delle eccezioni generali
                 e.printStackTrace();
             }
-    
-            // Aggiungi un hook per chiudere la connessione al database e fermare il server quando l'applicazione termina
+
+            // Aggiungi un hook per chiudere la connessione al database e fermare il server
+            // quando l'applicazione termina
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
                     System.out.println("Chiusura dell'applicazione...");
-                    DatabaseImpl.closeConnection();  // Chiude la connessione al database
-                    serverThread.stopServer();  // Ferma il server RMI
+                    DatabaseImpl.closeConnection(); // Chiude la connessione al database
+                    serverThread.stopServer(); // Ferma il server RMI
                 }
             });
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        
     }
 }

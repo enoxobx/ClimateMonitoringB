@@ -1,4 +1,5 @@
 package LAB_B.Common;
+
 import LAB_B.Client.Client;
 import LAB_B.Database.Database;
 
@@ -11,18 +12,18 @@ import java.rmi.RemoteException;
 
 // Classe astratta che fornisce una finestra di layout standard con un bottone "Home".
 // Nota: la classe è dichiarata "abstract" per non essere utilizzata direttamente,
-// ma probabilmente estesa da altre classi.
+// ma estesa da altre classi.
 abstract public class LayoutStandard extends JFrame {
 
     // Dichiarazione dei componenti dell'interfaccia
-    protected final JButton home;    // Bottone "Home"
-    private final Container body;  // Corpo della finestra (contenitore principale)
+    protected final JButton home; // Bottone "Home"
+    private final Container body; // Corpo della finestra (contenitore principale)
     private final Gestore gestore; // Gestore degli eventi (ActionListener)
     public Database db;
 
     // Costruttore della classe LayoutStandard
     public LayoutStandard() {
-        super("Climate Monitoring");  // Titolo della finestra
+        super("Climate Monitoring"); // Titolo della finestra
         try {
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -37,26 +38,26 @@ abstract public class LayoutStandard extends JFrame {
 
         // Ottiene il contenitore della finestra (il pannello principale)
         body = getContentPane();
-        body.setLayout(new BorderLayout());  // Imposta il layout come BorderLayout
+        body.setLayout(new BorderLayout()); // Imposta il layout come BorderLayout
 
         // Crea un'istanza del gestore che si occuperà di gestire gli eventi
         gestore = new Gestore();
 
         // Crea il bottone "Home"
         home = new JButton("Home");
-        // Aggiunge il bottone alla finestra nella posizione a sinistra (BorderLayout.WEST)
+        // Aggiunge il bottone alla finestra nella posizione a sinistra
+        // (BorderLayout.WEST)
         body.add(home, BorderLayout.WEST);
         // Associa l'azione del bottone al gestore (Gestore implementa ActionListener)
         home.addActionListener(gestore);
 
-        //istanzia il db da usare;
+        // istanzia il db da usare;
         try {
             db = Client.getDb();
         } catch (RemoteException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
 
         // Imposta le proprietà predefinite della finestra
         setDefaultProperties();
@@ -73,14 +74,14 @@ abstract public class LayoutStandard extends JFrame {
     }
 
     // Gestore degli eventi per il bottone "Home"
-    public class Gestore implements ActionListener, Serializable{
+    public class Gestore implements ActionListener, Serializable {
 
         // Metodo che gestisce l'evento quando il bottone viene cliccato
         @Override
         public void actionPerformed(ActionEvent e) {
             // Controlla se l'evento è stato generato dal bottone "Home"
             if (e.getSource() == home) {
-                // Crea una nuova finestra "Home" (classe che probabilmente rappresenta una schermata principale)
+                // Crea una nuova finestra "Home"
                 Home t = new Home();
                 // Imposta la chiusura dell'applicazione quando questa finestra viene chiusa
                 t.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -103,8 +104,5 @@ abstract public class LayoutStandard extends JFrame {
     public Gestore getGestore() {
         return gestore;
     }
-
-
-
 
 }

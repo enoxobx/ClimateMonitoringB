@@ -52,21 +52,22 @@ public class LayoutCittadino extends LayoutStandard {
         caricaCitta.addActionListener(e -> {
             setComboBox();
         });
-        posiziona.addActionListener(e ->{
-            var pos = (Coordinate)comboBox.getSelectedItem();
+        posiziona.addActionListener(e -> {
+            var pos = (Coordinate) comboBox.getSelectedItem();
             setPosition(pos);
             assert pos != null;
-            newDot = new MapMarkerDot(new Layer(pos.getCitta().getName()), pos.getLat(),pos.getLon());
+            newDot = new MapMarkerDot(new Layer(pos.getCitta().getName()), pos.getLat(), pos.getLon());
             mapViewer.addMapMarker(newDot);
             newDot.setVisible(true);
         });
-        
+
         search.addActionListener(e -> {
             JTextComponent editor = (JTextComponent) comboBox.getEditor().getEditorComponent();
             try {
-                if(!editor.getText().isEmpty())setComboBox(editor.getText());
-                else{
-                    JOptionPane.showMessageDialog(body,"Inserisci dei dati");
+                if (!editor.getText().isEmpty())
+                    setComboBox(editor.getText());
+                else {
+                    JOptionPane.showMessageDialog(body, "Inserisci dei dati");
                 }
             } catch (Exception e1) {
                 // TODO Auto-generated catch block
@@ -161,7 +162,7 @@ public class LayoutCittadino extends LayoutStandard {
         }
     }
 
-    private void setPosition(Coordinate pos){
+    private void setPosition(Coordinate pos) {
         mapViewer.setDisplayPosition(pos, 10);
     }
 }

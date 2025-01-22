@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import org.openstreetmap.gui.jmapviewer.interfaces.ICoordinate;
 
-public class Coordinate implements ICoordinate,Serializable{
+public class Coordinate implements ICoordinate, Serializable {
     private static final long serialVersionUID = 1L;
     private final Citta citta;
     private double latitude;
@@ -12,7 +12,7 @@ public class Coordinate implements ICoordinate,Serializable{
 
     // Costruttore
     public Coordinate(Citta citta) {
-        this.citta=citta;
+        this.citta = citta;
         this.latitude = citta.getLatitide();
         this.longitude = citta.getLongitude();
     }
@@ -34,15 +34,16 @@ public class Coordinate implements ICoordinate,Serializable{
 
     @Override
     public void setLon(double lon) {
-        this.longitude=lon;
+        this.longitude = lon;
     }
-    public Citta getCitta(){
+
+    public Citta getCitta() {
         return citta;
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return citta.toString();
     }
-    
+
 }
