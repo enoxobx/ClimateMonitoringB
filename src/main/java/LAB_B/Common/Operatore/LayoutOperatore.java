@@ -42,8 +42,8 @@ public class LayoutOperatore extends LayoutStandard {
 
         // Pannello centrale
         JPanel contentPanel = new JPanel(new GridBagLayout());
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30)); // Aggiunto padding
-        contentPanel.setBackground(Color.WHITE); // Colore di sfondo bianco
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
+        contentPanel.setBackground(Color.WHITE);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -58,36 +58,34 @@ public class LayoutOperatore extends LayoutStandard {
 
         caricaCentri(); // Carica i centri all'avvio
 
-        centriScrollPane.setPreferredSize(new Dimension(250, 150));
-        centriScrollPane.add(new JScrollPane(centriList)); // Usa JScrollPane per il JList
-        gbc.gridx = 0;
+        JScrollPane centriScrollPane = new JScrollPane(centriList);
+        centriScrollPane.setPreferredSize(new Dimension(300, 150));
         gbc.gridy = 1;
-        gbc.gridwidth = 2; // Centrare la lista
         contentPanel.add(centriScrollPane, gbc);
 
+
         // Bottone per creare un centro di monitoraggio
+        // Bottone Crea Centro Monitoraggio
         creaCentroButton = new JButton("Crea Centro Monitoraggio");
         customizeButton(creaCentroButton);
-        gbc.gridx = 1;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         contentPanel.add(creaCentroButton, gbc);
 
-        // Bottone per aggiungere parametri climatici
-        aggiungiDatiClimatici = new JButton("Aggiungi Parametri Climatici");
+        // Bottone Aggiungi Dati Climatici
+        aggiungiDatiClimatici = new JButton("Aggiungi Dati Climatici");
         customizeButton(aggiungiDatiClimatici);
-        gbc.gridx = 1;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         contentPanel.add(aggiungiDatiClimatici, gbc);
 
         container.add(contentPanel, BorderLayout.CENTER);
 
-        // Pannello inferiore per i bottoni di azione
-        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        actionPanel.setBackground(Color.WHITE);
-        // Aggiungi il bottone "Home" che è già stato creato in LayoutStandard
-        container.add(home, BorderLayout.WEST);
 
-        container.add(actionPanel, BorderLayout.SOUTH);
+        container.add(contentPanel, BorderLayout.CENTER);
+
+        JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        footerPanel.setBackground(Color.WHITE);
+        footerPanel.add(home);
+        container.add(footerPanel, BorderLayout.SOUTH);
 
         // Aggiungi action listeners
         Gestore gestore = new Gestore();
@@ -99,20 +97,16 @@ public class LayoutOperatore extends LayoutStandard {
     }
 
     private void caricaCentri() {
-        listaCentriModel.clear(); // Svuota la lista esistente
+        listaCentriModel.clear();
         try {
-            List<String> centri = db.getCentriPerOperatore(username); // Carica i centri dal database
+            List<String> centri = db.getCentriPerOperatore(username);
             if (centri.isEmpty()) {
                 listaCentriModel.addElement("Nessun centro disponibile");
             } else {
-                for (String centro : centri) {
-                    listaCentriModel.addElement(centro); // Aggiungi ogni centro al modello della lista
-                }
+                centri.forEach(listaCentriModel::addElement);
             }
         } catch (RemoteException ex) {
-            JOptionPane.showMessageDialog(this,
-                    "Errore durante il caricamento dei centri: " + ex.getMessage(),
-                    "Errore", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Errore durante il caricamento dei centri: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -385,23 +379,22 @@ public class LayoutOperatore extends LayoutStandard {
     }
 
     private void customizeButton(JButton button) {
-        button.setPreferredSize(new Dimension(220, 45));
-        button.setBackground(new Color(34, 139, 34)); // Verde
+        button.setPreferredSize(new Dimension(250, 40));
+        button.setBackground(new Color(34, 139, 34));
         button.setForeground(Color.WHITE);
         button.setFont(new Font("Segoe UI", Font.BOLD, 14));
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createLineBorder(new Color(70, 130, 180), 2));
-        button.setBorderPainted(true);
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }
 
     private class Gestore implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (e.getSource() == aggiungiDatiClimatici) {
-                apriFinestraDatiClimatici();
-            } else if (e.getSource() == creaCentroButton) {
+            if (e.getSource() == creaCentroButton) {
                 apriFinestraCreaCentro();
+            } else if (e.getSource() == aggiungiDatiClimatici) {
+                apriFinestraDatiClimatici();
             }
         }
     }
