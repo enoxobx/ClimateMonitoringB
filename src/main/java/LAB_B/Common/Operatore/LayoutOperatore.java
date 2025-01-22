@@ -11,7 +11,6 @@ import java.util.Locale;
 
 import LAB_B.Common.*;
 import LAB_B.Common.Interface.*;
-import LAB_B.Database.*;
 
 public class LayoutOperatore extends LayoutStandard {
 
