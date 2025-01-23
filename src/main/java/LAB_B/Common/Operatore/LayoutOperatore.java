@@ -1,11 +1,12 @@
 package LAB_B.Common.Operatore;
 
 import javax.swing.*;
-import javax.swing.text.BadLocationException;
+import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
+import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 
@@ -112,216 +113,128 @@ public class LayoutOperatore extends LayoutStandard {
 
     private void apriFinestraDatiClimatici() {
 
-        JFrame datiClimaticiFrame = new JFrame("Dati Climatici");
-        datiClimaticiFrame.setSize(600, 600); // Aumentata la dimensione per dare più spazio
-        datiClimaticiFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        datiClimaticiFrame.setLocationRelativeTo(this);
+        JFrame parametroFrame = new JFrame("Inserisci Dati Parametro");
+        parametroFrame.setSize(1000, 1000);
+        parametroFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        parametroFrame.setLocationRelativeTo(this);
 
-        // Layout e componenti della finestra
-        Container container = datiClimaticiFrame.getContentPane();
+        // Layout principale
+        Container container = parametroFrame.getContentPane();
         container.setLayout(new BorderLayout());
 
-        JLabel label = new JLabel("Inserisci Parametri Climatici", SwingConstants.CENTER);
-        label.setFont(new Font("Arial", Font.BOLD, 18));
-        container.add(label, BorderLayout.NORTH);
+        JLabel titleLabel = new JLabel("Inserisci Dati della Tabella Parametro", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        container.add(titleLabel, BorderLayout.NORTH);
 
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JComboBox<String> centriDropdown = new JComboBox<>();
-        for (int i = 0; i < listaCentriModel.size(); i++) {
-            centriDropdown.addItem(listaCentriModel.getElementAt(i));
-        }
-        if (listaCentriModel.isEmpty()) {
-            centriDropdown.addItem("Nessun centro disponibile");
-        }
-        gbc.gridx = 1;
-        panel.add(centriDropdown, gbc);
+        String[] fields = { "Wind", "Humidity", "Pressure", "Temperature", "Precipitation", "Glacier Altitude", "Glacier Mass" };
+        String[] comments = { "Wind Comment", "Humidity Comment", "Pressure Comment", "Temperature Comment", "Precipitation Comment", "Glacier Altitude Comment", "Glacier Mass Comment" };
+        String[] scores = { "Wind Score", "Humidity Score", "Pressure Score", "Temperature Score", "Precipitation Score", "Glacier Altitude Score", "Glacier Mass Score" };
 
-        // Parametri climatici con score e area di testo per severità
-        String[] parametri = { "Velocità Vento", "Temperatura", "Umidità", "Precipitazioni" };
-        JComboBox<Integer>[] scoreDropdowns = new JComboBox[parametri.length]; // Array per i dropdown di score
-        JTextArea[] severitaTextAreas = new JTextArea[parametri.length]; // Array per le JTextArea
-        JComboBox<Integer>[] usernamescore = new JComboBox[parametri.length];
-        JComboBox<Integer>[] geonemascore = new JComboBox[parametri.length];
-        // Campo per l'inserimento del valore della chiave primaria "key"
-        gbc.gridy++;
-        gbc.gridx = 0;
-        panel.add(new JLabel("Key (ID univoco):"), gbc);
+        JTextField[] fieldInputs = new JTextField[fields.length];
+        JTextArea[] commentInputs = new JTextArea[comments.length];
+        JComboBox<Integer>[] scoreDropdowns = new JComboBox[scores.length];
 
-        JTextField keyField = new JTextField(20);
-        gbc.gridx = 1;
-        panel.add(keyField, gbc);
-
-        // Dropdown per selezionare il centro
-        gbc.gridy++;
-        gbc.gridx = 0;
-        panel.add(new JLabel("Seleziona Centro:"), gbc);
-
-        for (int i = 0; i < listaCentriModel.size(); i++) {
-            centriDropdown.addItem(listaCentriModel.getElementAt(i));
-        }
-        if (listaCentriModel.isEmpty()) {
-            centriDropdown.addItem("Nessun centro disponibile");
-        }
-        gbc.gridx = 1;
-        panel.add(centriDropdown, gbc);
-
-        // Campo per l'inserimento dell'username
-        gbc.gridy++;
-        gbc.gridx = 0;
-        panel.add(new JLabel("Username:"), gbc);
-
-        // Definisci l'username di default
-        String usernameDefault = username; // Puoi sostituirlo con qualsiasi altro valore di default
-
-        // Crea il JTextField e imposta il valore di default
-        JTextField usernameField = new JTextField(20);
-        usernameField.setText(usernameDefault); // Imposta il testo predefinito
-
-        gbc.gridx = 1;
-        panel.add(usernameField, gbc);
-
-        // Dropdown per selezionare la città (geo_id)
-        gbc.gridy++;
-        gbc.gridx = 0;
-        panel.add(new JLabel("Seleziona Città (Geo ID):"), gbc);
-
-        JComboBox<Citta> cittaDropdown = new JComboBox<>();
-        // Aggiungi qui le città o geonameID
-
-        try {
-            List<Coordinate> listaC = db.getCoordinaResultSet();
-            for (var citta : listaC) {
-                cittaDropdown.addItem(citta.getCitta());
+        // DocumentFilter personalizzato per accettare solo input numerici
+        DocumentFilter numericFilter = new DocumentFilter() {
+            @Override
+            public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+                if (string != null && string.matches("\\d*")) { // Accetta solo numeri
+                    super.insertString(fb, offset, string, attr);
+                }
             }
-        } catch (RemoteException e) {
-            JOptionPane.showMessageDialog(this.getComponent(0), e.getMessage());
-            e.printStackTrace();
-        }
-        gbc.gridx = 1;
-        panel.add(cittaDropdown, gbc);
 
-        // Loop per aggiungere i parametri climatici
-        for (int i = 0; i < parametri.length; i++) {
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                if (text != null && text.matches("\\d*")) { // Accetta solo numeri
+                    super.replace(fb, offset, length, text, attrs);
+                }
+            }
+        };
+
+
+        // Loop per i commenti
+        for (int i = 0; i < comments.length; i++) {
             gbc.gridy++;
             gbc.gridx = 0;
-            panel.add(new JLabel(parametri[i] + " (Score 1-5):"), gbc);
+            panel.add(new JLabel(comments[i] + " (max 255 caratteri):"), gbc);
 
-            // Dropdown per il punteggio (Score 1-5)
-            scoreDropdowns[i] = new JComboBox<>(new Integer[] { 1, 2, 3, 4, 5 });
-            gbc.gridx = 1;
-            panel.add(scoreDropdowns[i], gbc);
-
-            // Area di testo per inserire la severità
-            gbc.gridx = 0;
-            gbc.gridy++;
-            panel.add(new JLabel("Note (max 256 caratteri) " + parametri[i] + ":"), gbc);
-
-            severitaTextAreas[i] = new JTextArea(3, 20); // 3 righe e 20 colonne
-            severitaTextAreas[i].setLineWrap(true); // Abilita il wrapping del testo
-            severitaTextAreas[i].setWrapStyleWord(true); // Parola intera a capo
-            severitaTextAreas[i].setDocument(new javax.swing.text.PlainDocument() {
+            commentInputs[i] = new JTextArea(3, 20);
+            commentInputs[i].setLineWrap(true);
+            commentInputs[i].setWrapStyleWord(true);
+            commentInputs[i].setDocument(new PlainDocument() {
                 @Override
-                public void insertString(int offs, String str, javax.swing.text.AttributeSet a) {
-                    if (getLength() + str.length() <= 256) { // Limita a 256 caratteri
-                        try {
-                            super.insertString(offs, str, a);
-                        } catch (BadLocationException e) {
-                            throw new RuntimeException(e);
-                        }
+                public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
+                    if (getLength() + str.length() <= 255) { // Limita a 255 caratteri
+                        super.insertString(offs, str, a);
                     }
                 }
             });
-            JScrollPane scrollPane = new JScrollPane(severitaTextAreas[i]);
-            scrollPane.setPreferredSize(new Dimension(200, 60)); // Ridimensionato per una visualizzazione ottimale
+            JScrollPane scrollPane = new JScrollPane(commentInputs[i]);
+            scrollPane.setPreferredSize(new Dimension(300, 80));
             gbc.gridx = 1;
             panel.add(scrollPane, gbc);
         }
 
-        // Pulsante "Salva Parametri"
+        // Loop per i punteggi
+        for (int i = 0; i < scores.length; i++) {
+            gbc.gridy++;
+            gbc.gridx = 0;
+            panel.add(new JLabel(scores[i] + " (1-5):"), gbc);
+
+            scoreDropdowns[i] = new JComboBox<>(new Integer[] { 1, 2, 3, 4, 5 });
+            gbc.gridx = 1;
+            panel.add(scoreDropdowns[i], gbc);
+        }
+
+        // Pulsante Salva
         gbc.gridy++;
         gbc.gridx = 0;
         gbc.gridwidth = 2;
-        JButton salvaParametriButton = new JButton("Salva Parametri");
-        panel.add(salvaParametriButton, gbc);
+        JButton salvaButton = new JButton("Salva Parametri");
+        panel.add(salvaButton, gbc);
 
-        salvaParametriButton.addActionListener(e -> {
-            // Validazione dei dati
-            String key = keyField.getText();
-            String centro = (String) centriDropdown.getSelectedItem();
-            if (centro == null || centro.equals("Nessun centro disponibile")) {
-                JOptionPane.showMessageDialog(datiClimaticiFrame, "Compila tutti i campi obbligatori.", "Errore",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            Citta selected = (Citta) cittaDropdown.getSelectedItem();
-            String geo_id = selected.getGeoname();
-
-            // Verifica se geo_id è valido
-            if (geo_id == null || geo_id.isEmpty()) {
-                JOptionPane.showMessageDialog(datiClimaticiFrame, "Seleziona una città valida.", "Errore",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            // Costruzione del log dei dati inseriti per il debug o conferma
-            StringBuilder datiInseriti = new StringBuilder(
-                    "Key: " + key + "\nCentro: " + centro + "\nGeo ID: " + geo_id + "\n");
-            for (int i = 0; i < parametri.length; i++) {
-                datiInseriti.append(parametri[i])
-                        .append(" - Score: ")
-                        .append(scoreDropdowns[i].getSelectedItem())
-                        .append(", Note: ")
-                        .append(severitaTextAreas[i].getText())
-                        .append("\n");
-            }
-
+        salvaButton.addActionListener(e -> {
             try {
-
-                long geoname = Long.parseLong(geo_id);
-                // Chiamata al metodo di salvataggio con tutti i parametri richiesti
-                boolean success = db.salvaRilevazione(key, centro, scoreDropdowns, severitaTextAreas, this.username,
-                        geoname);
-                if (success) {
-                    System.out.println("Rilevazione salvata con successo.");
-                } else {
-                    System.out.println("Errore nel salvataggio.");
+                StringBuilder dati = new StringBuilder();
+                for (int i = 0; i < fields.length; i++) {
+                    dati.append(fields[i]).append(": ").append(fieldInputs[i].getText()).append("\n");
                 }
 
-                // Mostra un messaggio di conferma all'utente
-                JOptionPane.showMessageDialog(null, "Dati salvati con successo:\n" + datiInseriti, "Successo",
-                        JOptionPane.OK_OPTION);
+                for (int i = 0; i < comments.length; i++) {
+                    dati.append(comments[i]).append(": ").append(commentInputs[i].getText()).append("\n");
+                }
 
-            } catch (RemoteException ex) {
-                throw new RuntimeException("Errore durante il salvataggio della rilevazione.", ex);
+                for (int i = 0; i < scores.length; i++) {
+                    dati.append(scores[i]).append(": ").append(scoreDropdowns[i].getSelectedItem()).append("\n");
+                }
+
+                JOptionPane.showMessageDialog(parametroFrame, "Dati salvati:\n" + dati, "Successo", JOptionPane.INFORMATION_MESSAGE);
+                parametroFrame.dispose();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(parametroFrame, "Errore durante il salvataggio: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
             }
-
-            // Mostra un messaggio di conferma
-            JOptionPane.showMessageDialog(datiClimaticiFrame, "Dati salvati localmente:\n" + datiInseriti, "Successo",
-                    JOptionPane.OK_OPTION);
-            datiClimaticiFrame.dispose();
         });
 
-        // Pulsante "Indietro"
+        // Pulsante Indietro
         gbc.gridy++;
         gbc.gridx = 0;
         gbc.gridwidth = 2;
         JButton indietroButton = new JButton("Indietro");
         panel.add(indietroButton, gbc);
 
-        indietroButton.addActionListener(e -> {
-            // Torna alla pagina precedente
-            datiClimaticiFrame.dispose(); // Chiude il frame corrente
-            // Aggiungi qui il codice per mostrare il frame precedente, ad esempio:
-            // paginaPrecedenteFrame.setVisible(true);
-        });
+        indietroButton.addActionListener(e -> parametroFrame.dispose());
 
-        container.add(panel, BorderLayout.CENTER);
-        datiClimaticiFrame.setVisible(true);
+        JScrollPane scrollPane = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        container.add(scrollPane, BorderLayout.CENTER);
+
+        parametroFrame.setVisible(true);
     }
+
 
     private void apriFinestraCreaCentro() {
         JFrame createCenterFrame = new JFrame("Crea Centro Monitoraggio");
