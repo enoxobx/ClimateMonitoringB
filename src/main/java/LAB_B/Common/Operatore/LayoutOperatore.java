@@ -156,6 +156,17 @@ public class LayoutOperatore extends LayoutStandard {
             }
         };
 
+        // Loop per i campi principali (solo numerici)
+        for (int i = 0; i < fields.length; i++) {
+            gbc.gridy++;
+            gbc.gridx = 0;
+            panel.add(new JLabel(fields[i] + ":"), gbc);
+
+            fieldInputs[i] = new JTextField(20);
+            ((AbstractDocument) fieldInputs[i].getDocument()).setDocumentFilter(numericFilter); // Applica il filtro
+            gbc.gridx = 1;
+            panel.add(fieldInputs[i], gbc);
+        }
 
         // Loop per i commenti
         for (int i = 0; i < comments.length; i++) {
