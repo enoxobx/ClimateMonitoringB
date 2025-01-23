@@ -2,8 +2,13 @@ package LAB_B.Database;
 
 import LAB_B.Common.Interface.Coordinate;
 import LAB_B.Common.Interface.Operatore;
+import LAB_B.Common.Interface.TipiPlot;
 
 import javax.swing.*;
+
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.jdbc.JDBCCategoryDataset;
+
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
@@ -27,5 +32,7 @@ public interface Database extends Remote{
     List<String> getCentriPerOperatore(String username)throws RemoteException;
     
     boolean salvaCentroMonitoraggio(String nomeCentro,String descrizione,String username) throws Exception;
+    
+    DefaultCategoryDataset getParametri(Coordinate city, TipiPlot type) throws RemoteException;
 
 }

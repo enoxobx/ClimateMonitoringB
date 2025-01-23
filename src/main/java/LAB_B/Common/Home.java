@@ -1,5 +1,6 @@
 package LAB_B.Common;
 
+import LAB_B.Common.Cittadino.LayoutCittadino;
 import LAB_B.Common.Operatore.Login;
 
 import javax.swing.*;

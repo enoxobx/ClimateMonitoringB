@@ -72,6 +72,13 @@ abstract public class LayoutStandard extends JFrame {
         setLocationRelativeTo(null); // Centra la finestra sullo schermo
         setResizable(false); // Disabilita la possibilità di ridimensionare la finestra
     }
+    protected void setDefaultProperties(JFrame temp) {
+        temp.setSize(800, 800); // Imposta la dimensione della finestra
+        temp.setDefaultCloseOperation(DISPOSE_ON_CLOSE); // Chiude l'applicazione quando la finestra viene chiusa
+        temp.setLocationRelativeTo(null); // Centra la finestra sullo schermo
+        temp.setResizable(true); // Disabilita la possibilità di ridimensionare la finestra
+        temp.setVisible(true);
+    }
 
     // Gestore degli eventi per il bottone "Home"
     public class Gestore implements ActionListener, Serializable {

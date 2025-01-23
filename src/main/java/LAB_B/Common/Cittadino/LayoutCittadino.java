@@ -1,9 +1,10 @@
-package LAB_B.Common;
+package LAB_B.Common.Cittadino;
 
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 import org.openstreetmap.gui.jmapviewer.Layer;
 import org.openstreetmap.gui.jmapviewer.MapMarkerDot;
 
+import LAB_B.Common.LayoutStandard;
 import LAB_B.Common.Interface.Citta;
 import LAB_B.Common.Interface.Coordinate;
 
@@ -20,6 +21,7 @@ public class LayoutCittadino extends LayoutStandard {
     private final JButton caricaCitta;
     private final JButton search;
     private final JButton posiziona;
+    private JButton mostra;
     private final JComboBox<Coordinate> comboBox;
     private List<Coordinate> coordinateM;
     private MapMarkerDot newDot;
@@ -33,25 +35,32 @@ public class LayoutCittadino extends LayoutStandard {
         mapViewer = new JMapViewer();
         comboBox = new JComboBox<Coordinate>();
         comboBox.setEditable(true);
+
         caricaCitta = new JButton("Carica città vicine");
         posiziona = new JButton("Mostra nella mappa");
         search = new JButton("Cerca");
+        mostra = new JButton("Mostra");
+
         Citta varese = new Citta("Varese", "Varese", "Varese", "it", "italia", 8.825058, 45.820599);
         Coordinate Vare = new Coordinate(varese);
         mapViewer.setDisplayPosition(Vare, 12);
 
         body.add(mapViewer, BorderLayout.NORTH);
         body.add(centerP, BorderLayout.CENTER);
+
         centerP.add(comboBox, BorderLayout.CENTER);
         centerP.add(caricaCitta, BorderLayout.CENTER);
         centerP.add(posiziona, BorderLayout.CENTER);
         centerP.add(search, BorderLayout.SOUTH);
+        centerP.add(mostra, BorderLayout.CENTER);
+
         setMarker();
 
         // Listener per il pulsante "Refresh"
         caricaCitta.addActionListener(e -> {
             setComboBox();
         });
+
         posiziona.addActionListener(e -> {
             var pos = (Coordinate) comboBox.getSelectedItem();
             setPosition(pos);
@@ -72,6 +81,19 @@ public class LayoutCittadino extends LayoutStandard {
             } catch (Exception e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
+            }
+        });
+
+        mostra.addActionListener(e -> {
+            var tempCity = (Coordinate) comboBox.getSelectedItem();
+
+            if (tempCity == null) {
+                JOptionPane.showMessageDialog(body, "Non hai selezionato nessuna città");
+            } else {
+                LayoutPlot newPlot = new LayoutPlot(tempCity,db);
+                setDefaultProperties(newPlot);
+                
+                
             }
         });
 

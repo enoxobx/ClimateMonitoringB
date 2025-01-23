@@ -24,6 +24,7 @@
             <url>https://josm.openstreetmap.de/nexus/content/repositories/releases/</url>
         </repository>
         
+        
     </repositories>
 
     <dependencies>
@@ -39,6 +40,14 @@
             <artifactId>jmapviewer</artifactId>
             <version>2.22</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.jfree/jfreechart -->
+        <dependency>
+            <groupId>org.jfree</groupId>
+            <artifactId>jfreechart</artifactId>
+            <version>1.5.5</version>
+        </dependency>
+
+
         
 
 

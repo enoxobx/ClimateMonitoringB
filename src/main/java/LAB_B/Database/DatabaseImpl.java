@@ -4,6 +4,10 @@ import LAB_B.Common.Config;
 import LAB_B.Common.Interface.*;
 
 import javax.swing.*;
+
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.jdbc.JDBCCategoryDataset;
+
 import java.util.List;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -178,6 +182,12 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public DefaultCategoryDataset getParametri(Coordinate city, TipiPlot type) throws RemoteException{
+            return queryExecutorImpl.getParametri(city,type);
+            
     }
 
 }

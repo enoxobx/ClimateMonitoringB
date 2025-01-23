@@ -40,6 +40,10 @@
       <id>central</id>
       <url>https://repo.maven.apache.org/maven2</url>
     </repository>
+    <repository>
+      <id>JOSM Repository</id>
+      <url>https://josm.openstreetmap.de/nexus/content/repositories/releases/</url>
+    </repository>
   </repositories>
   <properties>
     <maven.compiler.target>21</maven.compiler.target>

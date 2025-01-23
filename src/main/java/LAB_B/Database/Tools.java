@@ -1,6 +1,7 @@
 package LAB_B.Database;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 
@@ -23,6 +24,9 @@ public class Tools {
                     query.setBigDecimal(++i, (BigDecimal) parametro);
                 } else if (parametro instanceof Integer) {
                     query.setInt(++i, (Integer) parametro);
+                } else if (parametro instanceof BigInteger) {
+                    BigInteger b = (BigInteger)parametro;
+                    query.setLong(++i, b.longValue());
                 } else {
                     throw new Exception("tipo non ancora implementato");
                 }
@@ -32,6 +36,7 @@ public class Tools {
             System.err.println(e.getMessage());
             return null;
         }
+
 
     }
 }

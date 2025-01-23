@@ -1,13 +1,18 @@
 package LAB_B.Database;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import LAB_B.Common.Interface.*;
 
 import javax.swing.*;
+
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.jdbc.JDBCCategoryDataset;
 
 public class QueryExecutorImpl {
 
@@ -532,5 +537,45 @@ public class QueryExecutorImpl {
         }
 
         return centrimonitoraggio;
+    }
+
+    public DefaultCategoryDataset getParametri(Coordinate city, TipiPlot type) {
+
+        String query = "SELECT date_r, "+type.getName()+ //
+                " FROM rilevazione,parametro " + //
+                "where par_id = parametro.id " + //
+                "and geoname_id = ? ";
+        
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            ensureConnection();
+            DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
+            var geoname = new BigInteger(city.getCitta().getGeoname());
+            try (ResultSet rs = Tools.setParametri(stmt, geoname).executeQuery()) {
+                String parametro = type.getName();
+                while (rs.next()) {
+                    var value = rs.getString(parametro);
+                    var category = rs.getDate("date_r");
+
+                    //TODO da cambiare quando Golden implementa la sua parte
+                    String velocitaNumericaStringa = value.replace(" km/h","");
+                    int velocita = Integer.parseInt(velocitaNumericaStringa);
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+
+                    dataSet.addValue(velocita, city.getCitta().toString(), dateFormat.format(category));
+                }
+                //dataSet.getColumnKeys().stream().forEach(System.out::println);
+            } catch (Exception e) {
+                e.printStackTrace();
+                conn.rollback();
+            }
+
+            return dataSet;
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
+
     }
 }
