@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"LAB_B"},{"l":"LAB_B.Client"},{"l":"LAB_B.Common"},{"l":"LAB_B.Common.Cittadino"},{"l":"LAB_B.Common.Cittadino.Panels"},{"l":"LAB_B.Common.Interface"},{"l":"LAB_B.Common.Operatore"},{"l":"LAB_B.Database"}];updateSearchResults();
