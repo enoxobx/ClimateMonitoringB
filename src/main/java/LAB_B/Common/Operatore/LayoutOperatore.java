@@ -105,6 +105,9 @@ public class LayoutOperatore extends LayoutStandard {
                 listaCentriModel.addElement("Nessun centro disponibile");
             } else {
                 centri.forEach(listaCentriModel::addElement);
+
+                // Se ci sono centri, seleziona automaticamente il primo
+                centriList.setSelectedIndex(0);  // Seleziona il primo centro
             }
         } catch (RemoteException ex) {
             JOptionPane.showMessageDialog(this, "Errore durante il caricamento dei centri: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
@@ -112,139 +115,165 @@ public class LayoutOperatore extends LayoutStandard {
     }
 
     private void apriFinestraDatiClimatici() {
-
         JFrame parametroFrame = new JFrame("Inserisci Dati Parametro");
-        parametroFrame.setSize(1000, 1000);
+        parametroFrame.setSize(1000, 800);   // Imposta la dimensione della finestra
         parametroFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         parametroFrame.setLocationRelativeTo(this);
 
-        // Layout principale
+        String[] fields = { "Wind", "Humidity", "Pressure", "Temperature", "Precipitation", "Glacier Altitude", "Glacier Mass" };
+        String[] comments = { "Wind Comment", "Humidity Comment", "Pressure Comment", "Temperature Comment", "Precipitation Comment", "Glacier Altitude Comment", "Glacier Mass Comment" };
+        String[] units = { "km/h", "%", "hPa", "°C", "mm", "m", "kg" };
+
         Container container = parametroFrame.getContentPane();
         container.setLayout(new BorderLayout());
+        container.setBackground(new Color(240, 240, 240));
 
         JLabel titleLabel = new JLabel("Inserisci Dati della Tabella Parametro", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        titleLabel.setForeground(new Color(0, 51, 102));
         container.add(titleLabel, BorderLayout.NORTH);
 
         JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel.setBackground(new Color(255, 255, 255));
 
-        String[] fields = { "Wind", "Humidity", "Pressure", "Temperature", "Precipitation", "Glacier Altitude", "Glacier Mass" };
-        String[] comments = { "Wind Comment", "Humidity Comment", "Pressure Comment", "Temperature Comment", "Precipitation Comment", "Glacier Altitude Comment", "Glacier Mass Comment" };
-        String[] scores = { "Wind Score", "Humidity Score", "Pressure Score", "Temperature Score", "Precipitation Score", "Glacier Altitude Score", "Glacier Mass Score" };
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(10, 10, 10, 10);
+
+        panel.add(new JLabel("Parametro"), gbc);
+        gbc.gridx++;
+        panel.add(new JLabel("Valore"), gbc);
+        gbc.gridx++;
+        panel.add(new JLabel("Unità"), gbc);
+        gbc.gridx++;
+        panel.add(new JLabel("Commento (Max 256 caratteri)"), gbc);
+        gbc.gridx++;
+        panel.add(new JLabel("Punteggio"), gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
 
         JTextField[] fieldInputs = new JTextField[fields.length];
         JTextArea[] commentInputs = new JTextArea[comments.length];
-        JComboBox<Integer>[] scoreDropdowns = new JComboBox[scores.length];
+        JComboBox<Integer>[] scoreDropdowns = new JComboBox[fields.length];
 
-        // DocumentFilter personalizzato per accettare solo input numerici
+        // DocumentFilter for numeric input
         DocumentFilter numericFilter = new DocumentFilter() {
             @Override
             public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
-                if (string != null && string.matches("\\d*")) { // Accetta solo numeri
+                if (string != null && string.matches("\\d*")) {
                     super.insertString(fb, offset, string, attr);
                 }
             }
 
             @Override
             public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
-                if (text != null && text.matches("\\d*")) { // Accetta solo numeri
+                if (text != null && text.matches("\\d*")) {
                     super.replace(fb, offset, length, text, attrs);
                 }
             }
         };
 
-        // Loop per i campi principali (solo numerici)
+        // Add the input fields dynamically for each parameter
         for (int i = 0; i < fields.length; i++) {
-            gbc.gridy++;
             gbc.gridx = 0;
-            panel.add(new JLabel(fields[i] + ":"), gbc);
+            panel.add(new JLabel(fields[i]), gbc);
+            gbc.gridx++;
 
-            fieldInputs[i] = new JTextField(20);
-            ((AbstractDocument) fieldInputs[i].getDocument()).setDocumentFilter(numericFilter); // Applica il filtro
-            gbc.gridx = 1;
+            fieldInputs[i] = new JTextField(10);
+            ((AbstractDocument) fieldInputs[i].getDocument()).setDocumentFilter(numericFilter);
             panel.add(fieldInputs[i], gbc);
-        }
+            gbc.gridx++;
 
-        // Loop per i commenti
-        for (int i = 0; i < comments.length; i++) {
-            gbc.gridy++;
-            gbc.gridx = 0;
-            panel.add(new JLabel(comments[i] + " (max 255 caratteri):"), gbc);
+            panel.add(new JLabel(units[i]), gbc);
+            gbc.gridx++;
 
-            commentInputs[i] = new JTextArea(3, 20);
+            // Comment input is optional
+            commentInputs[i] = new JTextArea(3, 10);
             commentInputs[i].setLineWrap(true);
             commentInputs[i].setWrapStyleWord(true);
             commentInputs[i].setDocument(new PlainDocument() {
                 @Override
                 public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
-                    if (getLength() + str.length() <= 255) { // Limita a 255 caratteri
+                    if (getLength() + str.length() <= 255) {
                         super.insertString(offs, str, a);
                     }
                 }
             });
-            JScrollPane scrollPane = new JScrollPane(commentInputs[i]);
-            scrollPane.setPreferredSize(new Dimension(300, 80));
-            gbc.gridx = 1;
-            panel.add(scrollPane, gbc);
-        }
-
-        // Loop per i punteggi
-        for (int i = 0; i < scores.length; i++) {
-            gbc.gridy++;
-            gbc.gridx = 0;
-            panel.add(new JLabel(scores[i] + " (1-5):"), gbc);
+            JScrollPane commentScrollPane = new JScrollPane(commentInputs[i]);
+            panel.add(commentScrollPane, gbc);
+            gbc.gridx++;
 
             scoreDropdowns[i] = new JComboBox<>(new Integer[] { 1, 2, 3, 4, 5 });
-            gbc.gridx = 1;
             panel.add(scoreDropdowns[i], gbc);
+            gbc.gridx = 0;
+            gbc.gridy++;
         }
 
-        // Pulsante Salva
-        gbc.gridy++;
-        gbc.gridx = 0;
-        gbc.gridwidth = 2;
-        JButton salvaButton = new JButton("Salva Parametri");
-        panel.add(salvaButton, gbc);
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.setBackground(new Color(255, 255, 255));
 
+        JButton salvaButton = new JButton("Salva Parametri");
         salvaButton.addActionListener(e -> {
             try {
-                StringBuilder dati = new StringBuilder();
+                // Recupera i valori dai campi di input
                 for (int i = 0; i < fields.length; i++) {
-                    dati.append(fields[i]).append(": ").append(fieldInputs[i].getText()).append("\n");
+                    String valore = fieldInputs[i].getText();  // Valore del parametro (ad esempio, wind, humidity, etc.)
+                    String commento = commentInputs[i].getText().isEmpty() ? null : commentInputs[i].getText();  // Commento (opzionale)
+                    int punteggio = (int) scoreDropdowns[i].getSelectedItem();  // Punteggio selezionato
+
+                    // Verifica che il valore non sia vuoto
+                    if (valore.isEmpty()) {
+                        JOptionPane.showMessageDialog(parametroFrame, "Per favore, inserisci tutti i campi.");
+                        return;  // Uscita se un campo obbligatorio è vuoto
+                    }
+
+                    // Chiamata al metodo salvaDatiClimatici per ogni parametro
+                    boolean successo = db.salvaDatiClimatici(fields[i], valore, commento, punteggio, username, System.currentTimeMillis());
+
+                    if (!successo) {
+                        JOptionPane.showMessageDialog(parametroFrame, "Errore nel salvataggio dei dati.");
+                        return;
+                    }
                 }
 
-                for (int i = 0; i < comments.length; i++) {
-                    dati.append(comments[i]).append(": ").append(commentInputs[i].getText()).append("\n");
-                }
+                // Conferma che i dati sono stati salvati con successo
+                JOptionPane.showMessageDialog(parametroFrame, "Dati salvati con successo!");
+                parametroFrame.dispose();  // Chiudi la finestra dopo il salvataggio
 
-                for (int i = 0; i < scores.length; i++) {
-                    dati.append(scores[i]).append(": ").append(scoreDropdowns[i].getSelectedItem()).append("\n");
-                }
-
-                JOptionPane.showMessageDialog(parametroFrame, "Dati salvati:\n" + dati, "Successo", JOptionPane.INFORMATION_MESSAGE);
-                parametroFrame.dispose();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(parametroFrame, "Errore durante il salvataggio: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(parametroFrame, "Errore nel salvataggio dei dati: " + ex.getMessage());
             }
         });
 
         // Pulsante Indietro
-        gbc.gridy++;
-        gbc.gridx = 0;
-        gbc.gridwidth = 2;
         JButton indietroButton = new JButton("Indietro");
-        panel.add(indietroButton, gbc);
+        indietroButton.setFont(new Font("Arial", Font.BOLD, 14));  // Font personalizzato per il pulsante
+        indietroButton.setBackground(new Color(255, 99, 71));  // Colore di sfondo rosso per il pulsante
+        indietroButton.setForeground(Color.WHITE);  // Colore testo bianco
+        indietroButton.setFocusPainted(false);
+        indietroButton.setBorderPainted(false);
+        indietroButton.setPreferredSize(new Dimension(150, 40));  // Imposta dimensioni personalizzate
+        indietroButton.addActionListener(e -> parametroFrame.dispose());  // Chiude la finestra quando cliccato
 
-        indietroButton.addActionListener(e -> parametroFrame.dispose());
+        // Aggiungi i pulsanti al pannello
+        buttonPanel.add(salvaButton);
+        buttonPanel.add(indietroButton);
 
+        container.add(buttonPanel, BorderLayout.SOUTH);  // Aggiungi il pannello dei pulsanti in basso
+
+        // Aggiungi il pannello dei parametri a uno JScrollPane per consentire lo scorrimento
         JScrollPane scrollPane = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         container.add(scrollPane, BorderLayout.CENTER);
 
+        // Mostra la finestra
         parametroFrame.setVisible(true);
     }
+
+
 
 
     private void apriFinestraCreaCentro() {

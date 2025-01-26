@@ -23,7 +23,8 @@ public interface Database extends Remote{
 
     List<Coordinate> getCoordinaResultSet()throws RemoteException ;
 
-    boolean salvaRilevazione(String key, String centroID, JComboBox<Integer>[] scoreDropdowns, JTextArea[] severitaTextAreas, String username, long geo_id) throws RemoteException;
+
+    boolean salvaDatiClimatici(String parametro, String valore, String commento, int punteggio, String username, long timestamp) throws Exception;
 
     List<Coordinate> getCoordinaResultSet(String name) throws RemoteException;
     
@@ -32,7 +33,7 @@ public interface Database extends Remote{
     List<String> getCentriPerOperatore(String username)throws RemoteException;
     
     boolean salvaCentroMonitoraggio(String nomeCentro,String descrizione,String username) throws Exception;
-    
-    DefaultCategoryDataset getParametri(Coordinate city, TipiPlot type) throws RemoteException;
 
+
+    DefaultCategoryDataset getParametri(Coordinate city, TipiPlot type) throws RemoteException;
 }

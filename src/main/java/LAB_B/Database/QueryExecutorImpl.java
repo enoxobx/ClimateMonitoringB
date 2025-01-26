@@ -252,47 +252,120 @@ public class QueryExecutorImpl {
         return ids;
 
     }
-
-    public String getGeonameIdByName(String cittaSelezionata) {
-        String geonameID = null; // Valore di ritorno se non trovato
+    public boolean salvaDatiClimatici(String parametro, String valore, String commento, int punteggio, String username, long timestamp) throws Exception {
         try {
-            ensureConnection(); // Verifica che la connessione sia attiva
+            ensureConnection();  // Assicura una connessione al database
 
-            String query = "SELECT Geoname_ID FROM Citta WHERE Nome = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            // Query per inserire i dati nella tabella Parametro
+            String queryParametro = "INSERT INTO Parametro (" +
+                    "wind, humidity, pressure, temperature, precipitation, glacier_altitude, glacier_mass, " +
+                    "wind_comment, humidity_comment, pressure_comment, temperature_comment, precipitation_comment, " +
+                    "glacier_altitude_comment, glacier_mass_comment, " +
+                    "wind_score, humidity_score, pressure_score, temperature_score, precipitation_score, " +
+                    "glacier_altitude_score, glacier_mass_score) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING ID;";
 
-                try (ResultSet rs = Tools.setParametri(stmt, cittaSelezionata).executeQuery()) {
+            // Query per inserire i dati nella tabella Rilevazione
+            String queryRilevazione = "INSERT INTO Rilevazione (CF, CentriMonitoraggio_ID, Geoname_ID, Par_ID, date_r) " +
+                    "VALUES (?, ?, ?, ?, ?);";
+
+
+            try (PreparedStatement stmtParametro = conn.prepareStatement(queryParametro, Statement.RETURN_GENERATED_KEYS);
+                 PreparedStatement stmtRilevazione = conn.prepareStatement(queryRilevazione)) {
+
+                // Recupera le informazioni necessarie
+                String cf = getCF(username);
+                String centroMonitoraggioId = getCentroMonitoraggioId(username);
+                String geonameId = getGeonameId(username);
+
+                // Gestione dei valori nulli per i parametri e i commenti
+                valore = (valore == null) ? "" : valore;
+                commento = (commento == null) ? "" : commento;
+
+                // Imposta i parametri per la query Parametro
+                setParametroValues(stmtParametro, valore, commento, punteggio);
+
+                // Esegui la query per Parametro e ottieni l'ID generato
+                try (ResultSet rs = stmtParametro.executeQuery()) {
                     if (rs.next()) {
-                        geonameID = rs.getString("Geoname_ID"); // Recupera il Geoname_ID
+                        String parametroId = rs.getString("ID");  // Ottieni l'ID generato per il parametro
+
+                        // Inserisci i dati nella tabella Rilevazione
+                        stmtRilevazione.setString(1, cf);
+                        stmtRilevazione.setString(2, centroMonitoraggioId);
+                        stmtRilevazione.setString(3, geonameId);
+                        stmtRilevazione.setString(4, parametroId);
+                        stmtRilevazione.setDate(5, new java.sql.Date(timestamp));
+
+                        // Esegui la query per Rilevazione
+                        int rowsAffected = stmtRilevazione.executeUpdate();
+                        conn.commit();  // Commit delle transazioni
+
+                        return rowsAffected > 0;  // Se sono state inserite righe, il salvataggio è riuscito
+                    } else {
+                        throw new SQLException("Errore: ID Parametro non generato.");
                     }
+                } catch (SQLException e) {
+                    conn.rollback();  // Annulla in caso di errore
+                    throw new Exception("Errore nel salvataggio dei dati climatici: " + e.getMessage(), e);
                 }
             }
         } catch (SQLException e) {
-            // Gestione dell'errore
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Errore durante il recupero dell'ID Geoname.", "Errore",
-                    JOptionPane.ERROR_MESSAGE);
+            throw new RuntimeException("Errore nel salvataggio dei dati nel database.", e);
         }
-
-        return geonameID;
     }
 
-    private String getCF(String username) {
-        String res = "";
-        try {
-            ensureConnection();
-            String query = "select codice_fiscale from operatori where username = ?;";
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                ResultSet rs = Tools.setParametri(stmt, username).executeQuery();
-                if (rs.next()) { // Verifica se sono presenti risultati
-                    res = rs.getString("codice_fiscale");
+    private void setParametroValues(PreparedStatement stmtParametro, String valore, String commento, int punteggio) throws SQLException {
+        // Imposta i parametri nella query Parametro
+        for (int i = 1; i <= 6; i++) {
+            stmtParametro.setString(i, valore);  // Parametri Wind, Humidity, Pressure, Temperature, Precipitation, Glacier Altitude
+        }
+
+        stmtParametro.setString(7, valore);  // Glacier Mass
+
+        // Impostazione dei commenti
+        for (int i = 8; i <= 14; i++) {
+            stmtParametro.setString(i, commento);  // Commenti per ogni parametro
+        }
+
+        // Impostazione dei punteggi
+        for (int i = 15; i <= 21; i++) {
+            stmtParametro.setInt(i, punteggio);  // Punteggi per ogni parametro
+        }
+
+    }
+
+    private String getGeonameId(String username) {
+        String query = "SELECT geoname_id FROM Citta WHERE codice_fiscale = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, getCF(username));  // Usa il CF dell'operatore
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("geoname_id");
                 }
+                return null;  // In caso di nessun risultato
             }
         } catch (SQLException e) {
-            // TODO: gestire l'eccezione (ad esempio, log, rilancio)
             e.printStackTrace();
+            return null;  // Gestisce eventuali errori nella query
         }
-        return res;
+    }
+
+
+    private String getCF(String username) {
+        // Recupera il codice fiscale dell'operatore dal database
+        String query = "SELECT codice_fiscale FROM Operatori WHERE username = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("codice_fiscale");
+            }
+            return null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public boolean salvaCentroMonitoraggio(String nomeCentro, String indirizzo, String currentUsername)
@@ -322,121 +395,32 @@ public class QueryExecutorImpl {
         }
     }
 
-    private boolean salvaRilevazione(String currentUsername, String centroMonitoraggio, long geonameID,
-            String parametroID) {
-        try {
-            ensureConnection();
-
-            // Recupera il codice fiscale dell'utente
-            String cf = getCF(currentUsername);
-            List<String> centroMonitoraggioID = getIDCentri(centroMonitoraggio);
-
-            String query = "INSERT INTO Rilevazione (CF, CentriMonitoraggio_ID, Geoname_ID, Par_ID, date_r) " +
-                    "VALUES (?, ?, ?, ?, ?)";
-
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
-
-                int rowsAffected = Tools.setParametri(stmt, cf, centroMonitoraggioID.getFirst(), geonameID, parametroID,
-                        new java.sql.Date(System.currentTimeMillis())).executeUpdate();
-                conn.commit(); // Conferma le modifiche
-
-                return rowsAffected > 0; // Restituisce true se l'inserimento è stato effettuato con successo
-            } catch (SQLException e) {
-                conn.rollback(); // Annulla la transazione in caso di errore
-                throw e;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Errore nel salvataggio della rilevazione.", e);
-        }
-    }
-
-    public boolean salvaDatiClimatici(String key, String centroID, JComboBox<Integer>[] scoreDropdowns,
-            JTextArea[] severitaTextAreas, String username, long geo_id) throws SQLException {
-        try {
-            ensureConnection();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        String query = "INSERT INTO Parametro (" +
-                "ID, wind, humidity, pressure, temperature, precipitation, " +
-                "glacier_altitude, glacier_mass, wind_comment, humidity_comment, " +
-                "pressure_comment, temperature_comment, precipitation_comment, " +
-                "glacier_altitude_comment, glacier_mass_comment, wind_score, " +
-                "humidity_score, pressure_score, temperature_score, precipitation_score, " +
-                "glacier_altitude_score, glacier_mass_score) " +
-                "VALUES (gen_random_uuid(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING ID";
-
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-
-            ResultSet rs = Tools.setParametri(stmt, // Chiave primaria
-                    "N/A", // wind (da definire)
-                    "N/A", // humidity (da definire)
-                    "N/A", // pressure (da definire)
-                    "N/A", // temperature (da definire)
-                    "N/A", // precipitation (da definire)
-                    "N/A", // glacier_altitude (da definire)
-                    "N/A", // glacier_mass (da definire)
-                    severitaTextAreas[0].getText(), // wind_comment
-                    severitaTextAreas[1].getText(), // humidity_comment
-                    "N/A", // pressure_comment (da definire)
-                    severitaTextAreas[2].getText(), // temperature_comment
-                    severitaTextAreas[3].getText(), // precipitation_comment
-                    "N/A", // glacier_altitude_comment (da definire)
-                    "N/A", // glacier_mass_comment (da definire)
-                    new BigDecimal(scoreDropdowns[0].getSelectedItem().toString()), // wind_score
-                    new BigDecimal(scoreDropdowns[1].getSelectedItem().toString()), // humidity_score
-                    0, // pressure_score (da definire)
-                    new BigDecimal(scoreDropdowns[2].getSelectedItem().toString()), // temperature_score
-                    new BigDecimal(scoreDropdowns[3].getSelectedItem().toString()), // precipitation_score
-                    0, // glacier_altitude_score (da definire)
-                    0) // glacier_mass_score (da definire)
-                    .executeQuery();
-            rs.next();
-            key = rs.getString("ID");
-
-            salvaRilevazione(username, centroID, geo_id, key);
-
-            conn.commit(); // Conferma le modifiche
-            return key != null;
-
-        } catch (SQLException e) {
-            conn.rollback(); // Annulla le modifiche in caso di errore
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Errore durante il salvataggio dei dati climatici: " + e.getMessage(),
-                    "Errore", JOptionPane.ERROR_MESSAGE);
-        }
-        return false;
-    }
 
     public boolean isIdExist(String id) throws SQLException {
-
-        if (isIdExist(id)) {
-            throw new IllegalArgumentException("ID già esistente: " + id);
-        }
-
         ensureConnection();
         String query = "SELECT 1 FROM centrimonitoraggio WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             try (ResultSet rs = Tools.setParametri(stmt, id).executeQuery()) {
-                return rs.next();
+                return rs.next(); // Se esiste almeno una riga, l'ID esiste
             }
         }
     }
 
-    public List<String> getCentriMonitoraggio() throws SQLException {
-        ensureConnection();
-        List<String> centri = new ArrayList<>();
-        String query = "SELECT nomeCentro FROM centrimonitoraggio";
+
+    private String getCentroMonitoraggioId(String username) {
+        // Recupera l'ID del centro di monitoraggio per l'operatore
+        String query = "SELECT centrimonitoraggio_id FROM Lavora WHERE operatore_cf = ?";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    centri.add(rs.getString("nomeCentro"));
-                }
+            stmt.setString(1, getCF(username));  // Usa il CF dell'operatore
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("centro_monitoraggio_id");
             }
+            return null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
         }
-        return centri;
     }
 
     // Metodo per ottenere coordinate senza filtri

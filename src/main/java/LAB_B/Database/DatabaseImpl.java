@@ -3,10 +3,7 @@ package LAB_B.Database;
 import LAB_B.Common.Config;
 import LAB_B.Common.Interface.*;
 
-import javax.swing.*;
-
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.jdbc.JDBCCategoryDataset;
 
 import java.util.List;
 import java.rmi.RemoteException;
@@ -146,17 +143,15 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
     }
 
     @Override
-    public boolean salvaRilevazione(String key, String centroID, JComboBox<Integer>[] scoreDropdowns,
-            JTextArea[] severitaTextAreas, String username, long geo_id) throws RemoteException {
-        if (queryExecutorImpl == null)
+    public boolean salvaDatiClimatici(String parametro, String valore, String commento, int punteggio, String username, long timestamp) throws Exception {
+        if (queryExecutorImpl == null) {
             queryExecutorImpl = new QueryExecutorImpl();
-        try {
-            return queryExecutorImpl.salvaDatiClimatici(key, centroID, scoreDropdowns, severitaTextAreas, username,
-                    geo_id);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
+        return queryExecutorImpl.salvaDatiClimatici(parametro, valore, commento, punteggio, username, timestamp);
     }
+
+
+
 
     @Override
     public List<Coordinate> getCoordinaResultSet(String name) throws RemoteException {
