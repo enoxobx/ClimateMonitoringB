@@ -4,14 +4,12 @@ import LAB_B.Common.Interface.Coordinate;
 import LAB_B.Common.Interface.Operatore;
 import LAB_B.Common.Interface.TipiPlot;
 
-import javax.swing.*;
-
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.jdbc.JDBCCategoryDataset;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 public interface Database extends Remote{
 
@@ -24,7 +22,7 @@ public interface Database extends Remote{
     List<Coordinate> getCoordinaResultSet()throws RemoteException ;
 
 
-    boolean salvaDatiClimatici(String parametro, String valore, String commento, int punteggio, String username, long timestamp) throws Exception;
+    boolean salvaDatiClimatici(String[] parametro, ArrayList<String> valori, ArrayList<String> commenti, ArrayList<Integer> punteggi, String username, long timestamp, Coordinate citta, String centro) throws Exception;
 
     List<Coordinate> getCoordinaResultSet(String name) throws RemoteException;
     

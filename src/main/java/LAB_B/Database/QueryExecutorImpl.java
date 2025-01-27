@@ -1,6 +1,5 @@
 package LAB_B.Database;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -12,7 +11,6 @@ import LAB_B.Common.Interface.*;
 import javax.swing.*;
 
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.jdbc.JDBCCategoryDataset;
 
 public class QueryExecutorImpl {
 
@@ -213,7 +211,7 @@ public class QueryExecutorImpl {
 
     /*
      * private List<String> getIDCentri() {
-     * 
+     *
      * List<String> ids = new ArrayList<String>();
      * try {
      * ensureConnection();
@@ -227,9 +225,9 @@ public class QueryExecutorImpl {
      * } catch (SQLException e) {
      * // TODO
      * }
-     * 
+     *
      * return ids;
-     * 
+     *
      * }
      */
     // restituisce l'id dei centri sapendo il loro nome
@@ -252,70 +250,66 @@ public class QueryExecutorImpl {
         return ids;
 
     }
-    public boolean salvaDatiClimatici(String parametro, String valore, String commento, int punteggio, String username, long timestamp) throws Exception {
+
+    public boolean salvaDatiClimatici(String[] parametro, ArrayList<String> valori, ArrayList<String> commenti, ArrayList<Integer> punteggi, String username, long timestamp, Coordinate citta, String centro) throws Exception {
         try {
             ensureConnection();  // Assicura una connessione al database
 
             // Query per inserire i dati nella tabella Parametro
             String queryParametro = "INSERT INTO Parametro (" +
-                    "wind, humidity, pressure, temperature, precipitation, glacier_altitude, glacier_mass, " +
+                    "id, wind, humidity, pressure, temperature, precipitation, glacier_altitude, glacier_mass, " +
                     "wind_comment, humidity_comment, pressure_comment, temperature_comment, precipitation_comment, " +
                     "glacier_altitude_comment, glacier_mass_comment, " +
                     "wind_score, humidity_score, pressure_score, temperature_score, precipitation_score, " +
                     "glacier_altitude_score, glacier_mass_score) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING ID;";
+                    "VALUES (gen_random_uuid(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING ID;";
 
             // Query per inserire i dati nella tabella Rilevazione
             String queryRilevazione = "INSERT INTO Rilevazione (CF, CentriMonitoraggio_ID, Geoname_ID, Par_ID, date_r) " +
                     "VALUES (?, ?, ?, ?, ?);";
 
 
-            try (PreparedStatement stmtParametro = conn.prepareStatement(queryParametro, Statement.RETURN_GENERATED_KEYS);
+            try (PreparedStatement stmtParametro = conn.prepareStatement(queryParametro);
                  PreparedStatement stmtRilevazione = conn.prepareStatement(queryRilevazione)) {
 
                 // Recupera le informazioni necessarie
                 String cf = getCF(username);
-                String centroMonitoraggioId = getCentroMonitoraggioId(username);
-                String geonameId = getGeonameId(username);
+                String centroMonitoraggioId = getIDCentri(centro).getFirst();
+                Long geonameId = Long.valueOf(citta.getCitta().getGeoname());
 
                 // Gestione dei valori nulli per i parametri e i commenti
-                valore = (valore == null) ? "" : valore;
-                commento = (commento == null) ? "" : commento;
-
-                // Imposta i parametri per la query Parametro
-                setParametroValues(stmtParametro, valore, commento, punteggio);
-
-                // Esegui la query per Parametro e ottieni l'ID generato
-                try (ResultSet rs = stmtParametro.executeQuery()) {
-                    if (rs.next()) {
-                        String parametroId = rs.getString("ID");  // Ottieni l'ID generato per il parametro
-
-                        // Inserisci i dati nella tabella Rilevazione
-                        stmtRilevazione.setString(1, cf);
-                        stmtRilevazione.setString(2, centroMonitoraggioId);
-                        stmtRilevazione.setString(3, geonameId);
-                        stmtRilevazione.setString(4, parametroId);
-                        stmtRilevazione.setDate(5, new java.sql.Date(timestamp));
-
-                        // Esegui la query per Rilevazione
-                        int rowsAffected = stmtRilevazione.executeUpdate();
-                        conn.commit();  // Commit delle transazioni
-
-                        return rowsAffected > 0;  // Se sono state inserite righe, il salvataggio è riuscito
-                    } else {
-                        throw new SQLException("Errore: ID Parametro non generato.");
+                for (int i = 0; i < valori.size(); i++) {
+                    if (valori.get(i) == null) {
+                        valori.set(i, "");
                     }
-                } catch (SQLException e) {
-                    conn.rollback();  // Annulla in caso di errore
-                    throw new Exception("Errore nel salvataggio dei dati climatici: " + e.getMessage(), e);
+                }
+                for (int i = 0; i < commenti.size(); i++) {
+                    if (commenti.get(i) == null) {
+                        commenti.set(i, "");
+                    }
+                }
+                // Esegui la query per Parametro e ottieni l'ID generato
+                ResultSet rs = Tools.setParametri(stmtParametro, valori, commenti, punteggi).executeQuery();
+                if (rs.next()) {
+                    String parametroId = rs.getString("ID");  // Ottieni l'ID generato per il parametro
+
+
+                    // Esegui la query per Rilevazione
+                    int rowsAffected = Tools.setParametri(stmtRilevazione, cf, centroMonitoraggioId, geonameId, parametroId, new java.sql.Date(timestamp)).executeUpdate();
+                    conn.commit();  // Commit delle transazioni
+
+                    return rowsAffected > 0;  // Se sono state inserite righe, il salvataggio è riuscito
+                } else {
+                    throw new SQLException("Errore: ID Parametro non generato.");
                 }
             }
+
         } catch (SQLException e) {
             throw new RuntimeException("Errore nel salvataggio dei dati nel database.", e);
         }
     }
 
-    private void setParametroValues(PreparedStatement stmtParametro, String valore, String commento, int punteggio) throws SQLException {
+   /* private void setParametroValues(PreparedStatement stmtParametro, String valore, String commento, int punteggio) throws SQLException {
         // Imposta i parametri nella query Parametro
         for (int i = 1; i <= 6; i++) {
             stmtParametro.setString(i, valore);  // Parametri Wind, Humidity, Pressure, Temperature, Precipitation, Glacier Altitude
@@ -333,7 +327,7 @@ public class QueryExecutorImpl {
             stmtParametro.setInt(i, punteggio);  // Punteggi per ogni parametro
         }
 
-    }
+    }*/
 
     private String getGeonameId(String username) {
         String query = "SELECT geoname_id FROM Citta WHERE codice_fiscale = ?";
@@ -377,7 +371,7 @@ public class QueryExecutorImpl {
             String query2 = "INSERT INTO lavora(cf,centrimonitoraggio_id) values (?, ?);";
 
             try (PreparedStatement stmt = conn.prepareStatement(query);
-                    PreparedStatement stmt2 = conn.prepareStatement(query2)) {
+                 PreparedStatement stmt2 = conn.prepareStatement(query2)) {
                 String cf = getCF(currentUsername);
                 ResultSet rs = Tools.setParametri(stmt, nomeCentro, indirizzo).executeQuery();
                 rs.next();
@@ -396,23 +390,13 @@ public class QueryExecutorImpl {
     }
 
 
-    public boolean isIdExist(String id) throws SQLException {
-        ensureConnection();
-        String query = "SELECT 1 FROM centrimonitoraggio WHERE id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            try (ResultSet rs = Tools.setParametri(stmt, id).executeQuery()) {
-                return rs.next(); // Se esiste almeno una riga, l'ID esiste
-            }
-        }
-    }
-
 
     private String getCentroMonitoraggioId(String username) {
         // Recupera l'ID del centro di monitoraggio per l'operatore
-        String query = "SELECT centrimonitoraggio_id FROM Lavora WHERE operatore_cf = ?";
+        String query = "SELECT centrimonitoraggio_id FROM Lavora WHERE cf = ?";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, getCF(username));  // Usa il CF dell'operatore
-            ResultSet rs = stmt.executeQuery();
+
+            ResultSet rs = Tools.setParametri(stmt,username).executeQuery();
             if (rs.next()) {
                 return rs.getString("centro_monitoraggio_id");
             }
@@ -525,11 +509,11 @@ public class QueryExecutorImpl {
 
     public DefaultCategoryDataset getParametri(Coordinate city, TipiPlot type) {
 
-        String query = "SELECT date_r, "+type.getName()+ //
+        String query = "SELECT date_r, " + type.getName() + //
                 " FROM rilevazione,parametro " + //
                 "where par_id = parametro.id " + //
                 "and geoname_id = ? ";
-        
+
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             ensureConnection();
             DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
@@ -541,7 +525,7 @@ public class QueryExecutorImpl {
                     var category = rs.getDate("date_r");
 
                     //TODO da cambiare quando Golden implementa la sua parte
-                    String velocitaNumericaStringa = value.replace(" km/h","");
+                    String velocitaNumericaStringa = value.replace(" km/h", "");
                     int velocita = Integer.parseInt(velocitaNumericaStringa);
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 

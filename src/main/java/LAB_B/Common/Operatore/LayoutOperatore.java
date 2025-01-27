@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -22,8 +23,7 @@ public class LayoutOperatore extends LayoutStandard {
     private final DefaultListModel<String> listaCentriModel;
     private final JLabel titleLable;
     private final ScrollPane centriScrollPane;
-    private final JComboBox<String> cittaDropdown = new JComboBox<>();
-    private final JComboBox<String> centriDropdown = new JComboBox<>();
+    private JComboBox<Coordinate> cittaDropdown;
 
     public LayoutOperatore(String username) {
         super(); // Chiamata al costruttore della classe padre LayoutStandard
@@ -58,24 +58,28 @@ public class LayoutOperatore extends LayoutStandard {
         centriList = new JList<>(listaCentriModel);
 
         caricaCentri(); // Carica i centri all'avvio
+        cittaDropdown = new JComboBox<Coordinate>();
+        caricaCitta();
 
         JScrollPane centriScrollPane = new JScrollPane(centriList);
         centriScrollPane.setPreferredSize(new Dimension(300, 150));
         gbc.gridy = 1;
         contentPanel.add(centriScrollPane, gbc);
+        gbc.gridy = 2;
+        contentPanel.add(cittaDropdown,gbc);
 
 
         // Bottone per creare un centro di monitoraggio
         // Bottone Crea Centro Monitoraggio
         creaCentroButton = new JButton("Crea Centro Monitoraggio");
         customizeButton(creaCentroButton);
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         contentPanel.add(creaCentroButton, gbc);
 
         // Bottone Aggiungi Dati Climatici
         aggiungiDatiClimatici = new JButton("Aggiungi Dati Climatici");
         customizeButton(aggiungiDatiClimatici);
-        gbc.gridy = 3;
+        gbc.gridy = 4;
         contentPanel.add(aggiungiDatiClimatici, gbc);
 
         container.add(contentPanel, BorderLayout.CENTER);
@@ -95,6 +99,17 @@ public class LayoutOperatore extends LayoutStandard {
 
         setVisible(true);
         titleLable = null;
+    }
+
+    private void caricaCitta() {
+        try {
+            List<Coordinate> t = db.getCoordinaResultSet();
+            for(var citta:t){
+                cittaDropdown.addItem(citta);
+            }
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void caricaCentri() {
@@ -128,7 +143,11 @@ public class LayoutOperatore extends LayoutStandard {
         container.setLayout(new BorderLayout());
         container.setBackground(new Color(240, 240, 240));
 
-        JLabel titleLabel = new JLabel("Inserisci Dati della Tabella Parametro", SwingConstants.CENTER);
+        Coordinate citta =(Coordinate) cittaDropdown.getSelectedItem();
+        String centro = centriList.getSelectedValue();
+
+
+        JLabel titleLabel = new JLabel("Inserisci Dati per : "+ (citta != null ? citta.toString() : null) +" - dal centro : "+centro, SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         titleLabel.setForeground(new Color(0, 51, 102));
         container.add(titleLabel, BorderLayout.NORTH);
@@ -219,10 +238,18 @@ public class LayoutOperatore extends LayoutStandard {
         salvaButton.addActionListener(e -> {
             try {
                 // Recupera i valori dai campi di input
+
+                ArrayList<String> valori = new ArrayList<String>();
+                ArrayList<String> commenti = new ArrayList<String>();
+                ArrayList<Integer> punteggi = new ArrayList<Integer>();
+
                 for (int i = 0; i < fields.length; i++) {
-                    String valore = fieldInputs[i].getText();  // Valore del parametro (ad esempio, wind, humidity, etc.)
-                    String commento = commentInputs[i].getText().isEmpty() ? null : commentInputs[i].getText();  // Commento (opzionale)
-                    int punteggio = (int) scoreDropdowns[i].getSelectedItem();  // Punteggio selezionato
+                    valori.add(fieldInputs[i].getText());
+                    commenti.add(commentInputs[i].getText().isEmpty() ? null : commentInputs[i].getText());
+                    punteggi.add((int) scoreDropdowns[i].getSelectedItem());
+
+
+                    String valore = fieldInputs[i].getText();
 
                     // Verifica che il valore non sia vuoto
                     if (valore.isEmpty()) {
@@ -231,12 +258,13 @@ public class LayoutOperatore extends LayoutStandard {
                     }
 
                     // Chiamata al metodo salvaDatiClimatici per ogni parametro
-                    boolean successo = db.salvaDatiClimatici(fields[i], valore, commento, punteggio, username, System.currentTimeMillis());
 
-                    if (!successo) {
-                        JOptionPane.showMessageDialog(parametroFrame, "Errore nel salvataggio dei dati.");
-                        return;
-                    }
+                }
+                boolean successo = db.salvaDatiClimatici(fields, valori, commenti, punteggi, username, System.currentTimeMillis(),citta,centro);
+
+                if (!successo) {
+                    JOptionPane.showMessageDialog(parametroFrame, "Errore nel salvataggio dei dati.");
+                    return;
                 }
 
                 // Conferma che i dati sono stati salvati con successo

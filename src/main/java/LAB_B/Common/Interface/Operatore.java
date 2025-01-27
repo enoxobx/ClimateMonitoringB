@@ -2,10 +2,11 @@ package LAB_B.Common.Interface;
 
 import LAB_B.Database.QueryExecutorImpl;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.regex.Pattern;
 
-public class Operatore {
+public class Operatore implements Serializable {
 
     private final String nome;
     private final String cognome;

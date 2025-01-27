@@ -5,6 +5,7 @@ import LAB_B.Common.Interface.*;
 
 import org.jfree.data.category.DefaultCategoryDataset;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -143,11 +144,11 @@ public class DatabaseImpl extends UnicastRemoteObject implements Database {
     }
 
     @Override
-    public boolean salvaDatiClimatici(String parametro, String valore, String commento, int punteggio, String username, long timestamp) throws Exception {
+    public boolean salvaDatiClimatici(String[] parametri, ArrayList<String> valori, ArrayList<String> commenti, ArrayList<Integer> punteggi, String username, long timestamp, Coordinate citta, String centro) throws Exception {
         if (queryExecutorImpl == null) {
             queryExecutorImpl = new QueryExecutorImpl();
         }
-        return queryExecutorImpl.salvaDatiClimatici(parametro, valore, commento, punteggio, username, timestamp);
+        return queryExecutorImpl.salvaDatiClimatici(parametri, valori, commenti, punteggi, username, timestamp,citta,centro);
     }
 
 
