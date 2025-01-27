@@ -520,17 +520,15 @@ public class QueryExecutorImpl {
             var geoname = new BigInteger(city.getCitta().getGeoname());
             try (ResultSet rs = Tools.setParametri(stmt, geoname).executeQuery()) {
                 String parametro = type.getName();
+                int i=0;
                 while (rs.next()) {
                     var value = rs.getString(parametro);
                     var category = rs.getDate("date_r");
 
-                    //TODO da cambiare quando Golden implementa la sua parte
-                    String velocitaNumericaStringa = value.replace(" km/h", "");
-                    int velocita = Integer.parseInt(velocitaNumericaStringa);
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
 
-                    dataSet.addValue(velocita, city.getCitta().toString(), dateFormat.format(category));
+                    dataSet.addValue(Double.parseDouble(value), city.getCitta().toString(), dateFormat.format(category)+"_"+ i++);
                 }
                 //dataSet.getColumnKeys().stream().forEach(System.out::println);
             } catch (Exception e) {
